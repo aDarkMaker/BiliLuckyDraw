@@ -1,22 +1,19 @@
 <script lang="ts" setup>
-import HelloWorld from './components/HelloWorld.vue';
+import { ref } from 'vue';
+import DanmakuView from './components/DanmakuView.vue';
+import Settings from './components/settings.vue';
+
+const tab = ref<'danmaku' | 'settings'>('danmaku');
 </script>
 
 <template>
-    <img id="logo" alt="Wails logo" src="./assets/images/logo-universal.png" />
-    <HelloWorld />
-</template>
+    <div style="padding: 16px">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px">
+            <button @click="tab = 'danmaku'">弹幕</button>
+            <button @click="tab = 'settings'">设置</button>
+        </div>
 
-<style>
-#logo {
-    display: block;
-    width: 50%;
-    height: 50%;
-    margin: auto;
-    padding: 10% 0 0;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-origin: content-box;
-}
-</style>
+        <DanmakuView v-if="tab === 'danmaku'" />
+        <Settings v-else />
+    </div>
+</template>

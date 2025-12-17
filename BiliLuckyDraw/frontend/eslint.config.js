@@ -21,11 +21,21 @@ export default [
                 ecmaVersion: 'latest',
                 sourceType: 'module',
             },
+            globals: {
+                window: 'readonly',
+                document: 'readonly',
+                localStorage: 'readonly',
+                alert: 'readonly',
+            },
         },
         rules: {
             'vue/multi-word-component-names': 'off',
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-empty-object-type': 'off',
+            'vue/html-indent': 'off',
+            'vue/max-attributes-per-line': 'off',
+            'vue/html-self-closing': 'off',
+            'vue/singleline-html-element-content-newline': 'off',
         },
     },
 ];
