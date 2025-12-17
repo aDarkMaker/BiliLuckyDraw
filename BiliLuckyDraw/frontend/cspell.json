@@ -1,0 +1,10 @@
+{
+    "version": "0.2",
+    "language": "en,zh",
+    "ignorePaths": ["node_modules/**", "dist/**", "wailsjs/**", "bun.lock", "*.min.*"],
+    "dictionaryDefinitions": [
+        { "name": "project-words", "path": "./cspell-words.txt", "addWords": true }
+    ],
+    "dictionaries": ["project-words"],
+    "words": ["wails", "vite", "vue", "typescript", "tsconfig"]
+}
