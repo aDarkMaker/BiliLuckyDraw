@@ -1,0 +1,48 @@
+# ========== macOS ==========
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ========== Editor / IDE ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========== Logs ==========
+*.log
+
+# ========== Go ==========
+# binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# build/cache
+/bin/
+/dist/
+*.coverprofile
+coverage.out
+
+# ========== Wails (project nested at BiliLuckyDraw/) ==========
+# Wails build outputs (keep build assets like appicon.png, darwin/windows templates)
+BiliLuckyDraw/build/bin/
+BiliLuckyDraw/build/*.log
+
+# ========== Frontend (Vue + Vite) ==========
+BiliLuckyDraw/frontend/node_modules/
+BiliLuckyDraw/frontend/dist/
+BiliLuckyDraw/frontend/.vite/
+BiliLuckyDraw/frontend/.cache/
+BiliLuckyDraw/frontend/npm-debug.log*
+BiliLuckyDraw/frontend/yarn-debug.log*
+BiliLuckyDraw/frontend/yarn-error.log*
+BiliLuckyDraw/frontend/pnpm-debug.log*
+
+# ========== Env ==========
+.env
+.env.*
+!.env.example
