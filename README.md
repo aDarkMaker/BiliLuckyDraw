@@ -1,0 +1,3 @@
+# BiliLuckyDraw
+
+预计会在拜年祭投入使用的bilibili抽奖机
