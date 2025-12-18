@@ -14,20 +14,22 @@ import (
 	"luckydraw/internal/bili"
 	"luckydraw/internal/check"
 	"luckydraw/internal/config"
+	"luckydraw/internal/live"
 	"luckydraw/internal/login"
 	"luckydraw/internal/lottery"
 )
 
 type App struct {
-	ctx        context.Context
-	client     *bili.Client
-	config     *config.Config
-	myUID      int64
-	myName     string
-	configPath string
-	mu         sync.Mutex
-	running    bool
-	stopChan   chan struct{}
+	ctx         context.Context
+	client      *bili.Client
+	config      *config.Config
+	myUID       int64
+	myName      string
+	configPath  string
+	mu          sync.Mutex
+	running     bool
+	stopChan    chan struct{}
+	liveLottery *live.LiveLottery
 }
 
 func NewApp() *App {
@@ -35,11 +37,37 @@ func NewApp() *App {
 	configPath := filepath.Join(home, ".luckydraw", "config.json")
 	cfg, _ := config.LoadConfig(configPath)
 
-	return &App{
+	app := &App{
 		config:     cfg,
 		configPath: configPath,
 		stopChan:   make(chan struct{}),
 	}
+
+	if cfg.Cookie != "" {
+		app.autoLogin(cfg.Cookie)
+	}
+
+	return app
+}
+
+func (a *App) autoLogin(cookie string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	if cookie == "" {
+		return
+	}
+
+	a.client = bili.NewClient(cookie)
+	info, err := a.client.GetMyInfo()
+	if err != nil {
+		a.config.Cookie = ""
+		config.SaveConfig(a.configPath, a.config)
+		return
+	}
+
+	a.myUID = info.Mid
+	a.myName = info.Name
 }
 
 func (a *App) startup(ctx context.Context) {
@@ -62,6 +90,9 @@ func (a *App) Login(cookie string) (string, error) {
 
 	a.myUID = info.Mid
 	a.myName = info.Name
+
+	a.config.Cookie = cookie
+	config.SaveConfig(a.configPath, a.config)
 
 	return fmt.Sprintf("登录成功: %s (UID: %d)", info.Name, info.Mid), nil
 }
@@ -96,7 +127,6 @@ func (a *App) CheckQRCodeStatus(qrcodeKey string) (string, error) {
 	}
 
 	data, _ := json.Marshal(result)
-	fmt.Printf("[DEBUG] 二维码状态: %s\n", string(data))
 	return string(data), nil
 }
 
@@ -104,8 +134,6 @@ func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 	if loginURL == "" {
 		return "", fmt.Errorf("登录URL为空")
 	}
-
-	fmt.Printf("[DEBUG] 登录URL: %s\n", loginURL)
 
 	parsedURL, err := url.Parse(loginURL)
 	if err != nil {
@@ -124,15 +152,10 @@ func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 	}
 
 	if len(cookieParts) < 4 {
-		return "", fmt.Errorf("Cookie信息不完整，只获取到 %d 个参数", len(cookieParts))
+		return "", fmt.Errorf("cookie信息不完整，只获取到 %d 个参数", len(cookieParts))
 	}
 
 	cookieStr := strings.Join(cookieParts, "; ")
-	if len(cookieStr) > 80 {
-		fmt.Printf("[DEBUG] 提取到的Cookie (前80字符): %s...\n", cookieStr[:80])
-	} else {
-		fmt.Printf("[DEBUG] 提取到的Cookie: %s\n", cookieStr)
-	}
 
 	a.mu.Lock()
 	a.client = bili.NewClient(cookieStr)
@@ -144,9 +167,18 @@ func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 
 	a.myUID = info.Mid
 	a.myName = info.Name
+
+	a.config.Cookie = cookieStr
+	config.SaveConfig(a.configPath, a.config)
 	a.mu.Unlock()
 
 	return fmt.Sprintf("登录成功: %s (UID: %d)", info.Name, info.Mid), nil
+}
+
+func (a *App) IsLoggedIn() bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.client != nil && a.myUID > 0
 }
 
 func (a *App) GetAccountInfo() (string, error) {
