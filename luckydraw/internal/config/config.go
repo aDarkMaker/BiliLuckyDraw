@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	Cookie               string          `json:"cookie,omitempty"`
 	UIDs                 []int64         `json:"uids"`
 	Tags                 []string        `json:"tags"`
 	Articles             []string        `json:"articles"`

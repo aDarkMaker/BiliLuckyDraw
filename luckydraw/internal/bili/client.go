@@ -25,6 +25,10 @@ func NewClient(cookie string) *Client {
 	}
 }
 
+func (c *Client) GetCookie() string {
+	return c.cookie
+}
+
 func extractCSRF(cookie string) string {
 	parts := strings.Split(cookie, ";")
 	for _, part := range parts {
@@ -169,7 +173,7 @@ func (c *Client) GetMyAtInfo() ([]AtInfo, error) {
 				User struct {
 					Nickname string `json:"nickname"`
 				} `json:"user"`
-			} `items"`
+			} `json:"items"`
 		} `json:"data"`
 	}
 

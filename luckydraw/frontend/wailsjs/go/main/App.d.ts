@@ -5,11 +5,21 @@ export function CheckPrize():Promise<string>;
 
 export function CheckQRCodeStatus(arg1:string):Promise<string>;
 
+export function ConnectLiveRoom(arg1:number):Promise<void>;
+
+export function DrawWinners(arg1:number):Promise<string>;
+
 export function GetAccountInfo():Promise<string>;
 
 export function GetConfig():Promise<string>;
 
+export function GetParticipantCount():Promise<number>;
+
 export function GetQRCode():Promise<string>;
+
+export function IsLiveLotteryRunning():Promise<boolean>;
+
+export function IsLoggedIn():Promise<boolean>;
 
 export function IsRunning():Promise<boolean>;
 
@@ -19,6 +29,10 @@ export function LoginWithQRCode(arg1:string):Promise<string>;
 
 export function SaveConfig(arg1:string):Promise<void>;
 
+export function StartLiveLottery(arg1:string):Promise<void>;
+
 export function StartLottery():Promise<string>;
+
+export function StopLiveLottery():Promise<void>;
 
 export function StopLottery():Promise<void>;

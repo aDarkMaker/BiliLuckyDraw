@@ -10,6 +10,14 @@ export function CheckQRCodeStatus(arg1) {
   return window['go']['main']['App']['CheckQRCodeStatus'](arg1);
 }
 
+export function ConnectLiveRoom(arg1) {
+  return window['go']['main']['App']['ConnectLiveRoom'](arg1);
+}
+
+export function DrawWinners(arg1) {
+  return window['go']['main']['App']['DrawWinners'](arg1);
+}
+
 export function GetAccountInfo() {
   return window['go']['main']['App']['GetAccountInfo']();
 }
@@ -18,8 +26,20 @@ export function GetConfig() {
   return window['go']['main']['App']['GetConfig']();
 }
 
+export function GetParticipantCount() {
+  return window['go']['main']['App']['GetParticipantCount']();
+}
+
 export function GetQRCode() {
   return window['go']['main']['App']['GetQRCode']();
+}
+
+export function IsLiveLotteryRunning() {
+  return window['go']['main']['App']['IsLiveLotteryRunning']();
+}
+
+export function IsLoggedIn() {
+  return window['go']['main']['App']['IsLoggedIn']();
 }
 
 export function IsRunning() {
@@ -38,8 +58,16 @@ export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
 }
 
+export function StartLiveLottery(arg1) {
+  return window['go']['main']['App']['StartLiveLottery'](arg1);
+}
+
 export function StartLottery() {
   return window['go']['main']['App']['StartLottery']();
+}
+
+export function StopLiveLottery() {
+  return window['go']['main']['App']['StopLiveLottery']();
 }
 
 export function StopLottery() {
