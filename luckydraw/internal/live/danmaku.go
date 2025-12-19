@@ -16,6 +16,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var httpClient = &http.Client{
+	Timeout: 15 * time.Second,
+	Transport: &http.Transport{
+		DisableKeepAlives:   true,
+		MaxIdleConns:        0,
+		MaxIdleConnsPerHost: 0,
+		IdleConnTimeout:     0,
+	},
+}
+
 const (
 	PacketHeaderLength    = 16
 	ProtocolVersion       = 1
@@ -174,11 +184,16 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 		req1.Header.Set("Cookie", c.cookie)
 	}
 
-	resp, err := http.DefaultClient.Do(req1)
+	resp, err := httpClient.Do(req1)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		io.Copy(io.Discard, resp.Body)
+		return nil, fmt.Errorf("获取房间信息失败: HTTP %d", resp.StatusCode)
+	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -213,18 +228,22 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 			if c.cookie != "" {
 				reqMobile.Header.Set("Cookie", c.cookie)
 			}
-			respMobile, err := http.DefaultClient.Do(reqMobile)
+			respMobile, err := httpClient.Do(reqMobile)
 			if err == nil {
 				defer respMobile.Body.Close()
-				bodyMobile, _ := io.ReadAll(respMobile.Body)
-				var mobileResult struct {
-					Code int `json:"code"`
-					Data struct {
-						RoomID int `json:"room_id"`
-					} `json:"data"`
-				}
-				if json.Unmarshal(bodyMobile, &mobileResult) == nil && mobileResult.Code == 0 && mobileResult.Data.RoomID > 0 {
-					realRoomID = mobileResult.Data.RoomID
+				if respMobile.StatusCode == http.StatusOK {
+					bodyMobile, _ := io.ReadAll(respMobile.Body)
+					var mobileResult struct {
+						Code int `json:"code"`
+						Data struct {
+							RoomID int `json:"room_id"`
+						} `json:"data"`
+					}
+					if json.Unmarshal(bodyMobile, &mobileResult) == nil && mobileResult.Code == 0 && mobileResult.Data.RoomID > 0 {
+						realRoomID = mobileResult.Data.RoomID
+					}
+				} else {
+					io.Copy(io.Discard, respMobile.Body)
 				}
 			}
 		}
@@ -265,11 +284,16 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 			req2.Header.Set("X-Requested-With", "XMLHttpRequest")
 		}
 
-		resp2, err := http.DefaultClient.Do(req2)
+		resp2, err := httpClient.Do(req2)
 		if err != nil {
 			continue
 		}
 		defer resp2.Body.Close()
+
+		if resp2.StatusCode != http.StatusOK {
+			io.Copy(io.Discard, resp2.Body)
+			continue
+		}
 
 		body2, err := io.ReadAll(resp2.Body)
 		if err != nil {
