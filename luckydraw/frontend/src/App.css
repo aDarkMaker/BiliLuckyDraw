@@ -1,11 +1,26 @@
+@font-face {
+  font-family: 'Fanpaixiaogouriji';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./assets/fonts/Fanpaixiaogouriji-Regular-2.ttf') format('truetype');
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Fanpaixiaogouriji', inherit;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: 'Fanpaixiaogouriji', inherit;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Fanpaixiaogouriji', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -103,7 +118,7 @@ h3 {
   border-radius: 4px;
   font-size: 14px;
   transition: border-color 0.2s;
-  font-family: inherit;
+  font-family: 'Fanpaixiaogouriji', inherit;
 }
 
 .input:focus {
@@ -125,6 +140,7 @@ h3 {
   transition: opacity 0.2s;
   background: #00a1d6;
   color: white;
+  font-family: 'Fanpaixiaogouriji', inherit;
 }
 
 .btn:hover:not(:disabled) {
