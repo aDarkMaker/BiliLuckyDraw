@@ -19,10 +19,14 @@ import (
 var httpClient = &http.Client{
 	Timeout: 15 * time.Second,
 	Transport: &http.Transport{
-		DisableKeepAlives:   true,
-		MaxIdleConns:        0,
-		MaxIdleConnsPerHost: 0,
-		IdleConnTimeout:     0,
+		DisableKeepAlives:     true,
+		MaxIdleConns:          0,
+		MaxIdleConnsPerHost:   0,
+		IdleConnTimeout:       0,
+		DisableCompression:    false,
+		ResponseHeaderTimeout: 10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		ForceAttemptHTTP2:     false,
 	},
 }
 
@@ -180,6 +184,7 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 	req1.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
 	req1.Header.Set("Referer", "https://live.bilibili.com/")
 	req1.Header.Set("Origin", "https://live.bilibili.com")
+	req1.Header.Set("Connection", "close")
 	if c.cookie != "" {
 		req1.Header.Set("Cookie", c.cookie)
 	}
@@ -225,6 +230,7 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 		if err == nil {
 			reqMobile.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 			reqMobile.Header.Set("Accept", "application/json, text/plain, */*")
+			reqMobile.Header.Set("Connection", "close")
 			if c.cookie != "" {
 				reqMobile.Header.Set("Cookie", c.cookie)
 			}
@@ -272,6 +278,7 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 		req2.Header.Set("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
 		req2.Header.Set("Referer", fmt.Sprintf("https://live.bilibili.com/%d", realRoomID))
 		req2.Header.Set("Origin", "https://live.bilibili.com")
+		req2.Header.Set("Connection", "close")
 		req2.Header.Set("Sec-Fetch-Dest", "empty")
 		req2.Header.Set("Sec-Fetch-Mode", "cors")
 		req2.Header.Set("Sec-Fetch-Site", "same-site")

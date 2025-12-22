@@ -1,0 +1,148 @@
+@import '../styles/variables.css';
+
+.settings-view {
+	width: 100%;
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 100px 24px 60px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	box-sizing: border-box;
+	animation: fadeIn 0.4s ease-out;
+	overflow: hidden !important;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.settings-card {
+	background: rgba(255, 255, 255, 0.7);
+	backdrop-filter: blur(4px);
+	border-radius: 16px;
+	padding: 24px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.settings-title {
+	font-size: 18px;
+	color: var(--color-text);
+	margin-bottom: 20px;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.settings-title::before {
+	content: '';
+	display: inline-block;
+	width: 4px;
+	height: 18px;
+	background: var(--color-primary);
+	border-radius: 2px;
+}
+
+/* 账号部分重构 */
+.account-section {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	background: rgba(0, 161, 214, 0.05);
+	border-radius: 12px;
+}
+
+.account-main {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.account-avatar {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid white;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-info {
+	display: flex;
+	flex-direction: column;
+}
+
+.account-name {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+.account-uid {
+	font-size: 12px;
+	color: var(--color-text-secondary);
+	font-family: var(--font-family);
+}
+
+/* 房间列表部分 */
+.room-input-group {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.room-input-group .input {
+	flex: 1;
+	height: 42px;
+}
+
+.rooms-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.room-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	background: #fcfcfc;
+	border-radius: 10px;
+	border: 1px solid #f0f0f0;
+}
+
+.room-item span {
+	font-size: 14px;
+	color: var(--color-text);
+	font-weight: 500;
+}
+
+.empty-hint {
+	text-align: center;
+	color: var(--color-text-tertiary);
+	padding: 20px;
+	font-size: 13px;
+	background: #fafafa;
+	border-radius: 10px;
+	border: 1px dashed #e0e0e0;
+}
+
+.file-input-label {
+	display: inline-block;
+	margin-right: 12px;
+}
+
+.file-input {
+	display: none;
+}

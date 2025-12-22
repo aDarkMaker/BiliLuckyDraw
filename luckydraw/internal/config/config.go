@@ -8,6 +8,8 @@ import (
 
 type Config struct {
 	Cookie               string          `json:"cookie,omitempty"`
+	BackgroundImage      string          `json:"background_image,omitempty"`
+	WatchedRooms         []int           `json:"watched_rooms,omitempty"`
 	UIDs                 []int64         `json:"uids"`
 	Tags                 []string        `json:"tags"`
 	Articles             []string        `json:"articles"`

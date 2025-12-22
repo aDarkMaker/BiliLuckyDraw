@@ -194,6 +194,7 @@ func (a *App) GetAccountInfo() (string, error) {
 	result := map[string]interface{}{
 		"name": info.Name,
 		"uid":  info.Mid,
+		"face": info.Face,
 	}
 
 	data, _ := json.Marshal(result)
@@ -310,4 +311,75 @@ func (a *App) IsRunning() bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	return a.running
+}
+
+func (a *App) SetBackgroundImage(imagePath string) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	a.config.BackgroundImage = imagePath
+	return config.SaveConfig(a.configPath, a.config)
+}
+
+func (a *App) GetBackgroundImage() string {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.config.BackgroundImage
+}
+
+func (a *App) AddWatchedRoom(roomID int) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	for _, id := range a.config.WatchedRooms {
+		if id == roomID {
+			return fmt.Errorf("房间 %d 已在监听列表中", roomID)
+		}
+	}
+
+	a.config.WatchedRooms = append(a.config.WatchedRooms, roomID)
+	return config.SaveConfig(a.configPath, a.config)
+}
+
+func (a *App) RemoveWatchedRoom(roomID int) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	var newRooms []int
+	for _, id := range a.config.WatchedRooms {
+		if id != roomID {
+			newRooms = append(newRooms, id)
+		}
+	}
+
+	a.config.WatchedRooms = newRooms
+	return config.SaveConfig(a.configPath, a.config)
+}
+
+func (a *App) GetWatchedRooms() (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	data, err := json.Marshal(a.config.WatchedRooms)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func (a *App) Logout() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	a.client = nil
+	a.myUID = 0
+	a.myName = ""
+	a.config.Cookie = ""
+
+	if a.liveLottery != nil {
+		a.liveLottery.Stop()
+		a.liveLottery = nil
+	}
+
+	return config.SaveConfig(a.configPath, a.config)
 }

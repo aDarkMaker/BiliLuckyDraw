@@ -124,6 +124,7 @@ func (c *Client) GetMyInfo() (*UserInfo, error) {
 type UserInfo struct {
 	Mid  int64  `json:"mid"`
 	Name string `json:"name"`
+	Face string `json:"face"`
 }
 
 func (c *Client) GetUnreadNum() (*UnreadInfo, error) {
