@@ -7,7 +7,7 @@ export function CheckPrize():Promise<string>;
 
 export function CheckQRCodeStatus(arg1:string):Promise<string>;
 
-export function ConnectLiveRoom(arg1:number):Promise<void>;
+export function ConnectLiveRooms(arg1:Array<number>):Promise<void>;
 
 export function DrawWinners(arg1:number):Promise<string>;
 

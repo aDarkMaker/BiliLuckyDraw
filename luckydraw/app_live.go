@@ -7,7 +7,7 @@ import (
 	"luckydraw/internal/live"
 )
 
-func (a *App) ConnectLiveRoom(roomID int) error {
+func (a *App) ConnectLiveRooms(roomIDs []int) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -20,7 +20,7 @@ func (a *App) ConnectLiveRoom(roomID int) error {
 	}
 
 	cookie := a.client.GetCookie()
-	a.liveLottery = live.NewLiveLottery(roomID, cookie)
+	a.liveLottery = live.NewLiveLottery(roomIDs, cookie)
 	return nil
 }
 

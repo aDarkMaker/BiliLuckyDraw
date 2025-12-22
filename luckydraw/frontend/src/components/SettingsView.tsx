@@ -34,9 +34,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 				try {
 					await SetBackgroundImage(dataUrl);
 					onBackgroundImageChange(dataUrl);
-					onMessage('背景图片已设置');
+					onMessage('Background image set');
 				} catch (e: any) {
-					onMessage('设置背景失败: ' + e.message);
+					onMessage('Failed to set background: ' + e.message);
 				}
 			};
 			reader.readAsDataURL(file);
@@ -46,7 +46,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	const handleAddRoom = async () => {
 		const id = parseInt(newRoomID);
 		if (isNaN(id)) {
-			onMessage('请输入有效的房间号');
+			onMessage('Please enter a valid room ID');
 			return;
 		}
 
@@ -54,9 +54,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 			await AddWatchedRoom(id);
 			onWatchedRoomsChange();
 			setNewRoomID('');
-			onMessage(`已添加房间 ${id}`);
+			onMessage(`Added room ${id}`);
 		} catch (e: any) {
-			onMessage('添加失败: ' + e.message);
+			onMessage('Failed to add: ' + e.message);
 		}
 	};
 
@@ -64,26 +64,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 		try {
 			await RemoveWatchedRoom(roomID);
 			onWatchedRoomsChange();
-			onMessage(`已移除房间 ${roomID}`);
+			onMessage(`Removed room ${roomID}`);
 		} catch (e: any) {
-			onMessage('移除失败: ' + e.message);
+			onMessage('Failed to remove: ' + e.message);
 		}
 	};
 
 	return (
 		<div className="settings-view">
-			<div className="settings-card">
+			<div className="settings-view-content">
+				<div className="settings-card">
 				<h2 className="settings-title">账号信息</h2>
 				<div className="account-section">
 					<div className="account-main">
 						<img
 							src={accountInfo?.face || "https://i0.hdslb.com/bfs/face/member/noface.jpg"}
-							alt="头像"
+							alt="Avatar"
 							className="account-avatar"
 						/>
 						<div className="account-info">
 							<div className="account-name">
-								{accountInfo?.name || "加载中..."}
+								{accountInfo?.name || "Loading..."}
 							</div>
 							<div className="account-uid">UID: {accountInfo?.uid || "--"}</div>
 						</div>
@@ -96,28 +97,36 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
 			<div className="settings-card">
 				<h2 className="settings-title">背景图片</h2>
-				<label className="file-input-label">
-					<input type="file" accept="image/*" onChange={handleBackgroundImageChange} className="file-input" />
-					<span className="btn btn-secondary">选择图片</span>
-				</label>
 				{backgroundImage && (
-					<Button
-						variant="text"
-						onClick={async () => {
-							await SetBackgroundImage('');
-							onBackgroundImageChange('');
-							onMessage('已清除背景图片');
-						}}
-					>
-						清除背景
-					</Button>
+					<div className="background-preview">
+						<img src={backgroundImage} alt="Background preview" className="background-preview-image" />
+					</div>
 				)}
+				<div className="background-actions">
+					<label className="file-input-label">
+						<input type="file" accept="image/*" onChange={handleBackgroundImageChange} className="file-input" />
+						<span className="btn btn-secondary btn-small">选择图片</span>
+					</label>
+					{backgroundImage && (
+						<Button
+							variant="text"
+							size="small"
+							onClick={async () => {
+								await SetBackgroundImage('');
+								onBackgroundImageChange('');
+								onMessage('Background image cleared');
+							}}
+						>
+							清除背景
+						</Button>
+					)}
+				</div>
 			</div>
 
 			<div className="settings-card">
 				<h2 className="settings-title">监听直播间</h2>
 				<div className="room-input-group">
-					<Input type="text" placeholder="输入房间号" value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
+					<Input type="text" placeholder="Room ID" value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
 					<Button variant="primary" onClick={handleAddRoom}>
 						添加
 					</Button>
@@ -133,6 +142,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 					))}
 					{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">暂无监听的直播间</p>}
 				</div>
+			</div>
 			</div>
 		</div>
 	);

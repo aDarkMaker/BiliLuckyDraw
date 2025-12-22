@@ -78,6 +78,8 @@ func (a *App) Login(cookie string) (string, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
+	cookie = strings.TrimSpace(cookie)
+
 	if cookie == "" {
 		return "", fmt.Errorf("cookie不能为空")
 	}

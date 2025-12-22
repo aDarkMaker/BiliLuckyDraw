@@ -6,7 +6,23 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 100px var(--spacing-lg) var(--spacing-lg);
+	padding: 80px var(--spacing-lg) var(--spacing-lg);
+}
+
+.lottery-view-content {
+	animation: viewFadeIn 0.4s ease-out both;
+	will-change: opacity, transform;
+}
+
+@keyframes viewFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .lottery-main {
@@ -16,56 +32,29 @@
 }
 
 .btn-lottery {
-	padding: var(--spacing-lg) 50px;
-	font-size: 20px;
+	padding: 16px 48px;
+	font-size: 18px;
 	font-weight: 600;
 	border-radius: var(--radius-full);
-	background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+	background: var(--color-primary);
 	color: white;
-	box-shadow: var(--shadow-primary);
-	transition: var(--transition-slow);
+	box-shadow: none;
+	transition: var(--transition);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .btn-lottery:hover:not(:disabled) {
-	background: linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary-dark) 100%);
+	background: var(--color-primary-hover);
 }
 
 .btn-lottery.btn-running {
-	background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-hover) 100%);
-	animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-	0%,
-	100% {
-		box-shadow: var(--shadow-success);
-	}
-	50% {
-		box-shadow: 0 8px 32px rgba(82, 196, 26, 0.5);
-	}
-}
-
-.status-dot {
-	width: 10px;
-	height: 10px;
-	background: white;
-	border-radius: 50%;
-	display: inline-block;
-	animation: blink 1.5s ease-in-out infinite;
-}
-
-@keyframes blink {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.3;
-	}
+	background: var(--color-success);
 }
 
 .lottery-hint {
-	margin-top: var(--spacing-md);
+	margin-top: 15px;
 	color: var(--color-text-secondary);
-	font-size: 14px;
+	font-size: 13px;
 }

@@ -3,7 +3,7 @@
 .app-container {
 	width: 100vw;
 	height: 100vh;
-	background-color: var(--color-bg);
+	background-color: #fcfcfc;
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -16,14 +16,21 @@
 	height: 100%;
 	position: relative;
 	z-index: 1;
-	overflow: hidden; /* 禁止内容滑动 */
-	background-color: var(--color-bg);
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	background-color: #ffffff;
+}
+
+.app-content::-webkit-scrollbar {
+	display: none;
 }
 
 .app-container.has-bg .app-content {
-	backdrop-filter: blur(4px);
-	-webkit-backdrop-filter: blur(4px);
-	background-color: rgba(255, 255, 255, 0.25); /* 进一步降低白色遮盖感 */
+	backdrop-filter: blur(2px);
+	-webkit-backdrop-filter: blur(2px);
+	background-color: rgba(255, 255, 255, 0.15);
 }
 
 .top-bar {
@@ -31,19 +38,19 @@
 	top: 0;
 	left: 0;
 	right: 0;
-	padding: var(--spacing-md) var(--spacing-lg);
+	padding: 12px 24px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: var(--color-bg-blur);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
-	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	background-color: rgba(255, 255, 255, 0.8);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 	z-index: 100;
 }
 
 .lottery-controls {
 	display: flex;
-	gap: var(--spacing-sm);
+	gap: 10px;
 	align-items: center;
 }

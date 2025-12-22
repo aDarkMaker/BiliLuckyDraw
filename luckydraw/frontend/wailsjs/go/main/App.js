@@ -14,8 +14,8 @@ export function CheckQRCodeStatus(arg1) {
   return window['go']['main']['App']['CheckQRCodeStatus'](arg1);
 }
 
-export function ConnectLiveRoom(arg1) {
-  return window['go']['main']['App']['ConnectLiveRoom'](arg1);
+export function ConnectLiveRooms(arg1) {
+  return window['go']['main']['App']['ConnectLiveRooms'](arg1);
 }
 
 export function DrawWinners(arg1) {

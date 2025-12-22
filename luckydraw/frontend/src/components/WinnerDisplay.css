@@ -1,16 +1,16 @@
 @import '../styles/variables.css';
 
 .winners-display {
-	background: var(--color-bg-overlay);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border-radius: var(--radius-xl);
-	padding: var(--spacing-xxl);
-	box-shadow: var(--shadow-lg);
+	background: white;
+	border-radius: var(--radius-md);
+	padding: var(--spacing-xl);
+	box-shadow: var(--shadow-md);
+	margin: 0 auto;
+	width: 100%;
 }
 
 .winners-title {
-	font-size: 28px;
+	font-size: 24px;
 	color: var(--color-text);
 	margin-bottom: var(--spacing-xl);
 	font-weight: 600;
@@ -19,57 +19,43 @@
 .winners-list {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-md);
+	gap: 12px;
 	margin-bottom: var(--spacing-xl);
 }
 
 .winner-card {
 	display: flex;
 	align-items: center;
-	gap: var(--spacing-lg);
-	padding: var(--spacing-lg);
-	background: linear-gradient(135deg, rgba(0, 161, 214, 0.1) 0%, rgba(0, 144, 192, 0.1) 100%);
-	border-radius: var(--radius-md);
-	border-left: 4px solid var(--color-primary);
-	transition: var(--transition-slow);
-}
-
-.winner-card:hover {
-	transform: translateX(5px);
-	box-shadow: 0 4px 12px rgba(0, 161, 214, 0.2);
+	gap: 15px;
+	padding: 12px 20px;
+	background: #fcfcfc;
+	border-radius: var(--radius-sm);
+	border: 1px solid #f0f0f0;
 }
 
 .winner-rank {
-	font-size: 24px;
+	font-size: 20px;
 	font-weight: bold;
 	color: var(--color-primary);
-	min-width: 50px;
-	text-align: center;
+	min-width: 40px;
 }
 
 .winner-info {
 	flex: 1;
-	text-align: left;
+	text-align: middle;
 }
 
 .winner-name {
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: 600;
 	color: var(--color-text);
-	margin-bottom: var(--spacing-xs);
 }
 
 .winner-uid {
-	font-size: 14px;
+	font-size: 12px;
 	color: var(--color-text-tertiary);
 }
 
 .btn-reset {
-	padding: 12px 30px;
-	background: #f0f0f0;
-	color: var(--color-text);
-}
-
-.btn-reset:hover {
-	background: #e0e0e0;
+	padding: 10px 24px;
 }

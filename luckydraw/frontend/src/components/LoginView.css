@@ -10,19 +10,17 @@
 }
 
 .login-card {
-	background: var(--color-bg-overlay);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border-radius: var(--radius-xl);
+	background: white;
+	border-radius: var(--radius-md);
 	padding: var(--spacing-xxl);
-	box-shadow: var(--shadow-lg);
-	max-width: 400px;
+	box-shadow: var(--shadow-md);
+	max-width: 360px;
 	width: 100%;
 	text-align: center;
 }
 
 .login-title {
-	font-size: 24px;
+	font-size: 22px;
 	color: var(--color-text);
 	margin-bottom: var(--spacing-xl);
 	font-weight: 600;
@@ -31,15 +29,15 @@
 .login-actions {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-md);
+	gap: 15px;
 }
 
 .login-divider {
 	display: flex;
 	align-items: center;
-	gap: var(--spacing-sm);
+	gap: 10px;
 	color: var(--color-text-tertiary);
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .login-divider::before,
@@ -47,20 +45,20 @@
 	content: '';
 	flex: 1;
 	height: 1px;
-	background: var(--color-border);
+	background: #f0f0f0;
 }
 
 .qrcode-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: var(--spacing-lg);
+	gap: 20px;
 }
 
 .qrcode {
-	border: 1px solid var(--color-border);
-	border-radius: var(--radius-sm);
-	padding: var(--spacing-sm);
+	border: 1px solid #f0f0f0;
+	border-radius: 4px;
+	padding: 10px;
 	background: white;
 }
 

@@ -34,6 +34,7 @@ function App() {
 	} = useLottery(watchedRooms);
 
 	const handleLoginSuccess = async () => {
+		setLoggedIn(true);
 		await loadAll();
 		setView('lottery');
 	};
@@ -43,28 +44,19 @@ function App() {
 			await Logout();
 			setLoggedIn(false);
 			setView('lottery');
-			setMessage('已退出登录');
+			onMessage('Logged out');
 		} catch (e: any) {
-			setMessage('退出失败: ' + e.message);
+			onMessage('Logout failed: ' + e.message);
 		}
 	};
 
-	const handleStartLotteryWithMessage = async () => {
-		await handleStartLottery(setMessage);
+	const onMessage = (msg: string) => {
+		setMessage(msg);
 	};
 
-	const bgStyle = backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {};
-
-	if (!loggedIn) {
-		return (
-			<div className="app-container" style={bgStyle}>
-				<div className="app-content">
-					<LoginView onLoginSuccess={handleLoginSuccess} onMessage={setMessage} />
-					<MessageToast message={message} onClose={() => setMessage('')} />
-				</div>
-			</div>
-		);
-	}
+	const handleStartLotteryWithMessage = async () => {
+		await handleStartLottery(onMessage);
+	};
 
 	return (
 		<div
@@ -80,9 +72,25 @@ function App() {
 					lotteryRunning={lotteryRunning}
 					onSettingsToggle={() => setView(view === 'settings' ? 'lottery' : 'settings')}
 					isSettingsOpen={view === 'settings'}
+					loggedIn={loggedIn}
+					userAvatar={accountInfo?.face}
 				/>
 
-				{view === 'lottery' ? (
+				{!loggedIn ? (
+					view === 'settings' ? (
+						<SettingsView
+							accountInfo={accountInfo}
+							backgroundImage={backgroundImage}
+							watchedRooms={watchedRooms}
+							onLogout={handleLogout}
+							onBackgroundImageChange={setBackgroundImage}
+							onWatchedRoomsChange={loadWatchedRooms}
+							onMessage={onMessage}
+						/>
+					) : (
+						<LoginView onLoginSuccess={handleLoginSuccess} onMessage={onMessage} />
+					)
+				) : view === 'lottery' ? (
 					<LotteryView
 						lotteryRunning={lotteryRunning}
 						participantCount={participantCount}
@@ -99,7 +107,7 @@ function App() {
 						onLogout={handleLogout}
 						onBackgroundImageChange={setBackgroundImage}
 						onWatchedRoomsChange={loadWatchedRooms}
-						onMessage={setMessage}
+						onMessage={onMessage}
 					/>
 				)}
 

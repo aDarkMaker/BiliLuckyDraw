@@ -16,7 +16,7 @@ interface WinnerDisplayProps {
 export const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winners, onReset }) => {
 	return (
 		<div className="winners-display">
-			<h2 className="winners-title">🎊 中奖名单</h2>
+			<h2 className="winners-title">恭喜中奖</h2>
 			<div className="winners-list">
 				{winners.map((winner, index) => (
 					<div key={winner.uid} className="winner-card">
@@ -29,7 +29,7 @@ export const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winners, onReset }
 				))}
 			</div>
 			<Button variant="secondary" className="btn-reset" onClick={onReset}>
-				重新开始
+				再来
 			</Button>
 		</div>
 	);

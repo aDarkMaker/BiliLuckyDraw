@@ -10,17 +10,21 @@ import (
 )
 
 type LiveLottery struct {
-	client    *DanmakuClient
+	clients   []*DanmakuClient
 	keyword   string
 	mu        sync.Mutex
 	users     map[int64]*DanmakuUser
 	isRunning bool
 }
 
-func NewLiveLottery(roomID int, cookie string) *LiveLottery {
+func NewLiveLottery(roomIDs []int, cookie string) *LiveLottery {
+	clients := make([]*DanmakuClient, 0, len(roomIDs))
+	for _, roomID := range roomIDs {
+		clients = append(clients, NewDanmakuClient(roomID, cookie))
+	}
 	return &LiveLottery{
-		client: NewDanmakuClient(roomID, cookie),
-		users:  make(map[int64]*DanmakuUser),
+		clients: clients,
+		users:   make(map[int64]*DanmakuUser),
 	}
 }
 
@@ -35,15 +39,15 @@ func (l *LiveLottery) Start(keyword string) error {
 	l.users = make(map[int64]*DanmakuUser)
 	l.mu.Unlock()
 
-	l.client.SetOnMessage(func(msg *DanmakuMessage) {
-		l.handleDanmaku(msg)
-	})
+	for _, client := range l.clients {
+		client.SetOnMessage(func(msg *DanmakuMessage) {
+			l.handleDanmaku(msg)
+		})
 
-	if err := l.client.Connect(); err != nil {
-		l.mu.Lock()
-		l.isRunning = false
-		l.mu.Unlock()
-		return err
+		if err := client.Connect(); err != nil {
+			fmt.Printf("连接直播间 %d 失败: %v\n", client.roomID, err)
+			continue
+		}
 	}
 
 	return nil
@@ -103,7 +107,9 @@ func (l *LiveLottery) Stop() {
 	l.isRunning = false
 	l.mu.Unlock()
 
-	l.client.Close()
+	for _, client := range l.clients {
+		client.Close()
+	}
 }
 
 func (l *LiveLottery) Draw(count int) []*DanmakuUser {
