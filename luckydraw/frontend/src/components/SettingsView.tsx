@@ -4,10 +4,13 @@ import { Input } from './Input';
 import { SetBackgroundImage, AddWatchedRoom, RemoveWatchedRoom } from '../../wailsjs/go/main/App';
 import './SettingsView.css';
 
+import avatarSvg from '../assets/icon/avatar.svg';
+
 interface SettingsViewProps {
 	accountInfo: any;
 	backgroundImage: string;
 	watchedRooms: number[];
+	loggedIn: boolean;
 	onLogout: () => void;
 	onBackgroundImageChange: (image: string) => void;
 	onWatchedRoomsChange: () => void;
@@ -18,6 +21,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	accountInfo,
 	backgroundImage,
 	watchedRooms,
+	loggedIn,
 	onLogout,
 	onBackgroundImageChange,
 	onWatchedRoomsChange,
@@ -78,20 +82,22 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 				<div className="account-section">
 					<div className="account-main">
 						<img
-							src={accountInfo?.face || "https://i0.hdslb.com/bfs/face/member/noface.jpg"}
+							src={loggedIn ? (accountInfo?.face || "https://i0.hdslb.com/bfs/face/member/noface.jpg") : avatarSvg}
 							alt="Avatar"
-							className="account-avatar"
+							className={`account-avatar ${!loggedIn ? 'is-placeholder' : ''}`}
 						/>
 						<div className="account-info">
 							<div className="account-name">
-								{accountInfo?.name || "Loading..."}
+								{loggedIn ? (accountInfo?.name || "Loading...") : "xxxx"}
 							</div>
-							<div className="account-uid">UID: {accountInfo?.uid || "--"}</div>
+							<div className="account-uid">UID: {loggedIn ? (accountInfo?.uid || "--") : "--"}</div>
 						</div>
 					</div>
-					<Button variant="danger" size="small" onClick={onLogout}>
-						退出登录
-					</Button>
+					{loggedIn && (
+						<Button variant="danger" size="small" onClick={onLogout}>
+							退出登录
+						</Button>
+					)}
 				</div>
 			</div>
 

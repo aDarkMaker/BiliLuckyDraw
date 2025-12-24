@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/components.css';
 
 interface MessageToastProps {
@@ -7,11 +7,28 @@ interface MessageToastProps {
 }
 
 export const MessageToast: React.FC<MessageToastProps> = ({ message, onClose }) => {
-	if (!message) return null;
+	const [visible, setVisible] = useState(false);
+	const [activeMessage, setActiveMessage] = useState('');
+
+	useEffect(() => {
+		if (message) {
+			setActiveMessage(message);
+			setVisible(true);
+			const timer = setTimeout(() => {
+				setVisible(false);
+				setTimeout(() => {
+					onClose();
+				}, 300);
+			}, 1800);
+			return () => clearTimeout(timer);
+		}
+	}, [message, onClose]);
+
+	if (!activeMessage) return null;
 
 	return (
-		<div className="message" onClick={onClose}>
-			{message}
+		<div className={`message-toast ${visible ? 'is-visible' : ''}`} onClick={() => setVisible(false)}>
+			{activeMessage}
 		</div>
 	);
 };

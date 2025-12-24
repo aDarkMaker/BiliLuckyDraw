@@ -15,7 +15,7 @@ type View = 'lottery' | 'settings';
 
 function App() {
 	const [view, setView] = useState<View>('lottery');
-	const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('');
 
 	const { loggedIn, setLoggedIn, accountInfo, backgroundImage, setBackgroundImage, watchedRooms, setWatchedRooms, loadAll, loadWatchedRooms } =
 		useAuth();
@@ -34,18 +34,18 @@ function App() {
 	} = useLottery(watchedRooms);
 
 	const handleLoginSuccess = async () => {
-		setLoggedIn(true);
+      setLoggedIn(true);
 		await loadAll();
-		setView('lottery');
-	};
+      setView('lottery');
+  };
 
-	const handleLogout = async () => {
-		try {
-			await Logout();
-			setLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await Logout();
+      setLoggedIn(false);
 			setView('lottery');
 			onMessage('Logged out');
-		} catch (e: any) {
+    } catch (e: any) {
 			onMessage('Logout failed: ' + e.message);
 		}
 	};
@@ -58,12 +58,12 @@ function App() {
 		await handleStartLottery(onMessage);
 	};
 
-	return (
+  return (
 		<div
 			className={`app-container ${backgroundImage ? "has-bg" : ""}`}
 			style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none" }}
 		>
-			<div className="app-content">
+      <div className="app-content">
 				<TopBar
 					keyword={keyword}
 					onKeywordChange={setKeyword}
@@ -76,12 +76,13 @@ function App() {
 					userAvatar={accountInfo?.face}
 				/>
 
-				{!loggedIn ? (
+        {!loggedIn ? (
 					view === 'settings' ? (
 						<SettingsView
 							accountInfo={accountInfo}
 							backgroundImage={backgroundImage}
 							watchedRooms={watchedRooms}
+							loggedIn={loggedIn}
 							onLogout={handleLogout}
 							onBackgroundImageChange={setBackgroundImage}
 							onWatchedRoomsChange={loadWatchedRooms}
@@ -104,6 +105,7 @@ function App() {
 						accountInfo={accountInfo}
 						backgroundImage={backgroundImage}
 						watchedRooms={watchedRooms}
+						loggedIn={loggedIn}
 						onLogout={handleLogout}
 						onBackgroundImageChange={setBackgroundImage}
 						onWatchedRoomsChange={loadWatchedRooms}
@@ -112,9 +114,9 @@ function App() {
 				)}
 
 				<MessageToast message={message} onClose={() => setMessage('')} />
-			</div>
-		</div>
-	);
+      </div>
+    </div>
+  );
 }
 
 export default App;

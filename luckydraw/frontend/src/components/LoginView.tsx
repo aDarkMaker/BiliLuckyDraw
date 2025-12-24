@@ -92,31 +92,41 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 
 	return (
 		<div className="login-view">
-			<div className="login-card">
-				<h1 className="login-title">B站直播间抽奖助手</h1>
+			<div className="login-view-content">
+				<div className="login-card">
+					<h1 className="login-title">来抽奖吧！</h1>
 
-				{!showQRCode ? (
-					<div className="login-actions">
-						<Button variant="primary" size="large" onClick={handleGetQRCode}>
-							扫码登录
-						</Button>
-						<div className="login-divider">
-							<span>OR</span>
+					{!showQRCode ? (
+						<div className="login-actions">
+							<Button variant="primary" size="large" onClick={handleGetQRCode}>
+								扫码登录
+							</Button>
+							<div className="login-divider">
+								<span>使用 Cookie 登录</span>
+							</div>
+							<textarea
+								className="cookie-input"
+								placeholder="请在此粘贴 Bilibili Cookie"
+								value={cookie}
+								onChange={(e) => setCookie(e.target.value)}
+								rows={4}
+							/>
+							<Button variant="secondary" size="large" onClick={handleLogin}>
+								Cookie 登录
+							</Button>
 						</div>
-						<textarea className="input" placeholder="Paste Cookie then click login" value={cookie} onChange={(e) => setCookie(e.target.value)} rows={6} />
-						<Button variant="secondary" size="large" onClick={handleLogin}>
-							Cookie登录
-						</Button>
-					</div>
-				) : (
-					<div className="qrcode-container">
-						<img src={qrCodeDataUrl} alt="QR Code" className="qrcode" />
-						<p className="qrcode-tip">Please scan with Bilibili APP</p>
-						<Button variant="secondary" onClick={() => setShowQRCode(false)}>
-							Cancel
-						</Button>
-					</div>
-				)}
+					) : (
+						<div className="qrcode-container">
+							<div className="qrcode-wrapper">
+								<img src={qrCodeDataUrl} alt="QR Code" className="qrcode" />
+							</div>
+							<p className="qrcode-tip">请使用哔哩哔哩手机客户端扫码</p>
+							<Button variant="text" onClick={() => setShowQRCode(false)}>
+								返回
+							</Button>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);
