@@ -1,3 +1,57 @@
 # BiliLuckyDraw
 
-预计会在拜年祭投入使用的bilibili抽奖机
+在拜年祭投入使用的bilibili抽奖机
+
+## Features
+
+- Live room lottery: Monitor live room danmaku and draw winners based on keywords
+- Login: Support Cookie login and QR code login
+- Auto lottery: Automatically search and participate in dynamic lotteries
+- Configurable: Custom keywords, watched rooms, wait times and other parameters
+
+## How to use?
+
+- Download ```.exe```
+- Login and Config
+- Set Key Words
+- Start!
+
+## Stack
+
+- **Backend:** Wails + Go
+- **Frontend:** React + TypeScript + Vite
+- **Core:** WebSocket & Gorilla
+
+## Dev && Build
+
+### Environment:
+- Go
+- Node.js / Bun
+- Wails CLI
+
+### Local:
+
+```bash
+git clone https://github.com/aDarkMaker/BiliLuckyDraw.git
+cd luckydraw
+```
+
+#### Init:
+
+```bash
+cd frontend && bun install
+```
+
+#### Dev:
+
+```bash
+cd .. && bash dev.sh # If Mac
+cd .. && wails dev # If Windows
+```
+
+#### Build:
+
+```bash
+cd .. && bash build.sh # If Mac
+cd .. && wails build # If Windows
+```
