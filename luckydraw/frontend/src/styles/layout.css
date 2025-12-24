@@ -16,15 +16,8 @@
 	height: 100%;
 	position: relative;
 	z-index: 1;
-	overflow-y: auto;
-	overflow-x: hidden;
-	scrollbar-width: none;
-	-ms-overflow-style: none;
+	overflow: hidden; /* 改为 hidden，防止容器整体回弹影响 fixed 元素 */
 	background-color: #ffffff;
-}
-
-.app-content::-webkit-scrollbar {
-	display: none;
 }
 
 .app-container.has-bg .app-content {

@@ -7,6 +7,12 @@
 	align-items: center;
 	justify-content: center;
 	padding: var(--spacing-lg);
+	overflow-y: auto;
+	scrollbar-width: none;
+}
+
+.login-view::-webkit-scrollbar {
+	display: none;
 }
 
 .login-view-content {

@@ -63,19 +63,18 @@ function App() {
 			className={`app-container ${backgroundImage ? "has-bg" : ""}`}
 			style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none" }}
 		>
+			<TopBar
+				keyword={keyword}
+				onKeywordChange={setKeyword}
+				winnerCount={winnerCount}
+				onWinnerCountChange={setWinnerCount}
+				lotteryRunning={lotteryRunning}
+				onSettingsToggle={() => setView(view === 'settings' ? 'lottery' : 'settings')}
+				isSettingsOpen={view === 'settings'}
+				loggedIn={loggedIn}
+				userAvatar={accountInfo?.face}
+			/>
       <div className="app-content">
-				<TopBar
-					keyword={keyword}
-					onKeywordChange={setKeyword}
-					winnerCount={winnerCount}
-					onWinnerCountChange={setWinnerCount}
-					lotteryRunning={lotteryRunning}
-					onSettingsToggle={() => setView(view === 'settings' ? 'lottery' : 'settings')}
-					isSettingsOpen={view === 'settings'}
-					loggedIn={loggedIn}
-					userAvatar={accountInfo?.face}
-				/>
-
         {!loggedIn ? (
 					view === 'settings' ? (
 						<SettingsView
@@ -112,9 +111,8 @@ function App() {
 						onMessage={onMessage}
 					/>
 				)}
-
-				<MessageToast message={message} onClose={() => setMessage('')} />
       </div>
+			<MessageToast message={message} onClose={() => setMessage('')} />
     </div>
   );
 }
