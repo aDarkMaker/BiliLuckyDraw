@@ -1,6 +1,6 @@
 # BiliLuckyDraw
 
-在拜年祭投入使用的bilibili抽奖机
+一款可以定制化的B站直播抽奖机
 
 ## Features
 
