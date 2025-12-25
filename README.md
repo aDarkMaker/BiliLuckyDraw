@@ -25,7 +25,7 @@
 
 ## How to use?
 
-- Download ```.exe```
+- Download ```.exe``` (Wait for resources of image)
 - Login and Config
 - Set Key Words
 - Start!
