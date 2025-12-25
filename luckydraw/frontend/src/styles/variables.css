@@ -13,8 +13,8 @@
 	--color-border: #f5e6e6;
 	--color-bg: #ffffff;
 	--color-bg-secondary: #fcfcfc;
-	--color-bg-overlay: rgba(255, 255, 255, 0.9);
-	--color-bg-blur: rgba(255, 255, 255, 0.8);
+	--color-bg-overlay: rgba(252, 170, 77, 0.3); 
+	--color-bg-blur: rgba(255, 255, 255, 0.2);
 
 	--spacing-xs: 5px;
 	--spacing-sm: 10px;

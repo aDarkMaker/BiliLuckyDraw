@@ -28,7 +28,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 	userAvatar,
 }) => {
 	return (
-		<div className="top-bar">
+		<div className={`top-bar ${lotteryRunning ? 'is-lottery-running' : ''}`}>
 			<div className="lottery-controls">
 				{loggedIn && (
 					<>
