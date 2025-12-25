@@ -78,77 +78,75 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 		<div className="settings-view">
 			<div className="settings-view-content">
 				<div className="settings-card">
-				<h2 className="settings-title">账号信息</h2>
-				<div className="account-section">
-					<div className="account-main">
-						<img
-							src={loggedIn ? (accountInfo?.face || "https://i0.hdslb.com/bfs/face/member/noface.jpg") : avatarSvg}
-							alt="Avatar"
-							className={`account-avatar ${!loggedIn ? 'is-placeholder' : ''}`}
-						/>
-						<div className="account-info">
-							<div className="account-name">
-								{loggedIn ? (accountInfo?.name || "Loading...") : "xxxx"}
+					<h2 className="settings-title">账号信息</h2>
+					<div className="account-section">
+						<div className="account-main">
+							<img
+								src={loggedIn ? accountInfo?.face || 'https://i0.hdslb.com/bfs/face/member/noface.jpg' : avatarSvg}
+								alt="Avatar"
+								className={`account-avatar ${!loggedIn ? 'is-placeholder' : ''}`}
+							/>
+							<div className="account-info">
+								<div className="account-name">{loggedIn ? accountInfo?.name || 'Loading...' : 'xxxx'}</div>
+								<div className="account-uid">UID: {loggedIn ? accountInfo?.uid || '--' : '--'}</div>
 							</div>
-							<div className="account-uid">UID: {loggedIn ? (accountInfo?.uid || "--") : "--"}</div>
 						</div>
-					</div>
-					{loggedIn && (
-						<Button variant="danger" size="small" onClick={onLogout}>
-							退出登录
-						</Button>
-					)}
-				</div>
-			</div>
-
-			<div className="settings-card">
-				<h2 className="settings-title">背景图片</h2>
-				{backgroundImage && (
-					<div className="background-preview">
-						<img src={backgroundImage} alt="Background preview" className="background-preview-image" />
-					</div>
-				)}
-				<div className="background-actions">
-					<label className="file-input-label">
-						<input type="file" accept="image/*" onChange={handleBackgroundImageChange} className="file-input" />
-						<span className="btn btn-secondary btn-small">选择图片</span>
-					</label>
-					{backgroundImage && (
-						<Button
-							variant="text"
-							size="small"
-							onClick={async () => {
-								await SetBackgroundImage('');
-								onBackgroundImageChange('');
-								onMessage('Background image cleared');
-							}}
-						>
-							清除背景
-						</Button>
-					)}
-				</div>
-			</div>
-
-			<div className="settings-card">
-				<h2 className="settings-title">监听直播间</h2>
-				<div className="room-input-group">
-					<Input type="text" placeholder="Room ID" value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
-					<Button variant="primary" onClick={handleAddRoom}>
-						添加
-					</Button>
-				</div>
-				<div className="rooms-list">
-					{(watchedRooms || []).map((roomID) => (
-						<div key={roomID} className="room-item">
-							<span>房间 {roomID}</span>
-							<Button variant="text" size="small" onClick={() => handleRemoveRoom(roomID)}>
-								移除
+						{loggedIn && (
+							<Button variant="danger" size="small" onClick={onLogout}>
+								退出登录
 							</Button>
-						</div>
-					))}
-					{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">暂无监听的直播间</p>}
+						)}
+					</div>
 				</div>
-			</div>
+
+				<div className="settings-card">
+					<h2 className="settings-title">背景图片</h2>
+					{backgroundImage && (
+						<div className="background-preview">
+							<img src={backgroundImage} alt="Background preview" className="background-preview-image" />
+						</div>
+					)}
+					<div className="background-actions">
+						<label className="file-input-label">
+							<input type="file" accept="image/*" onChange={handleBackgroundImageChange} className="file-input" />
+							<span className="btn btn-secondary btn-small">选择图片</span>
+						</label>
+						{backgroundImage && (
+							<Button
+								variant="text"
+								size="small"
+								onClick={async () => {
+									await SetBackgroundImage('');
+									onBackgroundImageChange('');
+									onMessage('Background image cleared');
+								}}
+							>
+								清除背景
+							</Button>
+						)}
+					</div>
+				</div>
+
+				<div className="settings-card">
+					<h2 className="settings-title">监听直播间</h2>
+					<div className="room-input-group">
+						<Input type="text" placeholder="Room ID" value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
+						<Button variant="primary" onClick={handleAddRoom}>
+							添加
+						</Button>
+					</div>
+					<div className="rooms-list">
+						{(watchedRooms || []).map((roomID) => (
+							<div key={roomID} className="room-item">
+								<span>房间 {roomID}</span>
+								<Button variant="text" size="small" onClick={() => handleRemoveRoom(roomID)}>
+									移除
+								</Button>
+							</div>
+						))}
+						{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">暂无监听的直播间</p>}
+					</div>
+				</div>
 			</div>
 		</div>
 	);

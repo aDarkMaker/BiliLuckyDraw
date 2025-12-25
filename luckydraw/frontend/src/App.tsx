@@ -15,7 +15,7 @@ type View = 'lottery' | 'settings';
 
 function App() {
 	const [view, setView] = useState<View>('lottery');
-  const [message, setMessage] = useState('');
+	const [message, setMessage] = useState('');
 
 	const { loggedIn, setLoggedIn, accountInfo, backgroundImage, setBackgroundImage, watchedRooms, setWatchedRooms, loadAll, loadWatchedRooms } =
 		useAuth();
@@ -34,18 +34,18 @@ function App() {
 	} = useLottery(watchedRooms);
 
 	const handleLoginSuccess = async () => {
-      setLoggedIn(true);
+		setLoggedIn(true);
 		await loadAll();
-      setView('lottery');
-  };
+		setView('lottery');
+	};
 
-  const handleLogout = async () => {
-    try {
-      await Logout();
-      setLoggedIn(false);
+	const handleLogout = async () => {
+		try {
+			await Logout();
+			setLoggedIn(false);
 			setView('lottery');
 			onMessage('Logged out');
-    } catch (e: any) {
+		} catch (e: any) {
 			onMessage('Logout failed: ' + e.message);
 		}
 	};
@@ -58,10 +58,10 @@ function App() {
 		await handleStartLottery(onMessage);
 	};
 
-  return (
+	return (
 		<div
-			className={`app-container ${backgroundImage ? "has-bg" : ""}`}
-			style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none" }}
+			className={`app-container ${backgroundImage ? 'has-bg' : ''}`}
+			style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none' }}
 		>
 			<TopBar
 				keyword={keyword}
@@ -74,8 +74,8 @@ function App() {
 				loggedIn={loggedIn}
 				userAvatar={accountInfo?.face}
 			/>
-      <div className="app-content">
-        {!loggedIn ? (
+			<div className="app-content">
+				{!loggedIn ? (
 					view === 'settings' ? (
 						<SettingsView
 							accountInfo={accountInfo}
@@ -111,10 +111,10 @@ function App() {
 						onMessage={onMessage}
 					/>
 				)}
-      </div>
+			</div>
 			<MessageToast message={message} onClose={() => setMessage('')} />
-    </div>
-  );
+		</div>
+	);
 }
 
 export default App;

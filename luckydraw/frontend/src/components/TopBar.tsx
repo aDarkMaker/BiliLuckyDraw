@@ -52,11 +52,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 					</>
 				)}
 			</div>
-			<Button
-				variant="text"
-				className={`btn-settings ${!loggedIn ? 'btn-settings-svg' : 'btn-settings-avatar'}`}
-				onClick={onSettingsToggle}
-			>
+			<Button variant="text" className={`btn-settings ${!loggedIn ? 'btn-settings-svg' : 'btn-settings-avatar'}`} onClick={onSettingsToggle}>
 				{loggedIn && userAvatar ? (
 					<img src={userAvatar} alt="Avatar" className="top-bar-avatar" />
 				) : (
