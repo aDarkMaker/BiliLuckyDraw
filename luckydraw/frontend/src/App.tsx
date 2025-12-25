@@ -29,6 +29,7 @@ function App() {
 		participantCount,
 		winners,
 		showResults,
+		isConnecting,
 		handleStartLottery,
 		resetLottery,
 	} = useLottery(watchedRooms);
@@ -93,6 +94,7 @@ function App() {
 				) : view === 'lottery' ? (
 					<LotteryView
 						lotteryRunning={lotteryRunning}
+						isConnecting={isConnecting}
 						participantCount={participantCount}
 						showResults={showResults}
 						winners={winners}

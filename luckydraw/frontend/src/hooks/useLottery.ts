@@ -21,6 +21,7 @@ export const useLottery = (watchedRooms: number[]) => {
 	const [participantCount, setParticipantCount] = useState(0);
 	const [winners, setWinners] = useState<Winner[]>([]);
 	const [showResults, setShowResults] = useState(false);
+	const [isConnecting, setIsConnecting] = useState(false);
 
 	useEffect(() => {
 		const checkLotteryStatus = async () => {
@@ -43,19 +44,22 @@ export const useLottery = (watchedRooms: number[]) => {
 
 	const startLottery = async (onError: (message: string) => void) => {
 		if (watchedRooms.length === 0) {
-			onError('Please add a live room in settings first');
+			onError('请先在设置中添加监听的直播间');
 			return;
 		}
 
+		setIsConnecting(true);
 		try {
 			await ConnectLiveRooms(watchedRooms);
 			await StartLiveLottery(keyword);
 			setLotteryRunning(true);
 			setShowResults(false);
 			setWinners([]);
-			onError('Starting to collect danmaku...');
+			onError('开始收集弹幕...');
 		} catch (e: any) {
-			onError('Failed to start: ' + (e?.message || e || 'Unknown error'));
+			onError('启动失败: ' + (e?.message || e || '未知错误'));
+		} finally {
+			setIsConnecting(false);
 		}
 	};
 
@@ -67,9 +71,9 @@ export const useLottery = (watchedRooms: number[]) => {
 			setWinners(winnersData);
 			setShowResults(true);
 			setLotteryRunning(false);
-			onError(`Lottery completed! Drawn ${winnersData.length} winners`);
+			onError(`抽奖完成！共抽取 ${winnersData.length} 位中奖者`);
 		} catch (e: any) {
-			onError('Lottery failed: ' + (e?.message || e || 'Unknown error'));
+			onError('抽奖失败: ' + (e?.message || e || '未知错误'));
 		}
 	};
 
@@ -96,6 +100,7 @@ export const useLottery = (watchedRooms: number[]) => {
 		participantCount,
 		winners,
 		showResults,
+		isConnecting,
 		handleStartLottery,
 		resetLottery,
 	};
