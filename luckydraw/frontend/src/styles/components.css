@@ -148,15 +148,14 @@
 	-webkit-backdrop-filter: blur(16px) saturate(180%);
 	color: rgba(255, 255, 255, 0.95);
 	padding: 12px 28px;
-	border-radius: 100px; /* 胶囊形状更立体 */
+	border-radius: 100px;
 	font-size: 14px;
 	font-weight: 500;
 	z-index: 9999;
-	/* 多层阴影提升立体感 */
 	box-shadow:
 		0 10px 25px -5px rgba(0, 0, 0, 0.3),
 		0 8px 10px -6px rgba(0, 0, 0, 0.3),
-		inset 0 1px 1px rgba(255, 255, 255, 0.15); /* 顶部高光边线 */
+		inset 0 1px 1px rgba(255, 255, 255, 0.15);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	cursor: pointer;
@@ -170,5 +169,3 @@
 	transform: translate(-50%, 0);
 	pointer-events: auto;
 }
-
-/* 离开动画由 JS 控制状态切换，CSS 负责过渡 */
