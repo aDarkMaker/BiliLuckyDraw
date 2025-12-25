@@ -55,3 +55,8 @@ cd .. && wails dev # If Windows
 cd .. && bash build.sh # If Mac
 cd .. && wails build # If Windows
 ```
+
+## TODO List
+
+1. Custom components
+2. Icon
