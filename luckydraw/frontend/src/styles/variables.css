@@ -1,19 +1,20 @@
 :root {
-	--color-primary: #deb458;
-	--color-primary-hover: #f2970e;
-	--color-primary-dark: #0080b0;
-	--color-success: #b8483c;
-	--color-success-hover: #c91c1a;
-	--color-danger: #ff4757;
-	--color-danger-hover: #ee3542;
-	--color-text: #222;
-	--color-text-secondary: #555;
-	--color-text-tertiary: #999;
-	--color-border: #eee;
+	--color-primary: #d32f2f; /* 喜庆中国红 */
+	--color-primary-hover: #b71c1c;
+	--color-primary-dark: #7f0000;
+	--color-success: #d32f2f;
+	--color-success-hover: #b71c1c;
+	--color-danger: #d32f2f;
+	--color-danger-hover: #b71c1c;
+	--color-accent: #ffc107; /* 祥云金 */
+	--color-text: #2d0a0a; /* 深红黑 */
+	--color-text-secondary: #5c3d3d;
+	--color-text-tertiary: #a1887f;
+	--color-border: #f5e6e6;
 	--color-bg: #ffffff;
-	--color-bg-secondary: #fafafa;
-	--color-bg-overlay: rgba(255, 255, 255, 0.98);
-	--color-bg-blur: rgba(255, 255, 255, 0.85);
+	--color-bg-secondary: #fcfcfc;
+	--color-bg-overlay: rgba(255, 255, 255, 0.9);
+	--color-bg-blur: rgba(255, 255, 255, 0.8);
 
 	--spacing-xs: 5px;
 	--spacing-sm: 10px;

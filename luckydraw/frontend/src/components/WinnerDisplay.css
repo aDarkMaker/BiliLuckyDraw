@@ -1,12 +1,13 @@
 @import '../styles/variables.css';
 
 .winners-display {
-	background: white;
-	border-radius: var(--radius-md);
+	background: var(--color-bg-secondary);
+	border-radius: var(--radius-lg);
 	padding: var(--spacing-xl);
 	box-shadow: var(--shadow-md);
 	margin: 0 auto;
 	width: 100%;
+	border: 1px solid var(--color-border);
 }
 
 .winners-title {
@@ -28,9 +29,15 @@
 	align-items: center;
 	gap: 15px;
 	padding: 12px 20px;
-	background: #fcfcfc;
+	background: var(--color-bg);
 	border-radius: var(--radius-sm);
-	border: 1px solid #f0f0f0;
+	border: 1px solid var(--color-border);
+	transition: var(--transition);
+}
+
+.winner-card:hover {
+	border-color: var(--color-accent);
+	transform: translateX(4px);
 }
 
 .winner-rank {
