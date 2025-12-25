@@ -9,6 +9,20 @@
 - Auto lottery: Automatically search and participate in dynamic lotteries
 - Configurable: Custom keywords, watched rooms, wait times and other parameters
 
+## Screenshots
+
+### Login:
+![Login](img/login.png)
+
+### QR Code Login:
+![QR Code Login](img/prcode.png)
+
+### Main Interface:
+![Main Interface](img/home.png)
+
+### Settings:
+![Settings](img/settings.png)
+
 ## How to use?
 
 - Download ```.exe```
