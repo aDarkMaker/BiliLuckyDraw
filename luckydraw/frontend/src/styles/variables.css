@@ -1,13 +1,13 @@
 :root {
-	--color-primary: #d32f2f; /* 喜庆中国红 */
+	--color-primary: #d32f2f;
 	--color-primary-hover: #b71c1c;
 	--color-primary-dark: #7f0000;
 	--color-success: #d32f2f;
 	--color-success-hover: #b71c1c;
 	--color-danger: #d32f2f;
 	--color-danger-hover: #b71c1c;
-	--color-accent: #ffc107; /* 祥云金 */
-	--color-text: #2d0a0a; /* 深红黑 */
+	--color-accent: #ffc107;
+	--color-text: #2d0a0a;
 	--color-text-secondary: #5c3d3d;
 	--color-text-tertiary: #a1887f;
 	--color-border: #f5e6e6;

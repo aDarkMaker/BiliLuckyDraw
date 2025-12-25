@@ -27,6 +27,8 @@ export const TopBar: React.FC<TopBarProps> = ({
 	loggedIn,
 	userAvatar,
 }) => {
+	const keywordWidth = Math.max(100, keyword.length * 14 + 32);
+
 	return (
 		<div className={`top-bar ${lotteryRunning ? 'is-lottery-running' : ''}`}>
 			<div className="lottery-controls">
@@ -39,6 +41,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 							value={keyword}
 							onChange={(e) => onKeywordChange(e.target.value)}
 							disabled={lotteryRunning}
+							style={{ width: `${keywordWidth}px` }}
 						/>
 						<Input
 							type="number"
