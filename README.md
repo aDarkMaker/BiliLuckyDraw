@@ -74,3 +74,9 @@ cd .. && wails build # If Windows
 
 1. Custom components
 2. Icon
+
+## DevLog
+
+- 2025.12.26:
+  - 修复了 Windows 平台头像无法解析的 Bug
+  - 完成了基础开发
