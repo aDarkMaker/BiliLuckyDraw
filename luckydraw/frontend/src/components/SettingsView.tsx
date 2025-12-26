@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from './Button';
 import { Input } from './Input';
 import { SetBackgroundImage, AddWatchedRoom, RemoveWatchedRoom } from '../../wailsjs/go/main/App';
+import { formatAvatarUrl } from '../utils/format';
 import './SettingsView.css';
 
 import avatarSvg from '../assets/icon/avatar.svg';
@@ -82,7 +83,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 					<div className="account-section">
 						<div className="account-main">
 							<img
-								src={loggedIn ? accountInfo?.face || 'https://i0.hdslb.com/bfs/face/member/noface.jpg' : avatarSvg}
+								src={loggedIn ? formatAvatarUrl(accountInfo?.face) || 'https://i0.hdslb.com/bfs/face/member/noface.jpg' : avatarSvg}
 								alt="Avatar"
 								className={`account-avatar ${!loggedIn ? 'is-placeholder' : ''}`}
 							/>

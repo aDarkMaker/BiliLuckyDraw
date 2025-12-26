@@ -1,6 +1,7 @@
 import React from 'react';
 import { Input } from './Input';
 import { Button } from './Button';
+import { formatAvatarUrl } from '../utils/format';
 import settingsIcon from '../assets/icon/settings.svg';
 import '../styles/layout.css';
 
@@ -57,7 +58,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 			</div>
 			<Button variant="text" className={`btn-settings ${!loggedIn ? 'btn-settings-svg' : 'btn-settings-avatar'}`} onClick={onSettingsToggle}>
 				{loggedIn && userAvatar ? (
-					<img src={userAvatar} alt="Avatar" className="top-bar-avatar" />
+					<img src={formatAvatarUrl(userAvatar)} alt="Avatar" className="top-bar-avatar" />
 				) : (
 					<img src={settingsIcon} alt="Settings" className="top-bar-settings-icon" />
 				)}
