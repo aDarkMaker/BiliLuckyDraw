@@ -80,3 +80,4 @@ cd .. && wails build # If Windows
 - 2025.12.26:
   - 修复了 Windows 平台头像无法解析的 Bug
   - 完成了基础开发
+  - 修正了设置人数框的交互逻辑
