@@ -29,6 +29,31 @@ export const TopBar: React.FC<TopBarProps> = ({
 	userAvatar,
 }) => {
 	const keywordWidth = Math.max(100, keyword.length * 14 + 32);
+	const [inputValue, setInputValue] = React.useState(winnerCount.toString());
+
+	React.useEffect(() => {
+		setInputValue(winnerCount.toString());
+	}, [winnerCount]);
+
+	const handleWinnerCountChange = (value: string) => {
+		if (value === '') {
+			setInputValue('');
+			return;
+		}
+
+		const num = parseInt(value);
+		if (!isNaN(num) && num >= 0) {
+			setInputValue(num.toString());
+			onWinnerCountChange(num || 1);
+		}
+	};
+
+	const handleBlur = () => {
+		if (inputValue === '' || parseInt(inputValue) <= 0) {
+			setInputValue('1');
+			onWinnerCountChange(1);
+		}
+	};
 
 	return (
 		<div className={`top-bar ${lotteryRunning ? 'is-lottery-running' : ''}`}>
@@ -45,13 +70,14 @@ export const TopBar: React.FC<TopBarProps> = ({
 							style={{ width: `${keywordWidth}px` }}
 						/>
 						<Input
-							type="number"
+							type="text"
 							size="small"
-							placeholder="人数"
-							min="1"
-							value={winnerCount}
-							onChange={(e) => onWinnerCountChange(parseInt(e.target.value) || 1)}
+							placeholder="Number"
+							value={inputValue}
+							onChange={(e) => handleWinnerCountChange(e.target.value)}
+							onBlur={handleBlur}
 							disabled={lotteryRunning}
+							className="input-winner-count"
 						/>
 					</>
 				)}

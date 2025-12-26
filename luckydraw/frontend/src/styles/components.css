@@ -133,6 +133,11 @@
 	width: 110px;
 }
 
+.input-winner-count {
+	width: 60px;
+	text-align: center;
+}
+
 .input-number {
 	width: 70px;
 }
