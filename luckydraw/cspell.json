@@ -1,0 +1,13 @@
+{
+    "ignorePaths": [
+        "go.sum",
+        "go.mod"
+    ],
+    "words": [
+        "assetserver",
+        "maxday",
+        "minfollower",
+        "sneaktower",
+        "uids"
+    ]
+}
