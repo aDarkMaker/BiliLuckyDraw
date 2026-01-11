@@ -17,7 +17,7 @@ function App() {
 	const [view, setView] = useState<View>('lottery');
 	const [message, setMessage] = useState('');
 
-	const { loggedIn, setLoggedIn, accountInfo, backgroundImage, setBackgroundImage, watchedRooms, setWatchedRooms, loadAll, loadWatchedRooms } =
+	const { loggedIn, setLoggedIn, accountInfo, backgroundImage, setBackgroundImage, watchedRooms, loadAll, loadWatchedRooms } =
 		useAuth();
 
 	const {

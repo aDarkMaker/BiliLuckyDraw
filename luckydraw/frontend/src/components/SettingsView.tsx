@@ -101,7 +101,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 				</div>
 
 				<div className="settings-card">
-					<h2 className="settings-title">背景图片</h2>
+					<h2 className="settings-title">设置背景</h2>
 					{backgroundImage && (
 						<div className="background-preview">
 							<img src={backgroundImage} alt="Background preview" className="background-preview-image" />
@@ -122,18 +122,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 									onMessage('Background image cleared');
 								}}
 							>
-								清除背景
+								重置背景
 							</Button>
 						)}
 					</div>
 				</div>
 
 				<div className="settings-card">
-					<h2 className="settings-title">监听直播间</h2>
+					<h2 className="settings-title">抽奖列表</h2>
 					<div className="room-input-group">
 						<Input type="text" placeholder="Room ID" value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
 						<Button variant="primary" onClick={handleAddRoom}>
-							添加
+							加注
 						</Button>
 					</div>
 					<div className="rooms-list">
@@ -145,7 +145,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 								</Button>
 							</div>
 						))}
-						{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">暂无监听的直播间</p>}
+						{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">奖池有待积累</p>}
 					</div>
 				</div>
 			</div>

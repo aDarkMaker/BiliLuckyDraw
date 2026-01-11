@@ -94,7 +94,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 		<div className="login-view">
 			<div className="login-view-content">
 				<div className="login-card">
-					<h1 className="login-title">来抽奖吧！</h1>
+					<h1 className="login-title">我要验牌</h1>
 
 					{!showQRCode ? (
 						<div className="login-actions">
@@ -102,17 +102,17 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 								扫码登录
 							</Button>
 							<div className="login-divider">
-								<span>使用 Cookie 登录</span>
+								<span>我是高手 我用 Cookie</span>
 							</div>
 							<textarea
 								className="cookie-input"
-								placeholder="请在此粘贴 Bilibili Cookie"
+								placeholder="Bilibili Cookie"
 								value={cookie}
 								onChange={(e) => setCookie(e.target.value)}
 								rows={4}
 							/>
 							<Button variant="secondary" size="large" onClick={handleLogin}>
-								Cookie 登录
+								就决定是你了
 							</Button>
 						</div>
 					) : (
@@ -120,9 +120,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 							<div className="qrcode-wrapper">
 								<img src={qrCodeDataUrl} alt="QR Code" className="qrcode" />
 							</div>
-							<p className="qrcode-tip">请使用哔哩哔哩手机客户端扫码</p>
+							<p className="qrcode-tip">请使用B站手机客户端扫码</p>
 							<Button variant="text" onClick={() => setShowQRCode(false)}>
-								返回
+								Back
 							</Button>
 						</div>
 					)}

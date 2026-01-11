@@ -2,12 +2,12 @@
 
 cd "$(dirname "$0")"
 
-echo "🔨 编译 Go 代码..."
+echo "编译 Go 小子……"
 go build -o /dev/null ./... || exit 1
 
-echo "🔄 重新生成 Wails 绑定..."
+echo "和 Wails 偷情……"
 wails generate module || exit 1
 
-echo "🚀 启动开发模式..."
+echo "我要狠狠地开发你！"
 wails dev
 

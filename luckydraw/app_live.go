@@ -12,7 +12,7 @@ func (a *App) ConnectLiveRooms(roomIDs []int) error {
 	defer a.mu.Unlock()
 
 	if a.client == nil {
-		return fmt.Errorf("请先登录")
+		return fmt.Errorf("Login First")
 	}
 
 	if a.liveLottery != nil && a.liveLottery.IsRunning() {
@@ -29,7 +29,7 @@ func (a *App) StartLiveLottery(keyword string) error {
 	defer a.mu.Unlock()
 
 	if a.liveLottery == nil {
-		return fmt.Errorf("请先连接直播间")
+		return fmt.Errorf("先看几个直播呢？")
 	}
 
 	return a.liveLottery.Start(keyword)
@@ -40,7 +40,7 @@ func (a *App) StopLiveLottery() error {
 	defer a.mu.Unlock()
 
 	if a.liveLottery == nil {
-		return fmt.Errorf("未连接直播间")
+		return fmt.Errorf("啥也不看抽什么奖？")
 	}
 
 	a.liveLottery.Stop()
@@ -52,7 +52,7 @@ func (a *App) DrawWinners(count int) (string, error) {
 	defer a.mu.Unlock()
 
 	if a.liveLottery == nil {
-		return "", fmt.Errorf("未连接直播间")
+		return "", fmt.Errorf("没有直播间给你抽哦～")
 	}
 
 	winners := a.liveLottery.Draw(count)

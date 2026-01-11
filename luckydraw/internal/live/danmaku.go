@@ -117,7 +117,7 @@ func extractUIDAndBuvid(cookie string) (int64, string) {
 func (c *DanmakuClient) Connect() error {
 	roomInfo, err := c.getRoomInfo()
 	if err != nil {
-		return fmt.Errorf("获取房间信息失败: %v", err)
+		return fmt.Errorf("找不到直播间信息了喵: %v", err)
 	}
 
 	hosts := roomInfo.HostList
@@ -169,7 +169,7 @@ func (c *DanmakuClient) Connect() error {
 		}
 	}
 
-	return fmt.Errorf("所有弹幕服务器连接失败")
+	return fmt.Errorf("老大我们连接都失败了哎！")
 }
 
 func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
@@ -197,7 +197,7 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		io.Copy(io.Discard, resp.Body)
-		return nil, fmt.Errorf("获取房间信息失败: HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("火星的网络有点意思: HTTP %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -211,16 +211,16 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 	}
 
 	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("解析房间信息失败: %v", err)
+		return nil, fmt.Errorf("老大这个是什么喵: %v", err)
 	}
 
 	if result.Code != 0 {
-		return nil, fmt.Errorf("获取房间信息失败: code=%d", result.Code)
+		return nil, fmt.Errorf("握握手: code=%d", result.Code)
 	}
 
 	var roomData RoomInfo
 	if err := json.Unmarshal(result.Data, &roomData); err != nil {
-		return nil, fmt.Errorf("解析房间数据失败: %v", err)
+		return nil, fmt.Errorf("叽里咕噜看不懂: %v", err)
 	}
 
 	realRoomID := roomData.RoomID
@@ -428,7 +428,7 @@ func (c *DanmakuClient) sendAuth(roomID int, token string) error {
 	c.mu.Unlock()
 
 	if conn == nil {
-		return fmt.Errorf("连接未建立")
+		return fmt.Errorf("暂时还没对齐颗粒度……")
 	}
 
 	return conn.WriteMessage(websocket.BinaryMessage, packet)

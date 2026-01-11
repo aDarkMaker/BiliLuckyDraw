@@ -39,13 +39,13 @@ type QRCodeStatus struct {
 func (q *QRLogin) GetQRCode() (*QRCodeInfo, error) {
 	resp, err := q.client.Get("https://passport.bilibili.com/x/passport-login/web/qrcode/generate")
 	if err != nil {
-		return nil, fmt.Errorf("请求失败: %v", err)
+		return nil, fmt.Errorf("你码不理我: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("读取响应失败: %v", err)
+		return nil, fmt.Errorf("零人在意: %v", err)
 	}
 
 	var result struct {
@@ -58,15 +58,15 @@ func (q *QRLogin) GetQRCode() (*QRCodeInfo, error) {
 	}
 
 	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("解析响应失败: %v, body: %s", err, string(body))
+		return nil, fmt.Errorf("解析一败涂地: %v, body: %s", err, string(body))
 	}
 
 	if result.Code != 0 {
-		return nil, fmt.Errorf("获取二维码失败: code=%d, message=%s", result.Code, result.Message)
+		return nil, fmt.Errorf("你的码不理我: code=%d, message=%s", result.Code, result.Message)
 	}
 
 	if result.Data.URL == "" || result.Data.QrcodeKey == "" {
-		return nil, fmt.Errorf("二维码数据为空: %s", string(body))
+		return nil, fmt.Errorf("码扫不出来啊: %s", string(body))
 	}
 
 	return &QRCodeInfo{
@@ -82,18 +82,18 @@ func (q *QRLogin) CheckQRCodeStatus(qrcodeKey string) (*QRCodeStatus, error) {
 	reqURL := "https://passport.bilibili.com/x/passport-login/web/qrcode/poll?" + params.Encode()
 	resp, err := q.client.Get(reqURL)
 	if err != nil {
-		return nil, fmt.Errorf("请求失败: %v", err)
+		return nil, fmt.Errorf("你码不理我: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("读取响应失败: %v", err)
+		return nil, fmt.Errorf("零人在意: %v", err)
 	}
 
 	var status QRCodeStatus
 	if err := json.Unmarshal(body, &status); err != nil {
-		return nil, fmt.Errorf("解析响应失败: %v, body: %s", err, string(body))
+		return nil, fmt.Errorf("解析一败涂地: %v, body: %s", err, string(body))
 	}
 
 	return &status, nil

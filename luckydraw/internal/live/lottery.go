@@ -32,7 +32,7 @@ func (l *LiveLottery) Start(keyword string) error {
 	l.mu.Lock()
 	if l.isRunning {
 		l.mu.Unlock()
-		return fmt.Errorf("抽奖已在运行中")
+		return fmt.Errorf("在抽了，我有自己的节奏……")
 	}
 	l.keyword = keyword
 	l.isRunning = true
@@ -45,7 +45,7 @@ func (l *LiveLottery) Start(keyword string) error {
 		})
 
 		if err := client.Connect(); err != nil {
-			fmt.Printf("连接直播间 %d 失败: %v\n", client.roomID, err)
+			fmt.Printf("想看 %d 直播，驳回: %v\n", client.roomID, err)
 			continue
 		}
 	}

@@ -81,13 +81,13 @@ func (a *App) Login(cookie string) (string, error) {
 	cookie = strings.TrimSpace(cookie)
 
 	if cookie == "" {
-		return "", fmt.Errorf("cookie不能为空")
+		return "", fmt.Errorf("Cookie是空的！")
 	}
 
 	a.client = bili.NewClient(cookie)
 	info, err := a.client.GetMyInfo()
 	if err != nil {
-		return "", fmt.Errorf("登录失败: %v", err)
+		return "", fmt.Errorf("雜魚: %v", err)
 	}
 
 	a.myUID = info.Mid
@@ -96,14 +96,14 @@ func (a *App) Login(cookie string) (string, error) {
 	a.config.Cookie = cookie
 	config.SaveConfig(a.configPath, a.config)
 
-	return fmt.Sprintf("登录成功: %s (UID: %d)", info.Name, info.Mid), nil
+	return fmt.Sprintf("这号是你吗: %s (UID: %d)", info.Name, info.Mid), nil
 }
 
 func (a *App) GetQRCode() (string, error) {
 	qrLogin := login.NewQRLogin()
 	qrInfo, err := qrLogin.GetQRCode()
 	if err != nil {
-		return "", fmt.Errorf("获取二维码失败: %v", err)
+		return "", fmt.Errorf("老大咱码没了喵: %v", err)
 	}
 
 	result := map[string]string{
@@ -119,7 +119,7 @@ func (a *App) CheckQRCodeStatus(qrcodeKey string) (string, error) {
 	qrLogin := login.NewQRLogin()
 	status, err := qrLogin.CheckQRCodeStatus(qrcodeKey)
 	if err != nil {
-		return "", fmt.Errorf("检查状态失败: %v", err)
+		return "", fmt.Errorf("验牌失败了: %v", err)
 	}
 
 	result := map[string]interface{}{
@@ -134,12 +134,12 @@ func (a *App) CheckQRCodeStatus(qrcodeKey string) (string, error) {
 
 func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 	if loginURL == "" {
-		return "", fmt.Errorf("登录URL为空")
+		return "", fmt.Errorf("登陆有点问题哎～")
 	}
 
 	parsedURL, err := url.Parse(loginURL)
 	if err != nil {
-		return "", fmt.Errorf("解析URL失败: %v", err)
+		return "", fmt.Errorf("前边的登陆现在还做不到哦: %v", err)
 	}
 
 	queryParams := parsedURL.Query()
@@ -154,7 +154,7 @@ func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 	}
 
 	if len(cookieParts) < 4 {
-		return "", fmt.Errorf("cookie信息不完整，只获取到 %d 个参数", len(cookieParts))
+		return "", fmt.Errorf("我们在大量文字中只找到了 %d 个有效信息", len(cookieParts))
 	}
 
 	cookieStr := strings.Join(cookieParts, "; ")
@@ -164,7 +164,7 @@ func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 	info, err := a.client.GetMyInfo()
 	if err != nil {
 		a.mu.Unlock()
-		return "", fmt.Errorf("验证登录失败: %v", err)
+		return "", fmt.Errorf("登陆失效了喵: %v", err)
 	}
 
 	a.myUID = info.Mid
@@ -174,7 +174,7 @@ func (a *App) LoginWithQRCode(loginURL string) (string, error) {
 	config.SaveConfig(a.configPath, a.config)
 	a.mu.Unlock()
 
-	return fmt.Sprintf("登录成功: %s (UID: %d)", info.Name, info.Mid), nil
+	return fmt.Sprintf("这号是你吗: %s (UID: %d)", info.Name, info.Mid), nil
 }
 
 func (a *App) IsLoggedIn() bool {
@@ -185,7 +185,7 @@ func (a *App) IsLoggedIn() bool {
 
 func (a *App) GetAccountInfo() (string, error) {
 	if a.client == nil {
-		return "", fmt.Errorf("请先登录")
+		return "", fmt.Errorf("Login First！")
 	}
 
 	info, err := a.client.GetMyInfo()
@@ -226,13 +226,13 @@ func (a *App) SaveConfig(cfgJSON string) error {
 
 func (a *App) StartLottery() (string, error) {
 	if a.client == nil {
-		return "", fmt.Errorf("请先登录")
+		return "", fmt.Errorf("Login First！")
 	}
 
 	a.mu.Lock()
 	if a.running {
 		a.mu.Unlock()
-		return "", fmt.Errorf("抽奖已在运行中")
+		return "", fmt.Errorf("我有我的节奏……")
 	}
 	a.running = true
 	a.mu.Unlock()
@@ -276,7 +276,7 @@ func (a *App) StartLottery() (string, error) {
 		}
 	}()
 
-	return "抽奖已启动", nil
+	return "牌没有问题！", nil
 }
 
 func (a *App) StopLottery() error {
@@ -284,7 +284,7 @@ func (a *App) StopLottery() error {
 	defer a.mu.Unlock()
 
 	if !a.running {
-		return fmt.Errorf("抽奖未在运行")
+		return fmt.Errorf("还没有到时候～")
 	}
 
 	close(a.stopChan)
@@ -296,7 +296,7 @@ func (a *App) StopLottery() error {
 
 func (a *App) CheckPrize() (string, error) {
 	if a.client == nil {
-		return "", fmt.Errorf("请先登录")
+		return "", fmt.Errorf("Login First！")
 	}
 
 	service := check.NewService(a.client, a.config, a.myUID)
@@ -335,7 +335,7 @@ func (a *App) AddWatchedRoom(roomID int) error {
 
 	for _, id := range a.config.WatchedRooms {
 		if id == roomID {
-			return fmt.Errorf("房间 %d 已在监听列表中", roomID)
+			return fmt.Errorf("严肃观看 %d 的直播！", roomID)
 		}
 	}
 

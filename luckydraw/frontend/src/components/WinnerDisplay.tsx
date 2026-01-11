@@ -29,7 +29,7 @@ export const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winners, onReset }
 				))}
 			</div>
 			<Button variant="secondary" className="btn-reset" onClick={onReset}>
-				再来
+				我觉得这次能行！
 			</Button>
 		</div>
 	);

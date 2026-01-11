@@ -44,7 +44,7 @@ export const useLottery = (watchedRooms: number[]) => {
 
 	const startLottery = async (onError: (message: string) => void) => {
 		if (watchedRooms.length === 0) {
-			onError('请先在设置中添加监听的直播间');
+			onError('请先加几个直播间！');
 			return;
 		}
 
@@ -55,9 +55,9 @@ export const useLottery = (watchedRooms: number[]) => {
 			setLotteryRunning(true);
 			setShowResults(false);
 			setWinners([]);
-			onError('开始收集弹幕...');
+			onError('奖池积累ing...');
 		} catch (e: any) {
-			onError('启动失败: ' + (e?.message || e || '未知错误'));
+			onError('不出意外出意外了: ' + (e?.message || e || '未知错误'));
 		} finally {
 			setIsConnecting(false);
 		}
@@ -71,9 +71,9 @@ export const useLottery = (watchedRooms: number[]) => {
 			setWinners(winnersData);
 			setShowResults(true);
 			setLotteryRunning(false);
-			onError(`抽奖完成！共抽取 ${winnersData.length} 位中奖者`);
+			onError(`好哦！恭喜这 ${winnersData.length} 位LuckyDog！`);
 		} catch (e: any) {
-			onError('抽奖失败: ' + (e?.message || e || '未知错误'));
+			onError('有点小意外: ' + (e?.message || e || '未知错误'));
 		}
 	};
 
