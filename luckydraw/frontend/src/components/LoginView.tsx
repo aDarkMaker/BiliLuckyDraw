@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import QRCode from 'qrcode';
 import { Button } from './Button';
 import { GetQRCode, CheckQRCodeStatus, LoginWithQRCode, Login } from '../../wailsjs/go/main/App';
-import './LoginView.css';
+import '../styles/LoginView.css';
 
 interface LoginViewProps {
 	onLoginSuccess: () => void;

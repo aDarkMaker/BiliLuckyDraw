@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from './Button';
-import './WinnerDisplay.css';
+import '../styles/WinnerDisplay.css';
 
 interface Winner {
 	uid: number;

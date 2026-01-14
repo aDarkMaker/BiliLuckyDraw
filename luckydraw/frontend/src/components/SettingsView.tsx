@@ -3,7 +3,7 @@ import { Button } from './Button';
 import { Input } from './Input';
 import { SetBackgroundImage, AddWatchedRoom, RemoveWatchedRoom } from '../../wailsjs/go/main/App';
 import { formatAvatarUrl } from '../utils/format';
-import './SettingsView.css';
+import '../styles/SettingsView.css';
 
 import avatarSvg from '../assets/icon/avatar.svg';
 

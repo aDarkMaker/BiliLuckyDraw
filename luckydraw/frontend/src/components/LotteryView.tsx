@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './Button';
 import { WinnerDisplay } from './WinnerDisplay';
-import './LotteryView.css';
+import '../styles/LotteryView.css';
 
 interface Winner {
 	uid: number;
