@@ -51,9 +51,7 @@ export const LotteryView: React.FC<LotteryViewProps> = ({
 									'开始抽奖'
 								)}
 							</Button>
-							<div className="lottery-hint-container">
-								{lotteryRunning && <p className="lottery-hint">再按一下结束抽奖</p>}
-							</div>
+							<div className="lottery-hint-container">{lotteryRunning && <p className="lottery-hint">再按一下结束抽奖</p>}</div>
 						</>
 					) : (
 						<WinnerDisplay winners={winners} onReset={onReset} />

@@ -104,13 +104,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 							<div className="login-divider">
 								<span>我是高手 我用 Cookie</span>
 							</div>
-							<textarea
-								className="cookie-input"
-								placeholder="Bilibili Cookie"
-								value={cookie}
-								onChange={(e) => setCookie(e.target.value)}
-								rows={4}
-							/>
+							<textarea className="cookie-input" placeholder="Bilibili Cookie" value={cookie} onChange={(e) => setCookie(e.target.value)} rows={4} />
 							<Button variant="secondary" size="large" onClick={handleLogin}>
 								就决定是你了
 							</Button>

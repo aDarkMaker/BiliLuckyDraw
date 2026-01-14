@@ -5,4 +5,3 @@ export const formatAvatarUrl = (url?: string): string => {
 	}
 	return url;
 };
-

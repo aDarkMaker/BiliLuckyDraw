@@ -1,14 +1,11 @@
 {
-    "ignorePaths": [
-        "go.sum",
-        "go.mod"
-    ],
-    "words": [
-        "assetserver",
-        "maxday",
-        "minfollower",
-        "Nunito",
-        "sneaktower",
-        "uids"
-    ]
+  "ignorePaths": ["go.sum", "go.mod"],
+  "words": [
+    "assetserver",
+    "maxday",
+    "minfollower",
+    "Nunito",
+    "sneaktower",
+    "uids"
+  ]
 }
