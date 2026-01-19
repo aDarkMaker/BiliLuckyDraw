@@ -46,7 +46,7 @@ cd luckydraw
 cd frontend && bun install
 ```
 
-#### 运行与编译
+### 运行与编译
 
 ```bash
 # macOS
