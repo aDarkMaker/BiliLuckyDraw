@@ -1,87 +1,59 @@
-# BiliLuckyDraw
+<div align="center">
+  <img src="./img/logo.png" width="160" alt="BiliLuckyDraw logo" />
 
-一款可以定制化的B站直播抽奖机
+  # BiliLuckyDraw
+  ![Wails](https://img.shields.io/badge/Wails-v2-red?style=for-the-badge)
+  ![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+</div>
 
-## Features
+---
 
-- Live room lottery: Monitor live room danmaku and draw winners based on keywords
-- Login: Support Cookie login and QR code login
-- Auto lottery: Automatically search and participate in dynamic lotteries
-- Configurable: Custom keywords, watched rooms, wait times and other parameters
+## 1. 快速开始
 
-## Screenshots
+1. **下载安装包**：从下方的“下载方式”中选择一个，下载最新的安装文件
+2. **登录配置**：支持 Cookie 登录和二维码登录
+3. **设置直播间**：在设置界面配置您想要监控的直播间
+4. **开启抽奖**：点击“开始”，程序将自动监控弹幕或动态进行抽奖。
 
-### Login:
-![Login](img/login.png)
+## 3. 下载方式
 
-### QR Code Login:
-![QR Code Login](img/prcode.png)
+- **[GitHub Releases](https://github.com/aDarkMaker/BiliLuckyDraw/releases)**: 侧边下载即可，暂未支持其他渠道~
 
-### Main Interface:
-![Main Interface](img/home.png)
+## 4. 功能介绍
 
-### Settings:
-![Settings](img/settings.png)
+- **直播间抽奖**：实时监控直播间弹幕，根据关键词自动参与抽奖
+- **多种登录方式**：支持 Cookie 登录及二维码扫码登录，安全便捷
+- **高度可定制化**：自定义关键词、监控房间
 
-## How to use?
+## 5. 技术栈
 
-- Download ```.exe``` (Wait for resources of image)
-- Login and Config
-- Set Key Words
-- Start!
+- **后端**: Wails + Go
+- **前端**: React + TypeScript + Vite
+- **通信**: WebSocket & Gorilla
 
-## Stack
+## 6. 开发与构建
 
-- **Backend:** Wails + Go
-- **Frontend:** React + TypeScript + Vite
-- **Core:** WebSocket & Gorilla
-
-## Dev && Build
-
-### Environment:
+### 环境要求
 - Go
 - Node.js / Bun
 - Wails CLI
 
-### Local:
+### 本地开发
 
 ```bash
 git clone https://github.com/aDarkMaker/BiliLuckyDraw.git
 cd luckydraw
-```
-
-#### Init:
-
-```bash
 cd frontend && bun install
 ```
 
-#### Dev:
+#### 运行与编译
 
 ```bash
-cd .. && bash dev.sh # If Mac
-cd .. && wails dev # If Windows
+# macOS
+bash dev.sh   # 开发
+bash build.sh # 构建
+
+# Windows
+wails dev     # 开发
+wails build   # 构建
 ```
-
-#### Build:
-
-```bash
-cd .. && bash build.sh # If Mac
-cd .. && wails build # If Windows
-```
-
-## TODO List
-
-1. Custom components
-2. Icon
-
-## DevLog
-
-- 2025.12.26:
-  - 修复了 Windows 平台头像无法解析的 Bug
-  - 完成了基础开发
-  - 修正了设置人数框的交互逻辑
-
-- 2026.1.14:
-  - 修改了文字描述
-  - 修改了CSS代码位置
