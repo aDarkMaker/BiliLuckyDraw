@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button } from './Button';
 import { WinnerDisplay } from './WinnerDisplay';
+import startImg from '../assets/images/lottery-start.png';
+import ingImg from '../assets/images/lottery-ing.png';
 import '../styles/LotteryView.css';
 
 interface Winner {
@@ -33,26 +35,24 @@ export const LotteryView: React.FC<LotteryViewProps> = ({
 			<div className="lottery-view-content">
 				<div className="lottery-main">
 					{!showResults ? (
-						<>
-							<Button
-								variant="primary"
-								className={`btn-lottery ${lotteryRunning ? 'btn-running' : ''} ${isConnecting ? 'btn-connecting' : ''}`}
-								onClick={onStartLottery}
-								disabled={isConnecting}
+						<div className="lottery-action-area">
+							<div
+								className={`lottery-button-container ${isConnecting ? 'is-connecting' : ''}`}
+								onClick={!isConnecting ? onStartLottery : undefined}
 							>
 								{isConnecting ? (
-									<>
+									<div className="loading-container">
 										<span className="loading-spinner"></span>
-										正在连接直播间...
-									</>
+										<p className="loading-text">正在连接直播间...</p>
+									</div>
 								) : lotteryRunning ? (
-									<>正在收集... ({participantCount}人)</>
+									<img src={ingImg} alt="正在收集" className="lottery-image-btn btn-ing pulse" />
 								) : (
-									'开始抽奖'
+									<img src={startImg} alt="开始抽奖" className="lottery-image-btn btn-start" />
 								)}
-							</Button>
+							</div>
 							<div className="lottery-hint-container">{lotteryRunning && <p className="lottery-hint">再按一下结束抽奖</p>}</div>
-						</>
+						</div>
 					) : (
 						<WinnerDisplay winners={winners} onReset={onReset} />
 					)}
