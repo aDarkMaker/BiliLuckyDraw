@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"luckydraw/internal/live"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (a *App) ConnectLiveRooms(roomIDs []int) error {
@@ -32,6 +34,9 @@ func (a *App) StartLiveLottery(keyword string) error {
 		return fmt.Errorf("先看几个直播呢？")
 	}
 
+	a.liveLottery.OnUserJoin = func(user *live.DanmakuUser) {
+		runtime.EventsEmit(a.ctx, "live:user_join", user)
+	}
 	return a.liveLottery.Start(keyword)
 }
 
