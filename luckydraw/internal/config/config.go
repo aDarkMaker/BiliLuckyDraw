@@ -8,8 +8,6 @@ import (
 
 type Config struct {
 	Cookie               string          `json:"cookie,omitempty"`
-	BackgroundImage      string          `json:"background_image,omitempty"`
-	WatchedRooms         []int           `json:"watched_rooms,omitempty"`
 	UIDs                 []int64         `json:"uids"`
 	Tags                 []string        `json:"tags"`
 	Articles             []string        `json:"articles"`
@@ -122,5 +120,37 @@ func SaveConfig(path string, cfg *Config) error {
 		return err
 	}
 
+	return os.WriteFile(path, data, 0644)
+}
+
+type RuntimeState struct {
+	BackgroundImage string `json:"background_image,omitempty"`
+	WatchedRooms    []int  `json:"watched_rooms,omitempty"`
+}
+
+func LoadRuntimeState(path string) (*RuntimeState, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return &RuntimeState{}, nil
+		}
+		return nil, err
+	}
+	var state RuntimeState
+	if err := json.Unmarshal(data, &state); err != nil {
+		return &RuntimeState{}, nil
+	}
+	return &state, nil
+}
+
+func SaveRuntimeState(path string, state *RuntimeState) error {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return err
+	}
 	return os.WriteFile(path, data, 0644)
 }
