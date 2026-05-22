@@ -6,7 +6,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"time"
+
+	"luckydraw/internal/bili"
 )
 
 type QRLogin struct {
@@ -15,7 +16,7 @@ type QRLogin struct {
 
 func NewQRLogin() *QRLogin {
 	return &QRLogin{
-		client: &http.Client{Timeout: 30 * time.Second},
+		client: bili.DefaultHTTPClient,
 	}
 }
 
