@@ -10,11 +10,12 @@ import (
 )
 
 type LiveLottery struct {
-	clients   []*DanmakuClient
-	keyword   string
-	mu        sync.Mutex
-	users     map[int64]*DanmakuUser
-	isRunning bool
+	clients    []*DanmakuClient
+	keyword    string
+	mu         sync.Mutex
+	users      map[int64]*DanmakuUser
+	isRunning  bool
+	OnUserJoin func(*DanmakuUser)
 }
 
 func NewLiveLottery(roomIDs []int, cookie string) *LiveLottery {
@@ -93,10 +94,14 @@ func (l *LiveLottery) handleDanmaku(msg *DanmakuMessage) {
 
 	if l.keyword == "" || strings.Contains(message, l.keyword) {
 		if _, exists := l.users[uid]; !exists {
-			l.users[uid] = &DanmakuUser{
+			user := &DanmakuUser{
 				UID:      uid,
 				Username: username,
 				Count:    1,
+			}
+			l.users[uid] = user
+			if l.OnUserJoin != nil {
+				l.OnUserJoin(user)
 			}
 		}
 	}
