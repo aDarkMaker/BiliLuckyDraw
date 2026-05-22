@@ -17,30 +17,37 @@ import (
 	"luckydraw/internal/live"
 	"luckydraw/internal/login"
 	"luckydraw/internal/lottery"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
-	ctx         context.Context
-	client      *bili.Client
-	config      *config.Config
-	myUID       int64
-	myName      string
-	configPath  string
-	mu          sync.Mutex
-	running     bool
-	stopChan    chan struct{}
-	liveLottery *live.LiveLottery
+	ctx           context.Context
+	client        *bili.Client
+	config        *config.Config
+	state         *config.RuntimeState
+	myUID         int64
+	myName        string
+	configPath    string
+	statePath     string
+	mu            sync.Mutex
+	running       bool
+	cancelFunc    context.CancelFunc
+	liveLottery   *live.LiveLottery
 }
 
 func NewApp() *App {
 	home, _ := os.UserHomeDir()
 	configPath := filepath.Join(home, ".luckydraw", "config.json")
+	statePath := filepath.Join(home, ".luckydraw", "state.json")
 	cfg, _ := config.LoadConfig(configPath)
+	state, _ := config.LoadRuntimeState(statePath)
 
 	app := &App{
 		config:     cfg,
+		state:      state,
 		configPath: configPath,
-		stopChan:   make(chan struct{}),
+		statePath:  statePath,
 	}
 
 	if cfg.Cookie != "" {
@@ -218,9 +225,9 @@ func (a *App) SaveConfig(cfgJSON string) error {
 	}
 
 	a.mu.Lock()
-	a.config = &cfg
-	a.mu.Unlock()
+	defer a.mu.Unlock()
 
+	a.config = &cfg
 	return config.SaveConfig(a.configPath, &cfg)
 }
 
@@ -235,10 +242,14 @@ func (a *App) StartLottery() (string, error) {
 		return "", fmt.Errorf("我有我的节奏……")
 	}
 	a.running = true
+
+	ctx, cancel := context.WithCancel(a.ctx)
+	a.cancelFunc = cancel
 	a.mu.Unlock()
 
 	go func() {
 		defer func() {
+			cancel()
 			a.mu.Lock()
 			a.running = false
 			a.mu.Unlock()
@@ -248,21 +259,25 @@ func (a *App) StartLottery() (string, error) {
 
 		for {
 			select {
-			case <-a.stopChan:
+			case <-ctx.Done():
 				return
 			default:
 				lotteries, err := service.SearchLotteries()
 				if err != nil {
+					runtime.EventsEmit(a.ctx, "lottery:error", err.Error())
 					time.Sleep(time.Duration(a.config.LotteryLoopWait) * time.Millisecond)
 					continue
 				}
 
+				runtime.EventsEmit(a.ctx, "lottery:found", len(lotteries))
+
 				for _, lottery := range lotteries {
 					select {
-					case <-a.stopChan:
+					case <-ctx.Done():
 						return
 					default:
 						service.Participate(lottery)
+						runtime.EventsEmit(a.ctx, "lottery:participate", lottery.Des)
 						time.Sleep(time.Duration(a.config.Wait) * time.Millisecond)
 					}
 				}
@@ -287,9 +302,10 @@ func (a *App) StopLottery() error {
 		return fmt.Errorf("还没有到时候～")
 	}
 
-	close(a.stopChan)
-	a.stopChan = make(chan struct{})
-	a.running = false
+	if a.cancelFunc != nil {
+		a.cancelFunc()
+		a.cancelFunc = nil
+	}
 
 	return nil
 }
@@ -303,6 +319,10 @@ func (a *App) CheckPrize() (string, error) {
 	result, err := service.CheckPrize()
 	if err != nil {
 		return "", err
+	}
+
+	if result.HasPrize {
+		runtime.EventsEmit(a.ctx, "prize:check", result.Messages)
 	}
 
 	data, _ := json.Marshal(result)
@@ -319,28 +339,28 @@ func (a *App) SetBackgroundImage(imagePath string) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	a.config.BackgroundImage = imagePath
-	return config.SaveConfig(a.configPath, a.config)
+	a.state.BackgroundImage = imagePath
+	return config.SaveRuntimeState(a.statePath, a.state)
 }
 
 func (a *App) GetBackgroundImage() string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	return a.config.BackgroundImage
+	return a.state.BackgroundImage
 }
 
 func (a *App) AddWatchedRoom(roomID int) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	for _, id := range a.config.WatchedRooms {
+	for _, id := range a.state.WatchedRooms {
 		if id == roomID {
 			return fmt.Errorf("严肃观看 %d 的直播！", roomID)
 		}
 	}
 
-	a.config.WatchedRooms = append(a.config.WatchedRooms, roomID)
-	return config.SaveConfig(a.configPath, a.config)
+	a.state.WatchedRooms = append(a.state.WatchedRooms, roomID)
+	return config.SaveRuntimeState(a.statePath, a.state)
 }
 
 func (a *App) RemoveWatchedRoom(roomID int) error {
@@ -348,21 +368,21 @@ func (a *App) RemoveWatchedRoom(roomID int) error {
 	defer a.mu.Unlock()
 
 	var newRooms []int
-	for _, id := range a.config.WatchedRooms {
+	for _, id := range a.state.WatchedRooms {
 		if id != roomID {
 			newRooms = append(newRooms, id)
 		}
 	}
 
-	a.config.WatchedRooms = newRooms
-	return config.SaveConfig(a.configPath, a.config)
+	a.state.WatchedRooms = newRooms
+	return config.SaveRuntimeState(a.statePath, a.state)
 }
 
 func (a *App) GetWatchedRooms() (string, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	data, err := json.Marshal(a.config.WatchedRooms)
+	data, err := json.Marshal(a.state.WatchedRooms)
 	if err != nil {
 		return "", err
 	}
