@@ -14,21 +14,10 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"luckydraw/internal/bili"
 )
 
-var httpClient = &http.Client{
-	Timeout: 15 * time.Second,
-	Transport: &http.Transport{
-		DisableKeepAlives:     true,
-		MaxIdleConns:          0,
-		MaxIdleConnsPerHost:   0,
-		IdleConnTimeout:       0,
-		DisableCompression:    false,
-		ResponseHeaderTimeout: 10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		ForceAttemptHTTP2:     false,
-	},
-}
+var httpClient = bili.DefaultHTTPClient
 
 const (
 	PacketHeaderLength    = 16
@@ -115,6 +104,10 @@ func extractUIDAndBuvid(cookie string) (int64, string) {
 }
 
 func (c *DanmakuClient) Connect() error {
+	return c.connectWithRetry(true)
+}
+
+func (c *DanmakuClient) connectWithRetry(isReconnect bool) error {
 	roomInfo, err := c.getRoomInfo()
 	if err != nil {
 		return fmt.Errorf("找不到直播间信息了喵: %v", err)
@@ -147,6 +140,30 @@ func (c *DanmakuClient) Connect() error {
 
 		go func() {
 			c.receiveMessagesWithAuth(authChan)
+			if !isReconnect {
+				return
+			}
+			select {
+			case <-c.stop:
+				return
+			default:
+			}
+			backoff := 1 * time.Second
+			maxBackoff := 30 * time.Second
+			for {
+				select {
+				case <-c.stop:
+					return
+				case <-time.After(backoff):
+				}
+				if err := c.connectWithRetry(true); err == nil {
+					return
+				}
+				backoff *= 2
+				if backoff > maxBackoff {
+					backoff = maxBackoff
+				}
+			}
 		}()
 
 		time.Sleep(200 * time.Millisecond)
