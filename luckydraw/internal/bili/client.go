@@ -16,12 +16,21 @@ type Client struct {
 	client *http.Client
 }
 
+var DefaultHTTPClient = &http.Client{
+	Timeout: 30 * time.Second,
+	Transport: &http.Transport{
+		MaxIdleConns:        10,
+		IdleConnTimeout:     90 * time.Second,
+		DisableCompression:  false,
+	},
+}
+
 func NewClient(cookie string) *Client {
 	csrf := extractCSRF(cookie)
 	return &Client{
 		cookie: cookie,
 		csrf:   csrf,
-		client: &http.Client{Timeout: 30 * time.Second},
+		client: DefaultHTTPClient,
 	}
 }
 
@@ -296,6 +305,22 @@ func (c *Client) GetDynamicFeed(hostMid int64, offset string) ([]byte, error) {
 		"offset":   offset,
 	}
 	return c.Get("https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space", params)
+}
+
+func (c *Client) GetTagFeed(tag string, offset string) ([]byte, error) {
+	return c.Get("https://api.bilibili.com/x/web-interface/search/type", map[string]string{
+		"search_type": "dynamic",
+		"keyword":     tag,
+		"offset":      offset,
+	})
+}
+
+func (c *Client) GetArticleList(mid int64, page int) ([]byte, error) {
+	return c.Get("https://api.bilibili.com/x/space/article", map[string]string{
+		"mid": fmt.Sprintf("%d", mid),
+		"pn":  fmt.Sprintf("%d", page),
+		"ps":  "30",
+	})
 }
 
 func (c *Client) GetLotteryNotice(dyid string) (*LotteryNotice, error) {
