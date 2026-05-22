@@ -14,17 +14,26 @@ import (
 )
 
 type Service struct {
-	client *bili.Client
-	config *config.Config
-	myUID  int64
+	client     *bili.Client
+	config     *config.Config
+	myUID      int64
+	rng        *rand.Rand
+	keyPatterns []*regexp.Regexp
 }
 
 func NewService(client *bili.Client, cfg *config.Config, myUID int64) *Service {
-	return &Service{
+	s := &Service{
 		client: client,
 		config: cfg,
 		myUID:  myUID,
+		rng:    rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
+	for _, p := range cfg.KeyWords {
+		if re, err := regexp.Compile(p); err == nil {
+			s.keyPatterns = append(s.keyPatterns, re)
+		}
+	}
+	return s
 }
 
 type LotteryInfo struct {
@@ -97,11 +106,151 @@ func (s *Service) searchByUIDs() ([]LotteryInfo, error) {
 }
 
 func (s *Service) searchByTags() ([]LotteryInfo, error) {
-	return []LotteryInfo{}, nil
+	var result []LotteryInfo
+
+	for _, tag := range s.config.Tags {
+		for page := 1; page <= s.config.TagScanPage; page++ {
+			offset := ""
+			if page > 1 {
+				offset = strconv.Itoa(page)
+			}
+
+			data, err := s.client.GetTagFeed(tag, offset)
+			if err != nil {
+				continue
+			}
+
+			lotteries := s.parseSearchData(data)
+			result = append(result, lotteries...)
+
+			time.Sleep(time.Duration(s.config.SearchWait) * time.Millisecond)
+		}
+	}
+
+	return result, nil
 }
 
 func (s *Service) searchByArticles() ([]LotteryInfo, error) {
-	return []LotteryInfo{}, nil
+	var result []LotteryInfo
+
+	for _, uid := range s.config.UIDs {
+		for page := 1; page <= s.config.ArticleScanPage; page++ {
+			data, err := s.client.GetArticleList(uid, page)
+			if err != nil {
+				continue
+			}
+
+			lotteries := s.parseArticleData(data)
+			result = append(result, lotteries...)
+
+			time.Sleep(time.Duration(s.config.SearchWait) * time.Millisecond)
+		}
+	}
+
+	return result, nil
+}
+
+func (s *Service) parseSearchData(data []byte) []LotteryInfo {
+	var result []LotteryInfo
+
+	var resp struct {
+		Code int `json:"code"`
+		Data struct {
+			Items []struct {
+				Title       string `json:"title"`
+				Description string `json:"description"`
+				Pubdate     int64  `json:"pubdate"`
+				Mid         int64  `json:"mid"`
+				Author      string `json:"author"`
+				DynamicID   string `json:"dynamic_id"`
+				Type        string `json:"type"`
+			} `json:"items"`
+		} `json:"data"`
+	}
+
+	if err := json.Unmarshal(data, &resp); err != nil {
+		return result
+	}
+
+	if resp.Code != 0 {
+		return result
+	}
+
+	for _, item := range resp.Data.Items {
+		desc := item.Description
+		if desc == "" {
+			desc = item.Title
+		}
+		if !s.matchKeywords(desc) {
+			continue
+		}
+
+		lottery := LotteryInfo{
+			UIDs:       []int64{item.Mid},
+			Uname:      item.Author,
+			CreateTime: item.Pubdate,
+			Dyid:       item.DynamicID,
+			Des:        desc,
+			ChatType:   17,
+			TypeNum:    1,
+		}
+
+		result = append(result, lottery)
+	}
+
+	return result
+}
+
+func (s *Service) parseArticleData(data []byte) []LotteryInfo {
+	var result []LotteryInfo
+
+	var resp struct {
+		Code int `json:"code"`
+		Data struct {
+			Articles []struct {
+				ID      int64  `json:"id"`
+				Title   string `json:"title"`
+				Summary string `json:"summary"`
+				PublishTime int64  `json:"publish_time"`
+				Author  struct {
+					Mid  int64  `json:"mid"`
+					Name string `json:"name"`
+				} `json:"author"`
+			} `json:"articles"`
+		} `json:"data"`
+	}
+
+	if err := json.Unmarshal(data, &resp); err != nil {
+		return result
+	}
+
+	if resp.Code != 0 {
+		return result
+	}
+
+	for _, article := range resp.Data.Articles {
+		desc := article.Summary
+		if desc == "" {
+			desc = article.Title
+		}
+		if !s.matchKeywords(desc) {
+			continue
+		}
+
+		lottery := LotteryInfo{
+			UIDs:       []int64{article.Author.Mid},
+			Uname:      article.Author.Name,
+			CreateTime: article.PublishTime,
+			Dyid:       strconv.FormatInt(article.ID, 10),
+			Des:        desc,
+			ChatType:   17,
+			TypeNum:    1,
+		}
+
+		result = append(result, lottery)
+	}
+
+	return result
 }
 
 func (s *Service) parseDynamicData(data []byte) []LotteryInfo {
@@ -173,13 +322,14 @@ func (s *Service) parseDynamicData(data []byte) []LotteryInfo {
 			Des:        desc,
 		}
 
-		if item.Item.Type == "DYNAMIC_TYPE_DRAW" {
+		switch item.Item.Type {
+		case "DYNAMIC_TYPE_DRAW":
 			lottery.ChatType = 11
 			lottery.TypeNum = 2
-		} else if item.Item.Type == "DYNAMIC_TYPE_WORD" {
+		case "DYNAMIC_TYPE_WORD":
 			lottery.ChatType = 17
 			lottery.TypeNum = 4
-		} else {
+		default:
 			lottery.ChatType = 17
 			lottery.TypeNum = 1
 		}
@@ -191,13 +341,12 @@ func (s *Service) parseDynamicData(data []byte) []LotteryInfo {
 }
 
 func (s *Service) matchKeywords(text string) bool {
-	if len(s.config.KeyWords) == 0 {
+	if len(s.keyPatterns) == 0 {
 		return true
 	}
 
-	for _, pattern := range s.config.KeyWords {
-		matched, _ := regexp.MatchString(pattern, text)
-		if !matched {
+	for _, re := range s.keyPatterns {
+		if !re.MatchString(text) {
 			return false
 		}
 	}
@@ -279,12 +428,12 @@ func (s *Service) getRandomRelay() string {
 	if len(s.config.Relay) == 0 {
 		return "转发动态"
 	}
-	return s.config.Relay[rand.Intn(len(s.config.Relay))]
+	return s.config.Relay[s.rng.Intn(len(s.config.Relay))]
 }
 
 func (s *Service) getRandomChat() string {
 	if len(s.config.Chat) == 0 {
 		return "[OK]"
 	}
-	return s.config.Chat[rand.Intn(len(s.config.Chat))]
+	return s.config.Chat[s.rng.Intn(len(s.config.Chat))]
 }
