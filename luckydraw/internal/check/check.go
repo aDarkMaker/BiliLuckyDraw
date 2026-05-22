@@ -10,17 +10,31 @@ import (
 )
 
 type Service struct {
-	client *bili.Client
-	config *config.Config
-	myUID  int64
+	client        *bili.Client
+	config        *config.Config
+	myUID         int64
+	noticePatterns []*regexp.Regexp
+	noticeExcludes []*regexp.Regexp
 }
 
 func NewService(client *bili.Client, cfg *config.Config, myUID int64) *Service {
-	return &Service{
+	s := &Service{
 		client: client,
 		config: cfg,
 		myUID:  myUID,
 	}
+	for _, p := range cfg.NoticeKeyWords {
+		if strings.HasPrefix(p, "~") {
+			if re, err := regexp.Compile(p[1:]); err == nil {
+				s.noticeExcludes = append(s.noticeExcludes, re)
+			}
+		} else {
+			if re, err := regexp.Compile(p); err == nil {
+				s.noticePatterns = append(s.noticePatterns, re)
+			}
+		}
+	}
+	return s
 }
 
 type CheckResult struct {
@@ -55,21 +69,19 @@ func (s *Service) CheckPrize() (*CheckResult, error) {
 }
 
 func (s *Service) matchNoticeKeywords(text string) bool {
-	if len(s.config.NoticeKeyWords) == 0 {
+	if len(s.noticePatterns) == 0 && len(s.noticeExcludes) == 0 {
 		return false
 	}
 
-	for _, pattern := range s.config.NoticeKeyWords {
-		if strings.HasPrefix(pattern, "~") {
-			matched, _ := regexp.MatchString(pattern[1:], text)
-			if matched {
-				return false
-			}
-		} else {
-			matched, _ := regexp.MatchString(pattern, text)
-			if matched {
-				return true
-			}
+	for _, re := range s.noticeExcludes {
+		if re.MatchString(text) {
+			return false
+		}
+	}
+
+	for _, re := range s.noticePatterns {
+		if re.MatchString(text) {
+			return true
 		}
 	}
 
