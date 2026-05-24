@@ -14,9 +14,7 @@ interface Winner {
 	count: number;
 }
 
-export const useLottery = (watchedRooms: number[]) => {
-	const [keyword, setKeyword] = useState('');
-	const [winnerCount, setWinnerCount] = useState(1);
+export const useLottery = (watchedRooms: number[], keyword: string, winnerCount: number) => {
 	const [lotteryRunning, setLotteryRunning] = useState(false);
 	const [participantCount, setParticipantCount] = useState(0);
 	const [winners, setWinners] = useState<Winner[]>([]);
@@ -33,9 +31,7 @@ export const useLottery = (watchedRooms: number[]) => {
 					const count = await GetParticipantCount();
 					setParticipantCount(count);
 				}
-			} catch (e) {
-				// ignore
-			}
+			} catch (e) {}
 		};
 
 		const interval = setInterval(checkLotteryStatus, 1000);
@@ -92,10 +88,6 @@ export const useLottery = (watchedRooms: number[]) => {
 	};
 
 	return {
-		keyword,
-		setKeyword,
-		winnerCount,
-		setWinnerCount,
 		lotteryRunning,
 		participantCount,
 		winners,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Logout } from '../wailsjs/go/main/App';
 import { useAuth } from './hooks/useAuth';
 import { useLottery } from './hooks/useLottery';
@@ -17,13 +17,28 @@ function App() {
 	const [view, setView] = useState<View>('lottery');
 	const [message, setMessage] = useState('');
 
-	const { loggedIn, setLoggedIn, accountInfo, backgroundImage, setBackgroundImage, watchedRooms, loadAll, loadWatchedRooms } = useAuth();
-
 	const {
+		loggedIn,
+		setLoggedIn,
+		accountInfo,
+		backgroundImage,
+		setBackgroundImage,
+		watchedRooms,
+		profiles,
+		activeProfileId,
 		keyword,
 		setKeyword,
 		winnerCount,
 		setWinnerCount,
+		switchProfile,
+		createProfile,
+		deleteProfile,
+		renameProfile,
+		loadAll,
+		loadWatchedRooms,
+	} = useAuth();
+
+	const {
 		lotteryRunning,
 		participantCount,
 		winners,
@@ -31,7 +46,7 @@ function App() {
 		isConnecting,
 		handleStartLottery,
 		resetLottery,
-	} = useLottery(watchedRooms);
+	} = useLottery(watchedRooms, keyword, winnerCount);
 
 	const handleLoginSuccess = async () => {
 		setLoggedIn(true);
@@ -73,6 +88,12 @@ function App() {
 				isSettingsOpen={view === 'settings'}
 				loggedIn={loggedIn}
 				userAvatar={accountInfo?.face}
+				profiles={profiles}
+				activeProfileId={activeProfileId}
+				onSwitchProfile={switchProfile}
+				onCreateProfile={(name) => { createProfile(name); }}
+				onDeleteProfile={(id) => { deleteProfile(id); }}
+				onRenameProfile={(id, name) => { renameProfile(id, name); }}
 			/>
 			<div className="app-content">
 				{!loggedIn ? (
@@ -82,10 +103,17 @@ function App() {
 							backgroundImage={backgroundImage}
 							watchedRooms={watchedRooms}
 							loggedIn={loggedIn}
+							lotteryRunning={lotteryRunning}
 							onLogout={handleLogout}
 							onBackgroundImageChange={setBackgroundImage}
 							onWatchedRoomsChange={loadWatchedRooms}
 							onMessage={onMessage}
+							profiles={profiles}
+							activeProfileId={activeProfileId}
+							onCreateProfile={(name) => { createProfile(name); }}
+							onDeleteProfile={(id) => { deleteProfile(id); }}
+							onRenameProfile={(id, name) => { renameProfile(id, name); }}
+							onSwitchProfile={switchProfile}
 						/>
 					) : (
 						<LoginView onLoginSuccess={handleLoginSuccess} onMessage={onMessage} />
@@ -106,10 +134,17 @@ function App() {
 						backgroundImage={backgroundImage}
 						watchedRooms={watchedRooms}
 						loggedIn={loggedIn}
+						lotteryRunning={lotteryRunning}
 						onLogout={handleLogout}
 						onBackgroundImageChange={setBackgroundImage}
 						onWatchedRoomsChange={loadWatchedRooms}
 						onMessage={onMessage}
+						profiles={profiles}
+						activeProfileId={activeProfileId}
+						onCreateProfile={(name) => { createProfile(name); }}
+						onDeleteProfile={(id) => { deleteProfile(id); }}
+						onRenameProfile={(id, name) => { renameProfile(id, name); }}
+						onSwitchProfile={switchProfile}
 					/>
 				)}
 			</div>

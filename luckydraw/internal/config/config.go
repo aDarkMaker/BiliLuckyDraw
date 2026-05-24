@@ -123,24 +123,96 @@ func SaveConfig(path string, cfg *Config) error {
 	return os.WriteFile(path, data, 0644)
 }
 
-type RuntimeState struct {
+type ProfileConfig struct {
+	ID              string `json:"id"`
+	Name            string `json:"name"`
 	BackgroundImage string `json:"background_image,omitempty"`
 	WatchedRooms    []int  `json:"watched_rooms,omitempty"`
+	Keyword         string `json:"keyword,omitempty"`
+	WinnerCount     int    `json:"winner_count"`
+}
+
+type RuntimeState struct {
+	Profiles      []ProfileConfig `json:"profiles,omitempty"`
+	ActiveProfile string          `json:"active_profile,omitempty"`
+
+	// deprecated — kept for migration
+	BackgroundImage string `json:"background_image,omitempty"`
+	WatchedRooms    []int  `json:"watched_rooms,omitempty"`
+}
+
+func (s *RuntimeState) GetActiveProfile() *ProfileConfig {
+	if s == nil || len(s.Profiles) == 0 {
+		return nil
+	}
+	for i := range s.Profiles {
+		if s.Profiles[i].ID == s.ActiveProfile {
+			return &s.Profiles[i]
+		}
+	}
+	return &s.Profiles[0]
+}
+
+func (s *RuntimeState) SetActiveProfile(p *ProfileConfig) {
+	for i := range s.Profiles {
+		if s.Profiles[i].ID == p.ID {
+			s.Profiles[i] = *p
+			return
+		}
+	}
 }
 
 func LoadRuntimeState(path string) (*RuntimeState, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return &RuntimeState{}, nil
+			return defaultRuntimeState(), nil
 		}
 		return nil, err
 	}
 	var state RuntimeState
 	if err := json.Unmarshal(data, &state); err != nil {
-		return &RuntimeState{}, nil
+		return defaultRuntimeState(), nil
 	}
+
+	if len(state.Profiles) == 0 {
+		migrateOldState(&state)
+	}
+
+	if state.ActiveProfile == "" && len(state.Profiles) > 0 {
+		state.ActiveProfile = state.Profiles[0].ID
+	}
+
 	return &state, nil
+}
+
+func migrateOldState(state *RuntimeState) {
+	profile := ProfileConfig{
+		ID:              "default",
+		Name:            "默认配置",
+		BackgroundImage: state.BackgroundImage,
+		WatchedRooms:    state.WatchedRooms,
+		Keyword:         "",
+		WinnerCount:     1,
+	}
+	if profile.WatchedRooms == nil {
+		profile.WatchedRooms = []int{}
+	}
+	state.Profiles = []ProfileConfig{profile}
+	state.BackgroundImage = ""
+	state.WatchedRooms = nil
+}
+
+func defaultRuntimeState() *RuntimeState {
+	return &RuntimeState{
+		ActiveProfile: "default",
+		Profiles: []ProfileConfig{{
+			ID:          "default",
+			Name:        "默认配置",
+			WatchedRooms: []int{},
+			WinnerCount: 1,
+		}},
+	}
 }
 
 func SaveRuntimeState(path string, state *RuntimeState) error {

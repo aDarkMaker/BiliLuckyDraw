@@ -18,6 +18,14 @@ export function ConnectLiveRooms(arg1) {
   return window['go']['main']['App']['ConnectLiveRooms'](arg1);
 }
 
+export function CreateProfile(arg1) {
+  return window['go']['main']['App']['CreateProfile'](arg1);
+}
+
+export function DeleteProfile(arg1) {
+  return window['go']['main']['App']['DeleteProfile'](arg1);
+}
+
 export function DrawWinners(arg1) {
   return window['go']['main']['App']['DrawWinners'](arg1);
 }
@@ -36,6 +44,10 @@ export function GetConfig() {
 
 export function GetParticipantCount() {
   return window['go']['main']['App']['GetParticipantCount']();
+}
+
+export function GetProfiles() {
+  return window['go']['main']['App']['GetProfiles']();
 }
 
 export function GetQRCode() {
@@ -74,8 +86,16 @@ export function RemoveWatchedRoom(arg1) {
   return window['go']['main']['App']['RemoveWatchedRoom'](arg1);
 }
 
+export function RenameProfile(arg1, arg2) {
+  return window['go']['main']['App']['RenameProfile'](arg1, arg2);
+}
+
 export function SaveConfig(arg1) {
   return window['go']['main']['App']['SaveConfig'](arg1);
+}
+
+export function SaveProfileConfig(arg1, arg2) {
+  return window['go']['main']['App']['SaveProfileConfig'](arg1, arg2);
 }
 
 export function SetBackgroundImage(arg1) {
@@ -96,4 +116,8 @@ export function StopLiveLottery() {
 
 export function StopLottery() {
   return window['go']['main']['App']['StopLottery']();
+}
+
+export function SwitchProfile(arg1) {
+  return window['go']['main']['App']['SwitchProfile'](arg1);
 }

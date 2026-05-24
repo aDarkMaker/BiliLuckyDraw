@@ -9,6 +9,10 @@ export function CheckQRCodeStatus(arg1:string):Promise<string>;
 
 export function ConnectLiveRooms(arg1:Array<number>):Promise<void>;
 
+export function CreateProfile(arg1:string):Promise<string>;
+
+export function DeleteProfile(arg1:string):Promise<void>;
+
 export function DrawWinners(arg1:number):Promise<string>;
 
 export function GetAccountInfo():Promise<string>;
@@ -18,6 +22,8 @@ export function GetBackgroundImage():Promise<string>;
 export function GetConfig():Promise<string>;
 
 export function GetParticipantCount():Promise<number>;
+
+export function GetProfiles():Promise<string>;
 
 export function GetQRCode():Promise<string>;
 
@@ -37,7 +43,11 @@ export function Logout():Promise<void>;
 
 export function RemoveWatchedRoom(arg1:number):Promise<void>;
 
+export function RenameProfile(arg1:string,arg2:string):Promise<void>;
+
 export function SaveConfig(arg1:string):Promise<void>;
+
+export function SaveProfileConfig(arg1:string,arg2:number):Promise<void>;
 
 export function SetBackgroundImage(arg1:string):Promise<void>;
 
@@ -48,3 +58,5 @@ export function StartLottery():Promise<string>;
 export function StopLiveLottery():Promise<void>;
 
 export function StopLottery():Promise<void>;
+
+export function SwitchProfile(arg1:string):Promise<string>;

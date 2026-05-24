@@ -339,27 +339,41 @@ func (a *App) SetBackgroundImage(imagePath string) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	a.state.BackgroundImage = imagePath
+	profile := a.state.GetActiveProfile()
+	if profile == nil {
+		return fmt.Errorf("没有活跃的配置喵")
+	}
+	profile.BackgroundImage = imagePath
+	a.state.SetActiveProfile(profile)
 	return config.SaveRuntimeState(a.statePath, a.state)
 }
 
 func (a *App) GetBackgroundImage() string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	return a.state.BackgroundImage
+	profile := a.state.GetActiveProfile()
+	if profile == nil {
+		return ""
+	}
+	return profile.BackgroundImage
 }
 
 func (a *App) AddWatchedRoom(roomID int) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	for _, id := range a.state.WatchedRooms {
+	profile := a.state.GetActiveProfile()
+	if profile == nil {
+		return fmt.Errorf("没有活跃的配置喵")
+	}
+	for _, id := range profile.WatchedRooms {
 		if id == roomID {
 			return fmt.Errorf("严肃观看 %d 的直播！", roomID)
 		}
 	}
 
-	a.state.WatchedRooms = append(a.state.WatchedRooms, roomID)
+	profile.WatchedRooms = append(profile.WatchedRooms, roomID)
+	a.state.SetActiveProfile(profile)
 	return config.SaveRuntimeState(a.statePath, a.state)
 }
 
@@ -367,14 +381,19 @@ func (a *App) RemoveWatchedRoom(roomID int) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
+	profile := a.state.GetActiveProfile()
+	if profile == nil {
+		return fmt.Errorf("没有活跃的配置喵")
+	}
 	var newRooms []int
-	for _, id := range a.state.WatchedRooms {
+	for _, id := range profile.WatchedRooms {
 		if id != roomID {
 			newRooms = append(newRooms, id)
 		}
 	}
 
-	a.state.WatchedRooms = newRooms
+	profile.WatchedRooms = newRooms
+	a.state.SetActiveProfile(profile)
 	return config.SaveRuntimeState(a.statePath, a.state)
 }
 
@@ -382,7 +401,11 @@ func (a *App) GetWatchedRooms() (string, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	data, err := json.Marshal(a.state.WatchedRooms)
+	profile := a.state.GetActiveProfile()
+	if profile == nil {
+		return "[]", nil
+	}
+	data, err := json.Marshal(profile.WatchedRooms)
 	if err != nil {
 		return "", err
 	}
@@ -404,4 +427,119 @@ func (a *App) Logout() error {
 	}
 
 	return config.SaveConfig(a.configPath, a.config)
+}
+
+func (a *App) GetProfiles() (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	result := map[string]interface{}{
+		"profiles":       a.state.Profiles,
+		"active_profile": a.state.ActiveProfile,
+	}
+	data, _ := json.Marshal(result)
+	return string(data), nil
+}
+
+func (a *App) SwitchProfile(id string) (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	found := false
+	for _, p := range a.state.Profiles {
+		if p.ID == id {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return "", fmt.Errorf("没有这个配置喵")
+	}
+
+	a.state.ActiveProfile = id
+	if err := config.SaveRuntimeState(a.statePath, a.state); err != nil {
+		return "", err
+	}
+
+	profile := a.state.GetActiveProfile()
+	profileData, _ := json.Marshal(profile)
+	runtime.EventsEmit(a.ctx, "profile:switched", string(profileData))
+	return string(profileData), nil
+}
+
+func (a *App) CreateProfile(name string) (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	id := fmt.Sprintf("pf_%d", time.Now().UnixNano())
+	profile := config.ProfileConfig{
+		ID:          id,
+		Name:        name,
+		WatchedRooms: []int{},
+		WinnerCount: 1,
+	}
+	a.state.Profiles = append(a.state.Profiles, profile)
+	a.state.ActiveProfile = id
+
+	if err := config.SaveRuntimeState(a.statePath, a.state); err != nil {
+		return "", err
+	}
+
+	profileData, _ := json.Marshal(profile)
+	runtime.EventsEmit(a.ctx, "profile:created", string(profileData))
+	return string(profileData), nil
+}
+
+func (a *App) DeleteProfile(id string) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	if len(a.state.Profiles) <= 1 {
+		return fmt.Errorf("好歹留一个Profile吧")
+	}
+
+	var idx int = -1
+	for i, p := range a.state.Profiles {
+		if p.ID == id {
+			idx = i
+			break
+		}
+	}
+	if idx < 0 {
+		return fmt.Errorf("没有这个配置喵")
+	}
+
+	a.state.Profiles = append(a.state.Profiles[:idx], a.state.Profiles[idx+1:]...)
+	if a.state.ActiveProfile == id {
+		a.state.ActiveProfile = a.state.Profiles[0].ID
+	}
+
+	return config.SaveRuntimeState(a.statePath, a.state)
+}
+
+func (a *App) RenameProfile(id, name string) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	for i := range a.state.Profiles {
+		if a.state.Profiles[i].ID == id {
+			a.state.Profiles[i].Name = name
+			return config.SaveRuntimeState(a.statePath, a.state)
+		}
+	}
+	return fmt.Errorf("没有这个配置喵")
+}
+
+func (a *App) SaveProfileConfig(keyword string, winnerCount int) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	profile := a.state.GetActiveProfile()
+	if profile == nil {
+		return fmt.Errorf("没有活跃的配置喵")
+	}
+	profile.Keyword = keyword
+	profile.WinnerCount = winnerCount
+	a.state.SetActiveProfile(profile)
+	return config.SaveRuntimeState(a.statePath, a.state)
 }

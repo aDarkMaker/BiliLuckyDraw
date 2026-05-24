@@ -67,16 +67,20 @@
 	z-index: 1;
 }
 
-.settings-card:nth-child(3n+1) {
+.settings-card.settings-bg-0 {
 	background-position: 10% center;
 }
 
-.settings-card:nth-child(3n+2) {
+.settings-card.settings-bg-1 {
 	background-position: 50% center;
 }
 
-.settings-card:nth-child(3n+3) {
+.settings-card.settings-bg-2 {
 	background-position: 90% center;
+}
+
+.settings-card.settings-bg-3 {
+	background-position: 10% center;
 }
 
 .settings-title {
@@ -98,7 +102,6 @@
 	background: var(--color-primary);
 	border-radius: 1px;
 	flex-shrink: 0;
-	transform: translateY(2px);
 }
 
 .account-section {
@@ -222,4 +225,79 @@
 
 .file-input {
 	display: none;
+}
+
+.profile-input-group {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 16px;
+}
+
+.profile-input-group .input {
+	flex: 1;
+	height: 38px;
+}
+
+.profile-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.profile-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 14px;
+	background: #fcfcfc;
+	border-radius: 6px;
+	border: 1px solid #f0f0f0;
+}
+
+.profile-item.is-active {
+	border-color: var(--color-primary);
+	background: #fdf5f5;
+}
+
+.profile-item-info {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	flex: 1;
+}
+
+.profile-item-info.is-disabled {
+	cursor: default;
+	opacity: 0.5;
+}
+
+.profile-item-name {
+	font-size: 14px;
+	color: var(--color-text-secondary);
+}
+
+.profile-item-badge {
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background: var(--color-primary);
+	color: #fff;
+}
+
+.profile-item-actions {
+	display: flex;
+	gap: 4px;
+}
+
+.profile-item-edit {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	flex: 1;
+}
+
+.profile-item-edit .input {
+	flex: 1;
+	height: 32px;
 }
