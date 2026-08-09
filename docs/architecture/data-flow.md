@@ -13,11 +13,6 @@ flowchart LR
     Dedup -->|已存在| Danmaku
     Join --> Emit["emitter.Emit live:user_join"]
     Emit --> Front[前端更新参与人数]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class Connect,Listen,Parse,Join,Emit,Front proc;
-class Start,Dedup io;
 ```
 
 `live:user_join` 实时驱动参与人数更新；另有 1000ms 轮询兜底对账。
@@ -30,11 +25,6 @@ flowchart LR
     Quit --> Draw["DrawWinners Fisher-Yates 洗牌取前 N"]
     Draw --> JSON[返回 Winner 数组 JSON]
     JSON --> Show[前端展示中奖名单]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class Quit,Draw,JSON,Show proc;
-class Stop io;
 ```
 
 ## 登录流程
@@ -47,11 +37,6 @@ flowchart LR
     B --> C{校验通过}
     C -->|是| D[持久化到 config.json]
     C -->|否| E[提示登录失败]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class B,D,E proc;
-class A,C io;
 ```
 
 **扫码登录：**
@@ -65,11 +50,6 @@ flowchart LR
     Q4 -->|86090 待确认| Q3
     Q4 -->|0 成功| Q6[收集 Set-Cookie 头 Cookie]
     Q6 --> Q7[LoginWithQRCode 校验并持久化]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class Q1,Q2,Q6,Q7,Q5 proc;
-class Q3,Q4 io;
 ```
 
 ## Profile 事件
@@ -78,11 +58,6 @@ class Q3,Q4 io;
 flowchart LR
     S["SwitchProfile(id)"] --> SP[持久化] --> SE["emit profile:switched"]
     C["CreateProfile(name)"] --> CP["持久化, ID = pf_unixnano"] --> CE["emit profile:created"]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class SP,SE,CP,CE proc;
-class S,C io;
 ```
 
 payload 均为对应 ProfileConfig JSON。

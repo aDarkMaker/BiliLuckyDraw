@@ -13,11 +13,6 @@ flowchart LR
     Dedup -->|Already| Danmaku
     Join --> Emit["emitter.Emit live:user_join"]
     Emit --> Front[Frontend updates participant count]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class Connect,Listen,Parse,Join,Emit,Front proc;
-class Start,Dedup io;
 ```
 
 The `live:user_join` event drives participant-count updates in real time; a 1000ms polling fallback reconciles.
@@ -30,11 +25,6 @@ flowchart LR
     Quit --> Draw["DrawWinners Fisher-Yates shuffle, take top N"]
     Draw --> JSON[Return Winner array JSON]
     JSON --> Show[Frontend renders winner list]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class Quit,Draw,JSON,Show proc;
-class Stop io;
 ```
 
 ## Login flow
@@ -47,11 +37,6 @@ flowchart LR
     B --> C{Valid?}
     C -->|Yes| D[Persist to config.json]
     C -->|No| E[Show login-failed prompt]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class B,D,E proc;
-class A,C io;
 ```
 
 **QR-code login:**
@@ -65,11 +50,6 @@ flowchart LR
     Q4 -->|86090 awaiting confirm| Q3
     Q4 -->|0 success| Q6[Collect Cookie from Set-Cookie header]
     Q6 --> Q7[LoginWithQRCode validates and persists]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class Q1,Q2,Q6,Q7,Q5 proc;
-class Q3,Q4 io;
 ```
 
 ## Profile events
@@ -78,11 +58,6 @@ class Q3,Q4 io;
 flowchart LR
     S["SwitchProfile(id)"] --> SP[persist] --> SE["emit profile:switched"]
     C["CreateProfile(name)"] --> CP["persist, ID = pf_unixnano"] --> CE["emit profile:created"]
-
-classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class SP,SE,CP,CE proc;
-class S,C io;
 ```
 
 Both payloads are the corresponding ProfileConfig JSON.

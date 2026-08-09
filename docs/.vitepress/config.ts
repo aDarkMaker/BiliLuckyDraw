@@ -14,7 +14,7 @@ export default withMermaid(
 		lastUpdated: true,
 		head: [['link', { rel: 'icon', href: `${base}img/logo.png` }]],
 		themeConfig: {
-			logo: `${base}img/logo.png`,
+			logo: '/img/logo.png',
 		socialLinks: [{ icon: 'github', link: repo }],
 		search: { provider: 'local' },
 		footer: {

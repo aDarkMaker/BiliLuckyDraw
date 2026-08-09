@@ -12,9 +12,6 @@ flowchart LR
     Base["config · bili · live · login<br/>配置 / B站API / 弹幕协议 / 扫码登录"]
 
     App --> Svc --> Dom --> Base
-
-classDef layer fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class App,Svc,Dom,Base layer;
 ```
 
 - `app`：唯一 import `wails/v3` 的包，`AppService` 是暴露给前端的单一服务，所有方法委托 `service`。

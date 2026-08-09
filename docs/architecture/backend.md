@@ -31,7 +31,6 @@ sequenceDiagram
 - `ServiceName`：返回 `"App"`。
 
 `wailsEmitter` 实现 `event.Emitter` 接口，委托 `application.App.Event.Emit`，让 service 不直接依赖 Wails。每个导出方法薄委托对应 service，签名不变。
-
 ```mermaid
 flowchart LR
     subgraph FE["前端 (webview)"]
@@ -68,11 +67,6 @@ flowchart LR
     Live --> Bili
     Profile --> Cfg
     Auth --> Cfg
-
-classDef layer fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class AS,WE,Auth,Live,Profile,Bili,LLive,QR,Cfg layer;
-class UI io;
 ```
 
 `app` 层向 `live`/`profile` 注入 `Emitter`（`auth` 不需要事件），service 通过它发事件，由 `wailsEmitter` 转发回前端——service 全程不 import Wails。

@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      mermaid:
+        specifier: ^11.16.1
+        version: 11.16.1
       vitepress:
         specifier: 1.6.4
         version: 1.6.4(@algolia/client-search@5.56.0)(postcss@8.5.26)(search-insights@2.17.3)

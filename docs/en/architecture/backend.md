@@ -31,7 +31,6 @@ sequenceDiagram
 - `ServiceName`: returns `"App"`.
 
 `wailsEmitter` implements the `event.Emitter` interface, delegating to `application.App.Event.Emit` so services never import Wails directly. Each exported method thinly delegates to its service impl with an unchanged signature.
-
 ```mermaid
 flowchart LR
     subgraph FE["Frontend (webview)"]
@@ -68,11 +67,6 @@ flowchart LR
     Live --> Bili
     Profile --> Cfg
     Auth --> Cfg
-
-classDef layer fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class AS,WE,Auth,Live,Profile,Bili,LLive,QR,Cfg layer;
-class UI io;
 ```
 
 The `app` layer injects an `Emitter` into `live`/`profile` (`auth` needs no events); services emit through it and `wailsEmitter` forwards back to the frontend — services never import Wails.

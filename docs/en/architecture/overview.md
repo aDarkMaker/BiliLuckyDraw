@@ -12,9 +12,6 @@ flowchart LR
     Base["config · bili · live · login<br/>config / Bilibili API / danmaku protocol / QR login"]
 
     App --> Svc --> Dom --> Base
-
-classDef layer fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class App,Svc,Dom,Base layer;
 ```
 
 - `app`: the only package importing `wails/v3`. `AppService` is the single service exposed to the frontend; every method delegates to `service`.
