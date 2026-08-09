@@ -1,17 +1,20 @@
 import { defineConfig } from 'vitepress';
+import { withMermaid } from 'vitepress-plugin-mermaid';
 
 const repo = 'https://github.com/aDarkMaker/BiliLuckyDraw';
 const releases = `${repo}/releases`;
+const base = '/BiliLuckyDraw/';
 
-export default defineConfig({
-	title: 'BiliLuckyDraw',
-	description: '基于 Wails v3 + Go + React + TypeScript 的 B 站直播间弹幕抽奖桌面应用',
-	base: '/BiliLuckyDraw/',
-	cleanUrls: true,
-	lastUpdated: true,
-	head: [['link', { rel: 'icon', href: '/img/logo.png' }]],
-	themeConfig: {
-		logo: '/img/logo.png',
+export default withMermaid(
+	defineConfig({
+		title: 'BiliLuckyDraw',
+		description: '基于 Wails v3 + Go + React + TypeScript 的 B 站直播间弹幕抽奖桌面应用',
+		base,
+		cleanUrls: true,
+		lastUpdated: true,
+		head: [['link', { rel: 'icon', href: `${base}img/logo.png` }]],
+		themeConfig: {
+			logo: `${base}img/logo.png`,
 		socialLinks: [{ icon: 'github', link: repo }],
 		search: { provider: 'local' },
 		footer: {
@@ -115,4 +118,5 @@ export default defineConfig({
 			},
 		},
 	},
-});
+}),
+);
