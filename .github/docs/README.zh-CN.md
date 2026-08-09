@@ -18,14 +18,14 @@
 
 ## 简介
 
-BiliLuckyDraw 是一个 B 站直播弹幕抽奖桌面应用。开启后实时监控直播间弹幕，按关键词收集参与用户，随机抽取中奖者。支持多账号配置（Profile）、扫码 / Cookie 登录、日间 / 夜间 / 春节三套主题。
+BiliLuckyDraw 是一个 B 站直播弹幕抽奖桌面应用。开启后实时监控直播间弹幕，按关键词收集参与用户，随机抽取中奖者。支持多 Profile（抽奖配置集）、扫码 / Cookie 登录、日间 / 夜间 / 春节 / 海滩四套主题。
 
 ## 功能特性
 
 - **直播间抽奖**：实时监控弹幕，按关键词收集参与用户，随机抽奖
 - **多种登录方式**：Cookie 登录、B 站 APP 扫码登录
-- **多账号 Profile**：多套抽奖配置（关键词 / 中奖数 / 监控房间），一键切换
-- **主题系统**：日间（默认，跟随系统）、夜间、春节三套主题，运行时可切换，选择持久化
+- **多 Profile**：多套抽奖配置（关键词 / 中奖数 / 监控房间），一键切换
+- **主题系统**：日间（默认，跟随系统）、夜间、春节、海滩四套主题，运行时可切换，选择持久化
 - **可定制**：自定义关键词、监控房间、背景图
 
 ## 截图预览
@@ -33,12 +33,13 @@ BiliLuckyDraw 是一个 B 站直播弹幕抽奖桌面应用。开启后实时监
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="../../img/home.png" width="400" alt="首页/抽奖页"/><br/><sub>首页 / 抽奖页</sub></td>
-      <td align="center"><img src="../../img/login.png" width="400" alt="登录页"/><br/><sub>登录页</sub></td>
+      <td align="center"><img src="../../img/home.png" width="360" alt="首页/抽奖页"/><br/><sub>首页 / 抽奖页</sub></td>
+      <td align="center"><img src="../../img/login.png" width="360" alt="登录页"/><br/><sub>登录页</sub></td>
+      <td align="center"><img src="../../img/prcode.png" width="360" alt="扫码登录"/><br/><sub>扫码登录</sub></td>
     </tr>
     <tr>
-      <td align="center"><img src="../../img/prcode.png" width="400" alt="扫码登录"/><br/><sub>扫码登录</sub></td>
-      <td align="center"><img src="../../img/settings.png" width="400" alt="设置页"/><br/><sub>设置页</sub></td>
+      <td align="center"><img src="../../img/settings.png" width="360" alt="设置页"/><br/><sub>设置页</sub></td>
+      <td align="center"><img src="../../img/winners.png" width="360" alt="中奖结果"/><br/><sub>中奖结果</sub></td>
     </tr>
   </table>
 </div>
@@ -77,7 +78,7 @@ luckydraw/
     config/ bili/ live/ login/   # 配置、B 站 API、直播弹幕协议、扫码登录
   frontend/
     src/
-      themes/                    # 主题系统：light / dark / spring-festival
+      themes/                    # 主题系统：light / dark / spring-festival / beach
       styles/ components/ hooks/ # 基础结构 token、组件样式、React Hooks
     bindings/                    # wails3 generate bindings 生成（勿手改）
 ```
@@ -114,7 +115,7 @@ task common:generate:bindings    # 改后端方法后重新生成前端绑定
 ## 开发说明
 
 - 前端绑定位于 `frontend/bindings/`，由 `wails3 generate bindings` 生成，**勿手改**；改后端方法后重新生成
-- 主题通过 CSS 变量按 `theme-light` / `theme-dark` / `theme-spring-festival` class 作用域切换，颜色全部走 token
+- 主题通过 CSS 变量按 `theme-light` / `theme-dark` / `theme-spring-festival` / `theme-beach` class 作用域切换，颜色全部走 token
 - 后端分层：`app`（Wails 边界）→ `service`（纯业务）→ `domain`（接口）/ `event`（事件解耦），`app` 是唯一 import wails/v3 的包
 
 ## 许可证

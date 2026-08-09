@@ -16,14 +16,14 @@
 
 ---
 
-> 完整文档见上方语言链接。简要说明如下。
+> 完整文档见 [在线文档](https://adarkmaker.github.io/BiliLuckyDraw/)（或上方语言链接）。简要说明如下。
 
 ## 功能特性
 
 - **直播间抽奖**：实时监控弹幕，按关键词收集参与用户，随机抽奖
 - **多种登录方式**：Cookie 登录、B 站 APP 扫码登录
-- **多账号 Profile**：多套抽奖配置（关键词 / 中奖数 / 监控房间），一键切换
-- **主题系统**：日间（默认，跟随系统）、夜间、春节三套主题，运行时可切换
+- **多 Profile**：多套抽奖配置（关键词 / 中奖数 / 监控房间），一键切换
+- **主题系统**：日间（默认，跟随系统）、夜间、春节、海滩四套主题，运行时可切换
 - **可定制**：自定义关键词、监控房间、背景图
 
 ## 截图预览
@@ -31,12 +31,13 @@
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="../img/home.png" width="400" alt="首页/抽奖页"/><br/><sub>首页 / 抽奖页</sub></td>
-      <td align="center"><img src="../img/login.png" width="400" alt="登录页"/><br/><sub>登录页</sub></td>
+      <td align="center"><img src="../img/home.png" width="360" alt="首页/抽奖页"/><br/><sub>首页 / 抽奖页</sub></td>
+      <td align="center"><img src="../img/login.png" width="360" alt="登录页"/><br/><sub>登录页</sub></td>
+      <td align="center"><img src="../img/prcode.png" width="360" alt="扫码登录"/><br/><sub>扫码登录</sub></td>
     </tr>
     <tr>
-      <td align="center"><img src="../img/prcode.png" width="400" alt="扫码登录"/><br/><sub>扫码登录</sub></td>
-      <td align="center"><img src="../img/settings.png" width="400" alt="设置页"/><br/><sub>设置页</sub></td>
+      <td align="center"><img src="../img/settings.png" width="360" alt="设置页"/><br/><sub>设置页</sub></td>
+      <td align="center"><img src="../img/winners.png" width="360" alt="中奖结果"/><br/><sub>中奖结果</sub></td>
     </tr>
   </table>
 </div>
