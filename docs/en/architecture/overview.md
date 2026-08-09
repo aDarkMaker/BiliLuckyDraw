@@ -6,10 +6,10 @@ BiliLuckyDraw is a Wails v3 desktop app: the Go backend embeds the React fronten
 
 ```mermaid
 flowchart LR
-    App["internal/app<br/>Wails boundary, thin delegation<br/><i>only pkg importing wails/v3</i>"]
-    Svc["internal/service<br/>pure business logic<br/><i>no Wails dependency</i>"]
-    Dom["internal/domain · internal/event<br/>interfaces + DTO · Emitter interface<br/><i>decouples service from Wails</i>"]
-    Base["config · bili · live · login<br/>config / Bilibili API / danmaku protocol / QR login"]
+    App["internal/app<br/>Wails boundary, thin delegation"]
+    Svc["internal/service<br/>pure business logic"]
+    Dom["internal/domain<br/>internal/event<br/>interfaces + DTO + Emitter"]
+    Base["config / bili / live / login"]
 
     App --> Svc --> Dom --> Base
 ```
