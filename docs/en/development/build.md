@@ -14,9 +14,6 @@ flowchart LR
     B --> C["build frontend tsc && vite build"]
     C --> D[generate icons]
     D --> E["go build -tags production"]
-
-classDef step fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class A,B,C,D,E step;
 ```
 
 ## Package
@@ -32,7 +29,8 @@ task package          # package for the current OS
 You can also target a platform explicitly: `task darwin:package` / `task windows:package` / `task linux:package`.
 
 ::: tip Cross-compilation
-Non-target builds go through the `wails-cross` Docker image (build it first with `wails3 task setup:docker`). On macOS, `task darwin:build:universal` builds an arm64+amd64 universal binary.
+- Non-target builds go through the `wails-cross` Docker image (build it first with `wails3 task setup:docker`)
+- On macOS, `task darwin:build:universal` builds an arm64+amd64 universal binary
 :::
 
 ## Frontend-only build

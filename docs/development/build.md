@@ -14,9 +14,6 @@ flowchart LR
     B --> C["构建前端 tsc && vite build"]
     C --> D[生成图标]
     D --> E["go build -tags production"]
-
-classDef step fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
-class A,B,C,D,E step;
 ```
 
 ## 打包
@@ -32,7 +29,8 @@ task package          # 当前系统打包
 也可显式指定平台：`task darwin:package` / `task windows:package` / `task linux:package`。
 
 ::: tip 跨平台编译
-非目标平台构建通过 Docker 镜像 `wails-cross`（需先 `wails3 task setup:docker` 构建）。macOS 可 `task darwin:build:universal` 生成 arm64+amd64 通用二进制。
+- 非目标平台构建通过 Docker 镜像 `wails-cross`（需先 `wails3 task setup:docker` 构建）
+- macOS 可 `task darwin:build:universal` 生成 arm64+amd64 通用二进制
 :::
 
 ## 前端单独构建

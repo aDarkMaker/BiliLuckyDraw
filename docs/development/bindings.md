@@ -21,5 +21,7 @@ task common:generate:bindings
 - 前端 import 报 `Cannot find module 'bindings/...'` 时
 
 ::: warning
-改了后端方法却没重生成绑定，前端调用会报 `method not found` 或签名不匹配。改完方法后务必跑一次 `task common:generate:bindings`。
+改了后端方法却没重生成绑定，前端调用会报 `method not found` 或签名不匹配。
+
+改完方法后务必跑一次 `task common:generate:bindings`。
 :::

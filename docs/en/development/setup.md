@@ -4,8 +4,13 @@
 
 - **Go** 1.25+
 - **Bun** (or npm / pnpm / yarn)
-- **Wails v3 CLI**: `go install github.com/wailsapp/wails/v3/cmd/wails3@latest`
-- **Task**: `go install github.com/go-task/task/v3/cmd/task@latest`
+
+Install two CLI tools (the Wails v3 CLI and Task):
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+go install github.com/go-task/task/v3/cmd/task@latest
+```
 
 ## Clone & install dependencies
 

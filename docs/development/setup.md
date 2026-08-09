@@ -4,8 +4,13 @@
 
 - **Go** 1.25+
 - **Bun**（或 npm / pnpm / yarn）
-- **Wails v3 CLI**：`go install github.com/wailsapp/wails/v3/cmd/wails3@latest`
-- **Task**：`go install github.com/go-task/task/v3/cmd/task@latest`
+
+安装两个命令行工具（Wails v3 CLI 与 Task）：
+
+```bash
+go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+go install github.com/go-task/task/v3/cmd/task@latest
+```
 
 ## 克隆与安装依赖
 

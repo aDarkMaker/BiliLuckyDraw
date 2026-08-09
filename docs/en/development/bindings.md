@@ -21,5 +21,7 @@ Runs `wails3 generate bindings -ts -clean=true ./...` (with `-f` passing through
 - When the frontend import errors with `Cannot find module 'bindings/...'`
 
 ::: warning
-Changing a backend method without regenerating bindings causes `method not found` or signature-mismatch errors on the frontend. Always run `task common:generate:bindings` after changing methods.
+Changing a backend method without regenerating bindings causes `method not found` or signature-mismatch errors on the frontend.
+
+Always run `task common:generate:bindings` after changing methods.
 :::
