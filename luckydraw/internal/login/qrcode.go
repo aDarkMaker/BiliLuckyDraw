@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"luckydraw/internal/bili"
 )
@@ -35,6 +36,7 @@ type QRCodeStatus struct {
 		Code         int    `json:"code"`
 		Message      string `json:"message"`
 	} `json:"data"`
+	Cookie string `json:"cookie,omitempty"`
 }
 
 func (q *QRLogin) GetQRCode() (*QRCodeInfo, error) {
@@ -80,8 +82,13 @@ func (q *QRLogin) CheckQRCodeStatus(qrcodeKey string) (*QRCodeStatus, error) {
 	params := url.Values{}
 	params.Set("qrcode_key", qrcodeKey)
 
-	reqURL := "https://passport.bilibili.com/x/passport-login/web/qrcode/poll?" + params.Encode()
-	resp, err := q.client.Get(reqURL)
+	req, err := http.NewRequest("GET", "https://passport.bilibili.com/x/passport-login/web/qrcode/poll?"+params.Encode(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("你码不理我: %v", err)
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+	resp, err := q.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("你码不理我: %v", err)
 	}
@@ -97,5 +104,21 @@ func (q *QRLogin) CheckQRCodeStatus(qrcodeKey string) (*QRCodeStatus, error) {
 		return nil, fmt.Errorf("解析一败涂地: %v, body: %s", err, string(body))
 	}
 
+	if status.Code == 0 && status.Data.Code == 0 {
+		status.Cookie = collectSetCookies(resp)
+	}
+
 	return &status, nil
+}
+
+func collectSetCookies(resp *http.Response) string {
+	var parts []string
+	for _, h := range resp.Header["Set-Cookie"] {
+		if idx := strings.IndexByte(h, ';'); idx > 0 {
+			parts = append(parts, strings.TrimSpace(h[:idx]))
+		} else {
+			parts = append(parts, strings.TrimSpace(h))
+		}
+	}
+	return strings.Join(parts, "; ")
 }

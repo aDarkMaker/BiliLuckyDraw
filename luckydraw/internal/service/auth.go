@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 	"sync"
 
@@ -94,45 +93,27 @@ func (s *AuthService) CheckQRCodeStatus(qrcodeKey string) (string, error) {
 		"code":    status.Code,
 		"message": status.Message,
 		"data":    status.Data,
+		"cookie":  status.Cookie,
 	}
 	data, _ := json.Marshal(result)
 	return string(data), nil
 }
 
-func (s *AuthService) LoginWithQRCode(loginURL string) (string, error) {
-	if loginURL == "" {
+func (s *AuthService) LoginWithQRCode(cookie string) (string, error) {
+	if cookie == "" {
 		return "", fmt.Errorf("登陆有点问题哎～")
 	}
-
-	parsedURL, err := url.Parse(loginURL)
-	if err != nil {
-		return "", fmt.Errorf("前边的登陆现在还做不到哦: %v", err)
-	}
-
-	queryParams := parsedURL.Query()
-	cookieNames := []string{"DedeUserID", "DedeUserID__ckMd5", "SESSDATA", "bili_jct"}
-	var cookieParts []string
-	for _, name := range cookieNames {
-		if value := queryParams.Get(name); value != "" {
-			cookieParts = append(cookieParts, fmt.Sprintf("%s=%s", name, value))
-		}
-	}
-	if len(cookieParts) < 4 {
-		return "", fmt.Errorf("我们在大量文字中只找到了 %d 个有效信息", len(cookieParts))
-	}
-
-	cookieStr := strings.Join(cookieParts, "; ")
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.client = bili.NewClient(cookieStr)
+	s.client = bili.NewClient(cookie)
 	info, err := s.client.GetMyInfo()
 	if err != nil {
 		return "", fmt.Errorf("登陆失效了喵: %v", err)
 	}
 
-	s.config.Cookie = cookieStr
+	s.config.Cookie = cookie
 	config.SaveConfig(s.configPath, s.config)
 
 	return fmt.Sprintf("这号是你吗: %s (UID: %d)", info.Name, info.Mid), nil

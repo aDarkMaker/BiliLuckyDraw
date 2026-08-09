@@ -33,7 +33,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 					if (status.code === 0 && status.data.code === 0) {
 						clearInterval(interval);
 						isLoggingIn.current = true;
-						handleQRLogin(status.data.url);
+						handleQRLogin(status.cookie);
 					} else if (status.data.code === 86038) {
 						clearInterval(interval);
 						onMessage(t('login.toast.expired'));
@@ -68,10 +68,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 		}
 	};
 
-	const handleQRLogin = async (loginURL: string) => {
+	const handleQRLogin = async (cookie: string) => {
 		try {
 			onMessage(t('login.toast.verifying'));
-			const result = await AppService.LoginWithQRCode(loginURL);
+			const result = await AppService.LoginWithQRCode(cookie);
 			onMessage(result);
 			setShowQRCode(false);
 			onLoginSuccess();

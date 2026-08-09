@@ -8,7 +8,7 @@ type AccountInfo struct {
 
 type AuthService interface {
 	Login(cookie string) (string, error)
-	LoginWithQRCode(loginURL string) (string, error)
+	LoginWithQRCode(cookie string) (string, error)
 	GetQRCode() (string, error)
 	CheckQRCodeStatus(qrcodeKey string) (string, error)
 	IsLoggedIn() bool

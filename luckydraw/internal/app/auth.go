@@ -12,8 +12,8 @@ func (a *AppService) CheckQRCodeStatus(qrcodeKey string) (string, error) {
 	return a.auth.CheckQRCodeStatus(qrcodeKey)
 }
 
-func (a *AppService) LoginWithQRCode(loginURL string) (string, error) {
-	return a.auth.LoginWithQRCode(loginURL)
+func (a *AppService) LoginWithQRCode(cookie string) (string, error) {
+	return a.auth.LoginWithQRCode(cookie)
 }
 
 func (a *AppService) IsLoggedIn() bool {

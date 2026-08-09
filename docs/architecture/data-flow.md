@@ -40,7 +40,7 @@ Login(cookie) → GetMyInfo 校验 → 持久化 config.json
 GetQRCode() → 返回 {qrcode_key, url}
   → qrcode 库渲染二维码
   → 每 2000ms 轮询 CheckQRCodeStatus(qrcode_key)
-    → code 0：成功 → LoginWithQRCode(loginURL) 解析 Cookie → 校验 → 持久化
+    → code 0：成功 → 从 poll 响应 Set-Cookie 头收集 Cookie → LoginWithQRCode(cookie) 校验 → 持久化
     → 86038：过期 → 提示重新生成
     → 86090：已扫码待确认 → 提示
 ```

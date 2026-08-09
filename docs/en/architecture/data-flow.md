@@ -40,7 +40,7 @@ Login(cookie) → GetMyInfo validates → persist to config.json
 GetQRCode() → returns {qrcode_key, url}
   → qrcode lib renders the QR image
   → poll CheckQRCodeStatus(qrcode_key) every 2000ms
-    → code 0: success → LoginWithQRCode(loginURL) parses Cookie → validates → persist
+    → code 0: success → collect Cookie from poll response Set-Cookie header → LoginWithQRCode(cookie) validates → persist
     → 86038: expired → prompt to regenerate
     → 86090: scanned, awaiting confirmation → prompt
 ```
