@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import QRCode from 'qrcode';
 import { Button } from './Button';
-import { GetQRCode, CheckQRCodeStatus, LoginWithQRCode, Login } from '../../wailsjs/go/main/App';
+import { AppService } from '../../bindings/luckydraw/internal/app';
+import { useI18n } from '../i18n';
 import '../styles/LoginView.css';
 
 interface LoginViewProps {
@@ -10,6 +11,7 @@ interface LoginViewProps {
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage }) => {
+	const { t } = useI18n();
 	const [cookie, setCookie] = useState('');
 	const [showQRCode, setShowQRCode] = useState(false);
 	const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
@@ -25,7 +27,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 				}
 
 				try {
-					const result = await CheckQRCodeStatus(qrcodeKey);
+					const result = await AppService.CheckQRCodeStatus(qrcodeKey);
 					const status = JSON.parse(result);
 
 					if (status.code === 0 && status.data.code === 0) {
@@ -34,10 +36,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 						handleQRLogin(status.data.url);
 					} else if (status.data.code === 86038) {
 						clearInterval(interval);
-						onMessage('QR code expired, please get it again');
+						onMessage(t('login.toast.expired'));
 						setShowQRCode(false);
 					} else if (status.data.code === 86090) {
-						onMessage('Scanned, please confirm on mobile');
+						onMessage(t('login.toast.scanned'));
 					}
 				} catch (e: any) {
 					// ignore
@@ -49,7 +51,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 
 	const handleGetQRCode = async () => {
 		try {
-			const result = await GetQRCode();
+			const result = await AppService.GetQRCode();
 			const qrInfo = JSON.parse(result);
 			setQrcodeKey(qrInfo.qrcode_key);
 
@@ -60,21 +62,21 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 			setQrCodeDataUrl(qrDataUrl);
 
 			setShowQRCode(true);
-			onMessage('Please scan the QR code with Bilibili APP');
+			onMessage(t('login.toast.pleaseScan'));
 		} catch (e: any) {
-			onMessage('Failed to get QR code: ' + e.message);
+			onMessage(t('login.toast.qrFailed', { error: e.message }));
 		}
 	};
 
 	const handleQRLogin = async (loginURL: string) => {
 		try {
-			onMessage('Verifying login...');
-			const result = await LoginWithQRCode(loginURL);
+			onMessage(t('login.toast.verifying'));
+			const result = await AppService.LoginWithQRCode(loginURL);
 			onMessage(result);
 			setShowQRCode(false);
 			onLoginSuccess();
 		} catch (e: any) {
-			onMessage('Login failed: ' + e.message);
+			onMessage(t('login.toast.loginFailed', { error: e.message }));
 			setShowQRCode(false);
 			isLoggingIn.current = false;
 		}
@@ -82,11 +84,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 
 	const handleLogin = async () => {
 		try {
-			const result = await Login(cookie);
+			const result = await AppService.Login(cookie);
 			onMessage(result);
 			onLoginSuccess();
 		} catch (e: any) {
-			onMessage('Login failed: ' + e.message);
+			onMessage(t('login.toast.loginFailed', { error: e.message }));
 		}
 	};
 
@@ -94,19 +96,19 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 		<div className="login-view">
 			<div className="login-view-content">
 				<div className="login-card">
-					<h1 className="login-title">我要验牌</h1>
+					<h1 className="login-title">{t('login.title')}</h1>
 
 					{!showQRCode ? (
 						<div className="login-actions">
 							<Button variant="primary" size="large" onClick={handleGetQRCode}>
-								扫码登录
+								{t('login.scanLogin')}
 							</Button>
 							<div className="login-divider">
-								<span>我是高手 我用 Cookie</span>
+								<span>{t('login.cookieDivider')}</span>
 							</div>
-							<textarea className="cookie-input" placeholder="Bilibili Cookie" value={cookie} onChange={(e) => setCookie(e.target.value)} rows={4} />
+							<textarea className="cookie-input" placeholder={t('login.cookiePlaceholder')} value={cookie} onChange={(e) => setCookie(e.target.value)} rows={4} />
 							<Button variant="secondary" size="large" onClick={handleLogin}>
-								就决定是你了
+								{t('login.loginButton')}
 							</Button>
 						</div>
 					) : (
@@ -114,9 +116,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onMessage 
 							<div className="qrcode-wrapper">
 								<img src={qrCodeDataUrl} alt="QR Code" className="qrcode" />
 							</div>
-							<p className="qrcode-tip">请使用B站手机客户端扫码</p>
+							<p className="qrcode-tip">{t('login.qrcodeTip')}</p>
 							<Button variant="text" onClick={() => setShowQRCode(false)}>
-								Back
+								{t('login.back')}
 							</Button>
 						</div>
 					)}

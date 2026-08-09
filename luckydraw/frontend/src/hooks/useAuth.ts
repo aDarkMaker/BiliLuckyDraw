@@ -1,15 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-	IsLoggedIn,
-	GetAccountInfo,
-	GetBackgroundImage,
-	GetWatchedRooms,
-	GetProfiles,
-	SwitchProfile,
-	CreateProfile,
-	DeleteProfile,
-	RenameProfile,
-} from '../../wailsjs/go/main/App';
+import { AppService } from '../../bindings/luckydraw/internal/app';
+import { useI18n } from '../i18n';
 
 interface Profile {
 	id: string;
@@ -20,9 +11,8 @@ interface Profile {
 	winner_count: number;
 }
 
-const goApp = () => (window as any).go?.main?.App;
-
 export const useAuth = () => {
+	const { t } = useI18n();
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [accountInfo, setAccountInfo] = useState<any>(null);
 	const [backgroundImage, setBackgroundImage] = useState('');
@@ -35,25 +25,25 @@ export const useAuth = () => {
 
 	const loadAccountInfo = async () => {
 		try {
-			const info = await GetAccountInfo();
+			const info = await AppService.GetAccountInfo();
 			if (info) {
 				setAccountInfo(JSON.parse(info));
 			}
 		} catch (e) {
-			setAccountInfo({ name: 'Unknown', uid: 0 });
+			setAccountInfo({ name: t('auth.unknownName'), uid: 0 });
 		}
 	};
 
 	const loadBackgroundImage = async () => {
 		try {
-			const bg = await GetBackgroundImage();
+			const bg = await AppService.GetBackgroundImage();
 			setBackgroundImage(bg || '');
 		} catch (e) {}
 	};
 
 	const loadWatchedRooms = async () => {
 		try {
-			const rooms = await GetWatchedRooms();
+			const rooms = await AppService.GetWatchedRooms();
 			if (rooms) {
 				setWatchedRooms(JSON.parse(rooms));
 			} else {
@@ -66,7 +56,7 @@ export const useAuth = () => {
 
 	const loadProfiles = async () => {
 		try {
-			const data = await GetProfiles();
+			const data = await AppService.GetProfiles();
 			const parsed = JSON.parse(data);
 			setProfiles(parsed.profiles || []);
 			setActiveProfileId(parsed.active_profile || '');
@@ -86,7 +76,7 @@ export const useAuth = () => {
 
 	const handleSwitchProfile = useCallback(async (id: string) => {
 		try {
-			const data = await SwitchProfile(id);
+			const data = await AppService.SwitchProfile(id);
 			const profile: Profile = JSON.parse(data);
 			setActiveProfileId(profile.id);
 			setBackgroundImage(profile.background_image || '');
@@ -101,7 +91,7 @@ export const useAuth = () => {
 
 	const handleCreateProfile = useCallback(async (name: string) => {
 		try {
-			const data = await CreateProfile(name);
+			const data = await AppService.CreateProfile(name);
 			const profile: Profile = JSON.parse(data);
 			setActiveProfileId(profile.id);
 			setBackgroundImage(profile.background_image || '');
@@ -114,8 +104,8 @@ export const useAuth = () => {
 
 	const handleDeleteProfile = useCallback(async (id: string) => {
 		try {
-			await DeleteProfile(id);
-			const data = await GetProfiles();
+			await AppService.DeleteProfile(id);
+			const data = await AppService.GetProfiles();
 			const parsed = JSON.parse(data);
 			setProfiles(parsed.profiles || []);
 
@@ -133,7 +123,7 @@ export const useAuth = () => {
 
 	const handleRenameProfile = useCallback(async (id: string, name: string) => {
 		try {
-			await RenameProfile(id, name);
+			await AppService.RenameProfile(id, name);
 			setProfiles((prev) =>
 				prev.map((p) => (p.id === id ? { ...p, name } : p)),
 			);
@@ -143,7 +133,7 @@ export const useAuth = () => {
 	useEffect(() => {
 		if (!loggedIn) return;
 		const timer = setTimeout(() => {
-			goApp()?.SaveProfileConfig(keyword, winnerCount).catch(() => {});
+			AppService.SaveProfileConfig(keyword, winnerCount).catch(() => {});
 		}, 500);
 		return () => clearTimeout(timer);
 	}, [keyword, winnerCount, loggedIn]);
@@ -151,7 +141,7 @@ export const useAuth = () => {
 	useEffect(() => {
 		const checkLoginStatus = async () => {
 			try {
-				const isLoggedIn = await IsLoggedIn();
+				const isLoggedIn = await AppService.IsLoggedIn();
 				if (isLoggedIn) {
 					setLoggedIn(true);
 					await loadAll();

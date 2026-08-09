@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from './Button';
 import { Input } from './Input';
-import { SetBackgroundImage, AddWatchedRoom, RemoveWatchedRoom } from '../../wailsjs/go/main/App';
+import { AppService } from '../../bindings/luckydraw/internal/app';
+import { useTheme, THEMES, useThemeBackground } from '../themes';
+import { useI18n, Lang } from '../i18n';
 import { formatAvatarUrl } from '../utils/format';
 import '../styles/SettingsView.css';
 
@@ -53,6 +55,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	const [newProfileName, setNewProfileName] = React.useState('');
 	const [editingProfileId, setEditingProfileId] = React.useState('');
 	const [editingName, setEditingName] = React.useState('');
+	const [switchingId, setSwitchingId] = React.useState('');
+	const { theme, setTheme } = useTheme();
+	const themeBackground = useThemeBackground();
+	const { t, lang, setLang } = useI18n();
+
+	const handleSwitchProfile = async (id: string) => {
+		if (lotteryRunning || switchingId || id === activeProfileId) return;
+		setSwitchingId(id);
+		try {
+			await onSwitchProfile(id);
+		} finally {
+			setSwitchingId('');
+		}
+	};
 
 	const handleBackgroundImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -61,11 +77,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 			reader.onload = async (event) => {
 				const dataUrl = event.target?.result as string;
 				try {
-					await SetBackgroundImage(dataUrl);
+					await AppService.SetBackgroundImage(dataUrl);
 					onBackgroundImageChange(dataUrl);
-					onMessage('Background image set');
+					onMessage(t('settings.toast.backgroundSet'));
 				} catch (e: any) {
-					onMessage('Failed to set background: ' + e.message);
+					onMessage(t('settings.toast.backgroundFailed', { error: e.message }));
 				}
 			};
 			reader.readAsDataURL(file);
@@ -75,48 +91,48 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	const handleAddRoom = async () => {
 		const id = parseInt(newRoomID);
 		if (isNaN(id)) {
-			onMessage('Please enter a valid room ID');
+			onMessage(t('settings.toast.invalidRoomId'));
 			return;
 		}
 
 		try {
-			await AddWatchedRoom(id);
+			await AppService.AddWatchedRoom(id);
 			onWatchedRoomsChange();
 			setNewRoomID('');
-			onMessage(`Added room ${id}`);
+			onMessage(t('settings.toast.roomAdded', { id }));
 		} catch (e: any) {
-			onMessage('Failed to add: ' + e.message);
+			onMessage(t('settings.toast.roomAddFailed', { error: e.message }));
 		}
 	};
 
 	const handleRemoveRoom = async (roomID: number) => {
 		try {
-			await RemoveWatchedRoom(roomID);
+			await AppService.RemoveWatchedRoom(roomID);
 			onWatchedRoomsChange();
-			onMessage(`Removed room ${roomID}`);
+			onMessage(t('settings.toast.roomRemoved', { id: roomID }));
 		} catch (e: any) {
-			onMessage('Failed to remove: ' + e.message);
+			onMessage(t('settings.toast.roomRemoveFailed', { error: e.message }));
 		}
 	};
 
 	const handleCreateProfile = async () => {
 		const name = newProfileName.trim();
 		if (!name) {
-			onMessage('给个名字吧');
+			onMessage(t('settings.toast.profileNameEmpty'));
 			return;
 		}
 		await onCreateProfile(name);
 		setNewProfileName('');
-		onMessage(`创建配置 "${name}" 完成`);
+		onMessage(t('settings.toast.profileCreated', { name }));
 	};
 
 	const handleDeleteProfile = async (id: string) => {
 		if (profiles.length <= 1) {
-			onMessage('好歹留一个Profile吧');
+			onMessage(t('settings.toast.profileKeepOne'));
 			return;
 		}
 		await onDeleteProfile(id);
-		onMessage('配置已删除');
+		onMessage(t('settings.toast.profileDeleted'));
 	};
 
 	const handleStartRename = (id: string, name: string) => {
@@ -135,7 +151,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 		<div className="settings-view">
 			<div className="settings-view-content">
 				<div className="settings-card settings-bg-0">
-					<h2 className="settings-title">账号信息</h2>
+					<h2 className="settings-title">{t('settings.account.title')}</h2>
 					<div className="account-section">
 						<div className="account-main">
 							<img
@@ -144,25 +160,65 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 								className={`account-avatar ${!loggedIn ? 'is-placeholder' : ''}`}
 							/>
 							<div className="account-info">
-								<div className="account-name">{loggedIn ? accountInfo?.name || 'Loading...' : 'xxxx'}</div>
+								<div className="account-name">{loggedIn ? accountInfo?.name || t('common.loading') : t('settings.account.placeholder')}</div>
 								<div className="account-uid">UID: {loggedIn ? accountInfo?.uid || '--' : '--'}</div>
 							</div>
 						</div>
 						{loggedIn && (
 							<Button variant="danger" size="small" onClick={onLogout}>
-								退出登录
+								{t('settings.account.logout')}
 							</Button>
 						)}
 					</div>
 				</div>
 
+				<div className="settings-card settings-bg-1">
+					<h2 className="settings-title">{t('settings.appearance.title')}</h2>
+					<div className="seg-row">
+						<span className="seg-label">{t('settings.theme.title')}</span>
+						<div
+							className="seg-options"
+							style={{ '--seg-index': THEMES.findIndex((o) => o.id === theme), '--seg-count': THEMES.length } as React.CSSProperties}
+						>
+							<span className="seg-indicator" aria-hidden="true" />
+							{THEMES.map((opt) => (
+								<button
+									key={opt.id}
+									className={`seg-option ${theme === opt.id ? 'is-active' : ''}`}
+									onClick={() => setTheme(opt.id)}
+								>
+									{t(opt.labelKey)}
+								</button>
+							))}
+						</div>
+					</div>
+					<div className="seg-row">
+						<span className="seg-label">{t('settings.language.title')}</span>
+						<div
+							className="seg-options"
+							style={{ '--seg-index': (['zh', 'en'] as Lang[]).findIndex((l) => l === lang), '--seg-count': 2 } as React.CSSProperties}
+						>
+							<span className="seg-indicator" aria-hidden="true" />
+							{(['zh', 'en'] as Lang[]).map((l) => (
+								<button
+									key={l}
+									className={`seg-option ${lang === l ? 'is-active' : ''}`}
+									onClick={() => setLang(l)}
+								>
+									{t(`settings.language.${l}`)}
+								</button>
+							))}
+						</div>
+					</div>
+				</div>
+
 				{loggedIn && (
 					<div className="settings-card settings-bg-1">
-						<h2 className="settings-title">抽奖配置</h2>
+						<h2 className="settings-title">{t('settings.lottery.title')}</h2>
 						<div className="profile-input-group">
-							<Input type="text" placeholder="新配置名称" value={newProfileName} onChange={(e) => setNewProfileName(e.target.value)} />
+							<Input type="text" placeholder={t('settings.lottery.newNamePlaceholder')} value={newProfileName} onChange={(e) => setNewProfileName(e.target.value)} />
 							<Button variant="primary" onClick={handleCreateProfile}>
-								新建配置
+								{t('settings.lottery.create')}
 							</Button>
 						</div>
 						<div className="profile-list">
@@ -172,24 +228,28 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 										<div className="profile-item-edit">
 											<Input type="text" value={editingName} onChange={(e) => setEditingName(e.target.value)} size="small" />
 											<Button variant="primary" size="small" onClick={handleConfirmRename}>
-												确定
+												{t('common.confirm')}
 											</Button>
 											<Button variant="text" size="small" onClick={() => setEditingProfileId('')}>
-												取消
+												{t('common.cancel')}
 											</Button>
 										</div>
 									) : (
 										<>
-											<div className={`profile-item-info ${lotteryRunning ? 'is-disabled' : ''}`} onClick={() => !lotteryRunning && onSwitchProfile(p.id)}>
+											<div
+												className={`profile-item-info ${lotteryRunning || switchingId ? 'is-disabled' : ''}`}
+												onClick={() => handleSwitchProfile(p.id)}
+											>
+												{switchingId === p.id && <span className="profile-switching-spinner" aria-hidden="true" />}
 												<span className="profile-item-name">{p.name}</span>
-												{p.id === activeProfileId && <span className="profile-item-badge">当前</span>}
+												{p.id === activeProfileId && <span className="profile-item-badge">{t('common.current')}</span>}
 											</div>
 											<div className="profile-item-actions">
 												<Button variant="text" size="small" onClick={() => handleStartRename(p.id, p.name)}>
-													重命名
+													{t('settings.lottery.rename')}
 												</Button>
 												<Button variant="text" size="small" onClick={() => handleDeleteProfile(p.id)}>
-													删除
+													{t('settings.lottery.delete')}
 												</Button>
 											</div>
 										</>
@@ -200,52 +260,54 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 					</div>
 				)}
 
-				<div className={`settings-card ${loggedIn ? 'settings-bg-2' : 'settings-bg-1'}`}>
-					<h2 className="settings-title">设置背景</h2>
-					{backgroundImage && (
-						<div className="background-preview">
-							<img src={backgroundImage} alt="Background preview" className="background-preview-image" />
-						</div>
-					)}
-					<div className="background-actions">
-						<label className="file-input-label">
-							<input type="file" accept="image/*" onChange={handleBackgroundImageChange} className="file-input" />
-							<span className="btn btn-secondary btn-small">选择图片</span>
-						</label>
+				{!themeBackground && (
+					<div className={`settings-card ${loggedIn ? 'settings-bg-2' : 'settings-bg-1'}`}>
+						<h2 className="settings-title">{t('settings.background.title')}</h2>
 						{backgroundImage && (
-							<Button
-								variant="text"
-								size="small"
-								onClick={async () => {
-									await SetBackgroundImage('');
-									onBackgroundImageChange('');
-									onMessage('Background image cleared');
-								}}
-							>
-								重置背景
-							</Button>
+							<div className="background-preview">
+								<img src={backgroundImage} alt={t('settings.background.preview')} className="background-preview-image" />
+							</div>
 						)}
+						<div className="background-actions">
+							<label className="file-input-label">
+								<input type="file" accept="image/*" onChange={handleBackgroundImageChange} className="file-input" />
+								<span className="btn btn-secondary btn-small">{t('settings.background.selectImage')}</span>
+							</label>
+							{backgroundImage && (
+								<Button
+									variant="text"
+									size="small"
+									onClick={async () => {
+										await AppService.SetBackgroundImage('');
+										onBackgroundImageChange('');
+										onMessage(t('settings.toast.backgroundCleared'));
+									}}
+								>
+									{t('settings.background.reset')}
+								</Button>
+							)}
+						</div>
 					</div>
-				</div>
+				)}
 
 				<div className={`settings-card ${loggedIn ? 'settings-bg-3' : 'settings-bg-2'}`}>
-					<h2 className="settings-title">抽奖列表</h2>
+					<h2 className="settings-title">{t('settings.rooms.title')}</h2>
 					<div className="room-input-group">
-						<Input type="text" placeholder="Room ID" value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
+						<Input type="text" placeholder={t('settings.rooms.idPlaceholder')} value={newRoomID} onChange={(e) => setNewRoomID(e.target.value)} />
 						<Button variant="primary" onClick={handleAddRoom}>
-							加注
+							{t('settings.rooms.add')}
 						</Button>
 					</div>
 					<div className="rooms-list">
 						{(watchedRooms || []).map((roomID) => (
 							<div key={roomID} className="room-item">
-								<span>房间 {roomID}</span>
+								<span>{t('settings.rooms.roomLabel', { id: roomID })}</span>
 								<Button variant="text" size="small" onClick={() => handleRemoveRoom(roomID)}>
-									移除
+									{t('settings.rooms.remove')}
 								</Button>
 							</div>
 						))}
-						{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">奖池有待积累</p>}
+						{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">{t('settings.rooms.empty')}</p>}
 					</div>
 				</div>
 			</div>

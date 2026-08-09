@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Logout } from '../wailsjs/go/main/App';
+import { AppService } from '../bindings/luckydraw/internal/app';
 import { useAuth } from './hooks/useAuth';
 import { useLottery } from './hooks/useLottery';
+import { useI18n } from './i18n';
+import { useThemeBackground } from './themes';
 import { LoginView } from './components/LoginView';
 import { TopBar } from './components/TopBar';
 import { LotteryView } from './components/LotteryView';
@@ -14,8 +16,10 @@ import './styles/components.css';
 type View = 'lottery' | 'settings';
 
 function App() {
+	const { t } = useI18n();
 	const [view, setView] = useState<View>('lottery');
 	const [message, setMessage] = useState('');
+	const themeBackground = useThemeBackground();
 
 	const {
 		loggedIn,
@@ -56,12 +60,12 @@ function App() {
 
 	const handleLogout = async () => {
 		try {
-			await Logout();
+			await AppService.Logout();
 			setLoggedIn(false);
 			setView('lottery');
-			onMessage('Logged out');
+			onMessage(t('app.toast.loggedOut'));
 		} catch (e: any) {
-			onMessage('Logout failed: ' + e.message);
+			onMessage(t('app.toast.logoutFailed', { error: e.message }));
 		}
 	};
 
@@ -73,10 +77,17 @@ function App() {
 		await handleStartLottery(onMessage);
 	};
 
+	const appBackground = themeBackground || backgroundImage;
+
+	const handleContentMouseDown = (e: React.MouseEvent) => {
+		if (view !== 'settings') return;
+		if (!(e.target as HTMLElement).closest('.settings-card')) setView('lottery');
+	};
+
 	return (
 		<div
-			className={`app-container ${backgroundImage ? 'has-bg' : ''}`}
-			style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none' }}
+			className={`app-container ${appBackground ? 'has-bg' : ''}`}
+			style={{ backgroundImage: appBackground ? `url(${appBackground})` : 'none' }}
 		>
 			<TopBar
 				keyword={keyword}
@@ -95,7 +106,7 @@ function App() {
 				onDeleteProfile={(id) => { deleteProfile(id); }}
 				onRenameProfile={(id, name) => { renameProfile(id, name); }}
 			/>
-			<div className="app-content">
+			<div className="app-content" onMouseDown={handleContentMouseDown}>
 				{!loggedIn ? (
 					view === 'settings' ? (
 						<SettingsView

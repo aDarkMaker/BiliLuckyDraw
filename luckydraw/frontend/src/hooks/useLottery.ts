@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
-import {
-	ConnectLiveRooms,
-	StartLiveLottery,
-	StopLiveLottery,
-	DrawWinners,
-	GetParticipantCount,
-	IsLiveLotteryRunning,
-} from '../../wailsjs/go/main/App';
+import { Events } from '@wailsio/runtime';
+import { AppService } from '../../bindings/luckydraw/internal/app';
+import { useI18n } from '../i18n';
 
 interface Winner {
 	uid: number;
@@ -15,6 +10,7 @@ interface Winner {
 }
 
 export const useLottery = (watchedRooms: number[], keyword: string, winnerCount: number) => {
+	const { t } = useI18n();
 	const [lotteryRunning, setLotteryRunning] = useState(false);
 	const [participantCount, setParticipantCount] = useState(0);
 	const [winners, setWinners] = useState<Winner[]>([]);
@@ -22,13 +18,24 @@ export const useLottery = (watchedRooms: number[], keyword: string, winnerCount:
 	const [isConnecting, setIsConnecting] = useState(false);
 
 	useEffect(() => {
+		const off = Events.On('live:user_join', () => {
+			AppService.GetParticipantCount()
+				.then((count) => setParticipantCount(count))
+				.catch(() => {});
+		});
+		return () => {
+			if (off) off();
+		};
+	}, []);
+
+	useEffect(() => {
 		const checkLotteryStatus = async () => {
 			try {
-				const running = await IsLiveLotteryRunning();
+				const running = await AppService.IsLiveLotteryRunning();
 				setLotteryRunning(running);
 
 				if (running) {
-					const count = await GetParticipantCount();
+					const count = await AppService.GetParticipantCount();
 					setParticipantCount(count);
 				}
 			} catch (e) {}
@@ -40,20 +47,20 @@ export const useLottery = (watchedRooms: number[], keyword: string, winnerCount:
 
 	const startLottery = async (onError: (message: string) => void) => {
 		if (watchedRooms.length === 0) {
-			onError('请先加几个直播间！');
+			onError(t('lottery.toast.noRooms'));
 			return;
 		}
 
 		setIsConnecting(true);
 		try {
-			await ConnectLiveRooms(watchedRooms);
-			await StartLiveLottery(keyword);
+			await AppService.ConnectLiveRooms(watchedRooms);
+			await AppService.StartLiveLottery(keyword);
 			setLotteryRunning(true);
 			setShowResults(false);
 			setWinners([]);
-			onError('奖池积累ing...');
+			onError(t('lottery.toast.accumulating'));
 		} catch (e: any) {
-			onError('不出意外出意外了: ' + (e?.message || e || '未知错误'));
+			onError(t('lottery.toast.startFailed', { error: String(e?.message || e) }));
 		} finally {
 			setIsConnecting(false);
 		}
@@ -61,15 +68,15 @@ export const useLottery = (watchedRooms: number[], keyword: string, winnerCount:
 
 	const stopLottery = async (onError: (message: string) => void) => {
 		try {
-			await StopLiveLottery();
-			const result = await DrawWinners(winnerCount);
+			await AppService.StopLiveLottery();
+			const result = await AppService.DrawWinners(winnerCount);
 			const winnersData = JSON.parse(result);
 			setWinners(winnersData);
 			setShowResults(true);
 			setLotteryRunning(false);
-			onError(`好哦！恭喜这 ${winnersData.length} 位LuckyDog！`);
+			onError(t('lottery.toast.drawSuccess', { n: winnersData.length }));
 		} catch (e: any) {
-			onError('有点小意外: ' + (e?.message || e || '未知错误'));
+			onError(t('lottery.toast.drawFailed', { error: String(e?.message || e) }));
 		}
 	};
 

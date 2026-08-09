@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
-import { Input } from './Input';
 import { Button } from './Button';
 import { formatAvatarUrl } from '../utils/format';
+import { useI18n } from '../i18n';
 import settingsIcon from '../assets/icon/settings.svg';
 import '../styles/layout.css';
 
@@ -30,6 +30,18 @@ interface TopBarProps {
 	onRenameProfile: (id: string, name: string) => void;
 }
 
+const ChevronIcon: React.FC<{ open: boolean }> = ({ open }) => (
+	<svg className="field-chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>
+		<path d="M3.5 5.5L8 10l4.5-4.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+	</svg>
+);
+
+const CheckIcon: React.FC = () => (
+	<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" className="dropdown-check">
+		<path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+	</svg>
+);
+
 export const TopBar: React.FC<TopBarProps> = ({
 	keyword,
 	onKeywordChange,
@@ -47,14 +59,10 @@ export const TopBar: React.FC<TopBarProps> = ({
 	onDeleteProfile,
 	onRenameProfile,
 }) => {
-	const keywordWidth = Math.max(100, keyword.length * 14 + 32);
-	const [inputValue, setInputValue] = React.useState(winnerCount.toString());
+	const { t } = useI18n();
 	const [showDropdown, setShowDropdown] = React.useState(false);
+	const [switching, setSwitching] = React.useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
-
-	React.useEffect(() => {
-		setInputValue(winnerCount.toString());
-	}, [winnerCount]);
 
 	React.useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
@@ -68,27 +76,26 @@ export const TopBar: React.FC<TopBarProps> = ({
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [showDropdown]);
 
-	const handleWinnerCountChange = (value: string) => {
-		if (value === '') {
-			setInputValue('');
-			return;
-		}
-		const num = parseInt(value);
-		if (!isNaN(num) && num >= 0) {
-			setInputValue(num.toString());
-			onWinnerCountChange(num || 1);
+	const clampCount = (n: number) => Math.max(1, Math.min(9999, n || 1));
+
+	const handleSwitch = async (id: string) => {
+		if (lotteryRunning || switching || id === activeProfileId) return;
+		setSwitching(true);
+		setShowDropdown(false);
+		try {
+			await onSwitchProfile(id);
+		} finally {
+			setSwitching(false);
 		}
 	};
 
-	const handleBlur = () => {
-		if (inputValue === '' || parseInt(inputValue) <= 0) {
-			setInputValue('1');
-			onWinnerCountChange(1);
-		}
+	const stepCount = (delta: number) => {
+		if (lotteryRunning) return;
+		onWinnerCountChange(clampCount(winnerCount + delta));
 	};
 
 	const activeProfile = profiles.find((p) => p.id === activeProfileId);
-	const profileName = activeProfile?.name || '默认配置';
+	const profileName = activeProfile?.name || t('topbar.profile.default');
 
 	return (
 		<div className={`top-bar ${lotteryRunning ? 'is-lottery-running' : ''}`}>
@@ -98,50 +105,90 @@ export const TopBar: React.FC<TopBarProps> = ({
 						<div className="profile-selector" ref={dropdownRef}>
 							<button
 								type="button"
-								className="profile-selector-btn"
-								onClick={() => setShowDropdown(!showDropdown)}
-								disabled={lotteryRunning}
+								className={`profile-selector-btn ${showDropdown ? 'is-open' : ''} ${switching ? 'is-switching' : ''}`}
+								onClick={() => !lotteryRunning && !switching && setShowDropdown(!showDropdown)}
+								disabled={lotteryRunning || switching}
 							>
-								<span className="profile-name">{profileName}</span>
+								{switching ? (
+									<span className="profile-switching-spinner" aria-hidden="true" />
+								) : (
+									<>
+										<span className="profile-name">{profileName}</span>
+										<ChevronIcon open={showDropdown} />
+									</>
+								)}
 							</button>
 							{showDropdown && (
 								<div className="profile-dropdown">
-									<div className="profile-dropdown-header">切换配置</div>
+									<div className="profile-dropdown-header">{t('topbar.profile.switch')}</div>
 									{profiles.map((p) => (
 										<div
 											key={p.id}
-											className={`profile-dropdown-item ${p.id === activeProfileId ? 'is-active' : ''} ${lotteryRunning ? 'is-disabled' : ''}`}
-											onClick={() => { if (!lotteryRunning) { onSwitchProfile(p.id); setShowDropdown(false); } }}
+											className={`profile-dropdown-item ${p.id === activeProfileId ? 'is-active' : ''} ${lotteryRunning || switching ? 'is-disabled' : ''}`}
+											onClick={() => handleSwitch(p.id)}
 										>
-											{p.name}
+											<span className="dropdown-item-label">{p.name}</span>
+											{p.id === activeProfileId && <CheckIcon />}
 										</div>
 									))}
 								</div>
 							)}
 						</div>
-						<Input
-							type="text"
-							size="small"
-							placeholder="弹幕口令"
-							value={keyword}
-							onChange={(e) => onKeywordChange(e.target.value)}
-							disabled={lotteryRunning}
-							style={{ width: `${keywordWidth}px` }}
-						/>
-						<Input
-							type="text"
-							size="small"
-							placeholder="Number"
-							value={inputValue}
-							onChange={(e) => handleWinnerCountChange(e.target.value)}
-							onBlur={handleBlur}
-							disabled={lotteryRunning}
-							className="input-winner-count"
-						/>
+
+						<div className={`field keyword-field ${lotteryRunning ? 'is-disabled' : ''}`}>
+							<span className="field-icon" aria-hidden="true">
+								<svg viewBox="0 0 16 16" width="14" height="14">
+									<path d="M2 3h12v8H6l-3 3v-3H2V3z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+								</svg>
+							</span>
+							<input
+								type="text"
+								className="field-input"
+								placeholder={t('topbar.keywordPlaceholder')}
+								value={keyword}
+								onChange={(e) => onKeywordChange(e.target.value)}
+								disabled={lotteryRunning}
+							/>
+						</div>
+
+						<div className={`field stepper-field ${lotteryRunning ? 'is-disabled' : ''}`}>
+							<button
+								type="button"
+								className="stepper-btn"
+								onClick={() => stepCount(-1)}
+								disabled={lotteryRunning || winnerCount <= 1}
+								aria-label={t('topbar.countDec')}
+							>
+								−
+							</button>
+							<input
+								type="text"
+								inputMode="numeric"
+								pattern="[0-9]*"
+								className="stepper-input"
+								value={winnerCount}
+								onChange={(e) => {
+									const v = e.target.value.replace(/\D/g, '');
+									onWinnerCountChange(v === '' ? 1 : clampCount(parseInt(v)));
+								}}
+								onBlur={() => onWinnerCountChange(clampCount(winnerCount))}
+								disabled={lotteryRunning}
+								aria-label={t('topbar.countLabel')}
+							/>
+							<button
+								type="button"
+								className="stepper-btn"
+								onClick={() => stepCount(1)}
+								disabled={lotteryRunning || winnerCount >= 9999}
+								aria-label={t('topbar.countInc')}
+							>
+								+
+							</button>
+						</div>
 					</>
 				)}
 			</div>
-			<Button variant="text" className={`btn-settings ${!loggedIn ? 'btn-settings-svg' : 'btn-settings-avatar'}`} onClick={onSettingsToggle}>
+			<Button variant="text" className={`btn-settings ${!loggedIn ? 'btn-settings-svg' : 'btn-settings-avatar'}`} onClick={() => !isSettingsOpen && onSettingsToggle()}>
 				{loggedIn && userAvatar ? (
 					<img src={formatAvatarUrl(userAvatar)} alt="Avatar" className="top-bar-avatar" />
 				) : (
