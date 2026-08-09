@@ -43,6 +43,9 @@ luckydraw/frontend/yarn-debug.log*
 luckydraw/frontend/yarn-error.log*
 luckydraw/frontend/pnpm-debug.log*
 
+# screenshot generation scripts (local-only, regenerate img/*.png)
+luckydraw/frontend/scripts/
+
 # ========== Env ==========
 .env
 .env.*
