@@ -6,9 +6,9 @@ BiliLuckyDraw is a Wails v3 desktop app: the Go backend embeds the React fronten
 
 ```mermaid
 flowchart LR
-    App["internal/app<br/>Wails boundary, thin delegation"]
-    Svc["internal/service<br/>pure business logic"]
-    Dom["internal/domain<br/>internal/event<br/>interfaces + DTO + Emitter"]
+    App["internal/app"]
+    Svc["internal/service"]
+    Dom["internal/domain + event"]
     Base["config / bili / live / login"]
 
     App --> Svc --> Dom --> Base

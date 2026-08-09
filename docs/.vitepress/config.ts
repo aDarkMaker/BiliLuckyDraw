@@ -12,6 +12,7 @@ export default withMermaid(
 		base,
 		cleanUrls: true,
 		lastUpdated: true,
+		mermaid: { flowchart: { htmlLabels: false } },
 		head: [['link', { rel: 'icon', href: `${base}img/logo.png` }]],
 		themeConfig: {
 			logo: '/img/logo.png',

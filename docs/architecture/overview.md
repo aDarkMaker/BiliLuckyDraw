@@ -6,9 +6,9 @@ BiliLuckyDraw 是一个 Wails v3 桌面应用：Go 后端通过 `//go:embed all:
 
 ```mermaid
 flowchart LR
-    App["internal/app<br/>Wails 边界,薄委托"]
-    Svc["internal/service<br/>纯业务逻辑"]
-    Dom["internal/domain<br/>internal/event<br/>接口 + DTO + Emitter"]
+    App["internal/app"]
+    Svc["internal/service"]
+    Dom["internal/domain + event"]
     Base["config / bili / live / login"]
 
     App --> Svc --> Dom --> Base
