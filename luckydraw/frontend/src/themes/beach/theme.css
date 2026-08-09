@@ -1,0 +1,23 @@
+.theme-beach .login-card,
+.theme-beach .settings-card,
+.theme-beach .winners-display,
+.theme-beach .winner-card,
+.theme-beach .account-section,
+.theme-beach .room-item,
+.theme-beach .profile-item,
+.theme-beach .background-preview,
+.theme-beach .qrcode-wrapper,
+.theme-beach .input,
+.theme-beach .cookie-input,
+.theme-beach .field,
+.theme-beach .profile-selector-btn,
+.theme-beach .profile-dropdown,
+.theme-beach .message-toast {
+	backdrop-filter: blur(12px) saturate(140%);
+	-webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+.theme-beach .top-bar {
+	backdrop-filter: blur(16px) saturate(160%);
+	-webkit-backdrop-filter: blur(16px) saturate(160%);
+}

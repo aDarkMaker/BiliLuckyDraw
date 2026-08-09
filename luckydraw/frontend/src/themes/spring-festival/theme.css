@@ -1,0 +1,23 @@
+.theme-spring-festival .login-card,
+.theme-spring-festival .settings-card,
+.theme-spring-festival .winners-display,
+.theme-spring-festival .winner-card,
+.theme-spring-festival .account-section,
+.theme-spring-festival .room-item,
+.theme-spring-festival .profile-item,
+.theme-spring-festival .background-preview,
+.theme-spring-festival .qrcode-wrapper,
+.theme-spring-festival .input,
+.theme-spring-festival .cookie-input,
+.theme-spring-festival .field,
+.theme-spring-festival .profile-selector-btn,
+.theme-spring-festival .profile-dropdown,
+.theme-spring-festival .message-toast {
+	backdrop-filter: blur(12px) saturate(140%);
+	-webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+.theme-spring-festival .top-bar {
+	backdrop-filter: blur(16px) saturate(160%);
+	-webkit-backdrop-filter: blur(16px) saturate(160%);
+}
