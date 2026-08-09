@@ -12,8 +12,29 @@
 ```bash
 git clone https://github.com/aDarkMaker/BiliLuckyDraw.git
 cd BiliLuckyDraw/luckydraw
-task common:install:frontend:deps   # runs bun install under frontend/
 ```
+
+Install frontend dependencies (under `frontend/`):
+
+::: code-group
+
+```bash [bun]
+bun install
+```
+
+```bash [npm]
+npm install
+```
+
+```bash [pnpm]
+pnpm install
+```
+
+```bash [yarn]
+yarn install
+```
+
+:::
 
 ## Development mode
 

@@ -6,7 +6,18 @@
 task build
 ```
 
-`task build` 等价于 `task {{OS}}:build`（自动按当前系统分发到 `darwin:build` / `windows:build` / `linux:build`）。流程：`go mod tidy` → 生成绑定 → 构建前端（`tsc && vite build`）→ 生成图标 → `go build -tags production`，产物在 `bin/luckydraw`（Windows 为 `.exe`）。
+`task build` 等价于 `task {{OS}}:build`（自动按当前系统分发到 `darwin:build` / `windows:build` / `linux:build`），产物在 `bin/luckydraw`（Windows 为 `.exe`）。
+
+```mermaid
+flowchart LR
+    A[go mod tidy] --> B[生成绑定]
+    B --> C["构建前端 tsc && vite build"]
+    C --> D[生成图标]
+    D --> E["go build -tags production"]
+
+classDef step fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class A,B,C,D,E step;
+```
 
 ## 打包
 
@@ -28,10 +39,29 @@ task package          # 当前系统打包
 
 在 `frontend/` 目录下：
 
-```bash
+::: code-group
+
+```bash [bun]
 bun run dev     # vite，开发预览（实际开发用 task dev 一体化）
 bun run build   # tsc && vite build，生产构建到 dist/
 ```
+
+```bash [npm]
+npm run dev
+npm run build
+```
+
+```bash [pnpm]
+pnpm dev
+pnpm build
+```
+
+```bash [yarn]
+yarn dev
+yarn build
+```
+
+:::
 
 ## 构建配置
 

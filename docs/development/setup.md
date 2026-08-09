@@ -12,8 +12,29 @@
 ```bash
 git clone https://github.com/aDarkMaker/BiliLuckyDraw.git
 cd BiliLuckyDraw/luckydraw
-task common:install:frontend:deps   # 在 frontend/ 下执行 bun install
 ```
+
+安装前端依赖（在 `frontend/` 下执行）：
+
+::: code-group
+
+```bash [bun]
+bun install
+```
+
+```bash [npm]
+npm install
+```
+
+```bash [pnpm]
+pnpm install
+```
+
+```bash [yarn]
+yarn install
+```
+
+:::
 
 ## 开发模式
 

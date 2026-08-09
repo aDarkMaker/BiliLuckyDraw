@@ -4,6 +4,24 @@
 
 `application.New` 注册一个服务 `application.NewService(app.New())`，内嵌前端 dist 与应用图标，创建 1200×800 webview 窗口（URL `/`），macOS 关闭最后一个窗口即退出。
 
+```mermaid
+sequenceDiagram
+    participant M as main.go
+    participant A as application
+    participant AS as AppService
+    participant FS as 前端 dist
+
+    M->>A: application.New(Options{Services:[NewService(AS)]})
+    A->>A: 内嵌 frontend/dist 与 appicon
+    A->>AS: ServiceStartup
+    AS->>AS: 加载 config.json / state.json
+    AS->>AS: 构造 wailsEmitter 注入 live/profile
+    A->>FS: 创建 1200×800 webview 窗口 (URL /)
+    Note over A,FS: 运行期:前端经绑定调用 AppService.*
+    A->>AS: ServiceShutdown
+    AS->>AS: live.Stop() 停止弹幕监听
+```
+
 ## app 层（Wails 边界）
 
 `AppService` 是暴露给前端的唯一服务，持有 `auth`/`live`/`profile` 三个 service impl 与 `app *application.App`。
@@ -13,6 +31,51 @@
 - `ServiceName`：返回 `"App"`。
 
 `wailsEmitter` 实现 `event.Emitter` 接口，委托 `application.App.Event.Emit`，让 service 不直接依赖 Wails。每个导出方法薄委托对应 service，签名不变。
+
+```mermaid
+flowchart LR
+    subgraph FE["前端 (webview)"]
+        UI[React 组件 / hooks]
+    end
+
+    subgraph APP["internal/app · Wails 边界"]
+        AS["AppService<br/>薄委托"]
+        WE["wailsEmitter<br/>实现 event.Emitter"]
+    end
+
+    subgraph SVC["internal/service · 纯业务"]
+        Auth[AuthService]
+        Live[LiveLotteryService]
+        Profile[ProfileService]
+    end
+
+    subgraph BASE["config · bili · live · login"]
+        Bili[bili.Client]
+        LLive[LiveLottery / DanmakuClient]
+        QR[QRLogin]
+        Cfg[config.Config / RuntimeState]
+    end
+
+    UI -- "AppService.* (生成绑定)" --> AS
+    AS --> Auth
+    AS --> Live
+    AS --> Profile
+    Live -- "emitter.Emit live:user_join" --> WE
+    Profile -- "emitter.Emit profile:switched/created" --> WE
+    WE -. "application.Event.Emit" .-> UI
+    Auth --> Bili
+    Live --> LLive
+    Live --> Bili
+    Profile --> Cfg
+    Auth --> Cfg
+
+classDef layer fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class AS,WE,Auth,Live,Profile,Bili,LLive,QR,Cfg layer;
+class UI io;
+```
+
+`app` 层向 `live`/`profile` 注入 `Emitter`（`auth` 不需要事件），service 通过它发事件，由 `wailsEmitter` 转发回前端——service 全程不 import Wails。
 
 ## service 层（纯业务）
 
@@ -48,16 +111,31 @@
 
 ## 前端可见方法
 
-| 认证 (auth) | 直播抽奖 (live) | Profile (profile) |
+`AppService` 暴露给前端的全部方法，前端经生成绑定调用。
+
+| 方法 | 职责 | 说明 |
 | --- | --- | --- |
-| Login | ConnectLiveRooms | GetProfiles |
-| GetQRCode | StartLiveLottery | SwitchProfile |
-| CheckQRCodeStatus | StopLiveLottery | CreateProfile |
-| LoginWithQRCode | DrawWinners | DeleteProfile |
-| IsLoggedIn | GetParticipantCount | RenameProfile |
-| GetAccountInfo | IsLiveLotteryRunning | SaveProfileConfig |
-| Logout | | SetBackgroundImage |
-| | | GetBackgroundImage |
-| | | AddWatchedRoom |
-| | | RemoveWatchedRoom |
-| | | GetWatchedRooms |
+| `Login` | auth | Cookie 登录，调 GetMyInfo 校验后持久化 |
+| `LoginWithQRCode` | auth | 用扫码收集的 Cookie 完成登录 |
+| `GetQRCode` | auth | 申请二维码，返回 qrcode_key 与 url |
+| `CheckQRCodeStatus` | auth | 轮询扫码状态（0/86038/86090） |
+| `IsLoggedIn` | auth | 是否已登录 |
+| `GetAccountInfo` | auth | 当前账号信息（name/uid/face） |
+| `Logout` | auth | 登出并清空 Cookie |
+| `ConnectLiveRooms` | live | 连接监控房间的弹幕 WebSocket |
+| `StartLiveLottery` | live | 开始监听，设 OnUserJoin 回调 |
+| `StopLiveLottery` | live | 停止弹幕监听 |
+| `DrawWinners` | live | 从参与者池随机抽取中奖者 |
+| `GetParticipantCount` | live | 当前参与者人数 |
+| `IsLiveLotteryRunning` | live | 抽奖是否进行中 |
+| `GetProfiles` | profile | 列出全部 Profile 与激活项 |
+| `SwitchProfile` | profile | 切换激活 Profile |
+| `CreateProfile` | profile | 新建 Profile |
+| `DeleteProfile` | profile | 删除 Profile |
+| `RenameProfile` | profile | 重命名 Profile |
+| `SaveProfileConfig` | profile | 保存 Profile 配置 |
+| `SetBackgroundImage` | profile | 设置自定义背景图 |
+| `GetBackgroundImage` | profile | 读取自定义背景图 |
+| `AddWatchedRoom` | profile | 添加监控房间 |
+| `RemoveWatchedRoom` | profile | 移除监控房间 |
+| `GetWatchedRooms` | profile | 列出监控房间 |

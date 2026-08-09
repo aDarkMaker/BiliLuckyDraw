@@ -11,7 +11,7 @@ Once connected to a live room, the app continuously listens to danmaku. Any view
 
 ## Multiple draw profiles
 
-You can keep a separate profile for each scenario — each one holds its own keyword, winner count, watched rooms and background image. Create one for "daily thank-you", another for "fan festival", a third for "New Year special", and switch between them with a single click before going live. Everything is preserved when you switch or exit.
+Keep a separate profile for each scenario — each one holds its own keyword, winner count, watched rooms and background image. Switch with one click before going live; everything is preserved across switches and restarts.
 
 ## Four themes
 
@@ -24,7 +24,7 @@ Four built-in looks, switchable any time while running:
 | spring-festival | Red palette, frosted-glass and festive feel | Yes |
 | beach | Blue palette, frosted-glass and fresh feel | Yes |
 
-Your choice is remembered, so the app reopens in the theme you left it. Spring-festival and beach ship with their own backgrounds; under light and dark you can use your own.
+Your choice is remembered across restarts. Spring-festival and beach ship with a background; under light and dark you can use your own.
 
 ## Flexible & customizable
 

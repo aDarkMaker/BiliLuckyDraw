@@ -2,13 +2,18 @@
 
 ## Live-stream interactive draw
 
-The most common usage: a streamer runs a keyword interaction in the live room; viewers who send danmaku containing the keyword are auto-added to the pool, and winners are drawn at random after stopping.
+A streamer runs a keyword interaction; viewers who send the keyword are auto-added to the pool, and winners are drawn at random after stopping.
 
-1. Log in to a Bilibili account (Cookie or QR code)
-2. Add the live room ID(s) to monitor
-3. Enter the keyword and set the winner count (1–9999) in the top bar
-4. Click Start → danmaku enters the pool in real time, participant count climbs live
-5. Click Stop → draw, reveal the winner list
+```mermaid
+flowchart LR
+    A[Log in] --> B[Add rooms]
+    B --> C[Set keyword & winner count]
+    C --> D[Start]
+    D --> E[Stop & draw]
+
+classDef step fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class A,B,C,D,E step;
+```
 
 ## Multi-room monitoring
 
@@ -31,10 +36,6 @@ Four built-in themes fit different scenarios:
 - **beach**: summer / relaxed vibes (bundled background)
 
 You can also set a custom background image on any Profile (a theme background takes priority over a custom background).
-
-## Multi-account management
-
-Manage via multiple Profiles: switching a Profile swaps a complete draw config while reusing the same Bilibili login. Handy for reusing presets across different stream sessions.
 
 ::: warning Unsupported capabilities
 This is a local desktop app. It does **not** provide: cloud config sync, auto-announcing winners to danmaku, or auto prize distribution. The winner list is shown locally only.

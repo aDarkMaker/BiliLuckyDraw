@@ -2,53 +2,90 @@
 
 ## 抽奖流程
 
-```
-用户点击开始
-  → ConnectLiveRooms(roomIDs)        连接各直播间弹幕 WebSocket
-  → StartLiveLottery(keyword)        设 OnUserJoin 回调，开始监听
-  → DanmakuClient 收到 DANMU_MSG
-  → 解析弹幕 → 关键词匹配
-  → UID 去重（首次出现才入池）
-  → OnUserJoin(user)
-  → emitter.Emit("live:user_join", user)
-  → 前端 Events.On('live:user_join') → GetParticipantCount()
+```mermaid
+flowchart LR
+    Start([点击开始]) --> Connect[ConnectLiveRooms 连接弹幕 WS]
+    Connect --> Listen[StartLiveLottery 设 OnUserJoin 并监听]
+    Listen --> Danmaku[收到 DANMU_MSG]
+    Danmaku --> Parse[解析弹幕并匹配关键词]
+    Parse --> Dedup{UID 已存在?}
+    Dedup -->|首次| Join[OnUserJoin 回调]
+    Dedup -->|已存在| Danmaku
+    Join --> Emit["emitter.Emit live:user_join"]
+    Emit --> Front[前端更新参与人数]
+
+classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class Connect,Listen,Parse,Join,Emit,Front proc;
+class Start,Dedup io;
 ```
 
-`live:user_join` 事件实时驱动参与人数更新；另有 1000ms 轮询兜底对账。
+`live:user_join` 实时驱动参与人数更新；另有 1000ms 轮询兜底对账。
 
 ## 停止与开奖
 
-```
-用户点击停止
-  → StopLiveLottery()                停止弹幕监听
-  → DrawWinners(count)               Fisher-Yates 洗牌取前 count 个
-  → 返回 Winner[] JSON
-  → 前端解析 → WinnerDisplay 展示
+```mermaid
+flowchart LR
+    Stop([点击停止]) --> Quit[StopLiveLottery 停止监听]
+    Quit --> Draw["DrawWinners Fisher-Yates 洗牌取前 N"]
+    Draw --> JSON[返回 Winner 数组 JSON]
+    JSON --> Show[前端展示中奖名单]
+
+classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class Quit,Draw,JSON,Show proc;
+class Stop io;
 ```
 
 ## 登录流程
 
 **Cookie 登录：**
 
-```
-Login(cookie) → GetMyInfo 校验 → 持久化 config.json
+```mermaid
+flowchart LR
+    A[粘贴 Cookie] --> B[Login 调 GetMyInfo 校验]
+    B --> C{校验通过}
+    C -->|是| D[持久化到 config.json]
+    C -->|否| E[提示登录失败]
+
+classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class B,D,E proc;
+class A,C io;
 ```
 
 **扫码登录：**
 
-```
-GetQRCode() → 返回 {qrcode_key, url}
-  → qrcode 库渲染二维码
-  → 每 2000ms 轮询 CheckQRCodeStatus(qrcode_key)
-    → code 0：成功 → 从 poll 响应 Set-Cookie 头收集 Cookie → LoginWithQRCode(cookie) 校验 → 持久化
-    → 86038：过期 → 提示重新生成
-    → 86090：已扫码待确认 → 提示
+```mermaid
+flowchart LR
+    Q1[GetQRCode 返回 qrcode_key 与 url] --> Q2[qrcode 库渲染二维码]
+    Q2 --> Q3[每 2000ms 轮询 CheckQRCodeStatus]
+    Q3 --> Q4{状态码}
+    Q4 -->|86038 过期| Q5[提示重新生成]
+    Q4 -->|86090 待确认| Q3
+    Q4 -->|0 成功| Q6[收集 Set-Cookie 头 Cookie]
+    Q6 --> Q7[LoginWithQRCode 校验并持久化]
+
+classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class Q1,Q2,Q6,Q7,Q5 proc;
+class Q3,Q4 io;
 ```
 
 ## Profile 事件
 
-- `SwitchProfile(id)` → 持久化 → 发 `profile:switched`（payload：激活的 ProfileConfig JSON）。
-- `CreateProfile(name)` → 持久化 → 发 `profile:created`（payload：新建的 ProfileConfig JSON）。ID 格式 `pf_<unixnano>`。
+```mermaid
+flowchart LR
+    S["SwitchProfile(id)"] --> SP[持久化] --> SE["emit profile:switched"]
+    C["CreateProfile(name)"] --> CP["持久化, ID = pf_unixnano"] --> CE["emit profile:created"]
+
+classDef proc fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+classDef io fill:transparent,stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class SP,SE,CP,CE proc;
+class S,C io;
+```
+
+payload 均为对应 ProfileConfig JSON。
 
 ## 配置持久化
 

@@ -6,7 +6,18 @@
 task build
 ```
 
-`task build` resolves to `task {{OS}}:build` (auto-dispatches to `darwin:build` / `windows:build` / `linux:build`). Flow: `go mod tidy` → generate bindings → build frontend (`tsc && vite build`) → generate icons → `go build -tags production`. Output lands in `bin/luckydraw` (`.exe` on Windows).
+`task build` resolves to `task {{OS}}:build` (auto-dispatches to `darwin:build` / `windows:build` / `linux:build`). Output lands in `bin/luckydraw` (`.exe` on Windows).
+
+```mermaid
+flowchart LR
+    A[go mod tidy] --> B[generate bindings]
+    B --> C["build frontend tsc && vite build"]
+    C --> D[generate icons]
+    D --> E["go build -tags production"]
+
+classDef step fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class A,B,C,D,E step;
+```
 
 ## Package
 
@@ -28,10 +39,29 @@ Non-target builds go through the `wails-cross` Docker image (build it first with
 
 From the `frontend/` directory:
 
-```bash
+::: code-group
+
+```bash [bun]
 bun run dev     # vite, dev preview (in real dev, use task dev for the integrated flow)
 bun run build   # tsc && vite build, production build into dist/
 ```
+
+```bash [npm]
+npm run dev
+npm run build
+```
+
+```bash [pnpm]
+pnpm dev
+pnpm build
+```
+
+```bash [yarn]
+yarn dev
+yarn build
+```
+
+:::
 
 ## Build config
 

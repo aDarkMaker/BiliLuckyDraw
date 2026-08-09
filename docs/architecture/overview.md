@@ -4,17 +4,17 @@ BiliLuckyDraw 是一个 Wails v3 桌面应用：Go 后端通过 `//go:embed all:
 
 ## 后端分层
 
-```
-┌─────────────────────────────────────────┐
-│  internal/app      (Wails 边界，薄委托)  │  唯一 import wails/v3
-├─────────────────────────────────────────┤
-│  internal/service   (纯业务逻辑)         │  不依赖 Wails
-├─────────────────────────────────────────┤
-│  internal/domain    (接口 + DTO)         │
-│  internal/event     (Emitter 接口)       │  service 与 Wails 解耦
-├─────────────────────────────────────────┤
-│  config · bili · live · login           │  配置 / B站API / 弹幕协议 / 扫码登录
-└─────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    App["internal/app<br/>Wails 边界，薄委托<br/><i>唯一 import wails/v3</i>"]
+    Svc["internal/service<br/>纯业务逻辑<br/><i>不依赖 Wails</i>"]
+    Dom["internal/domain · internal/event<br/>接口 + DTO · Emitter 接口<br/><i>service 与 Wails 解耦</i>"]
+    Base["config · bili · live · login<br/>配置 / B站API / 弹幕协议 / 扫码登录"]
+
+    App --> Svc --> Dom --> Base
+
+classDef layer fill:var(--vp-c-brand-soft),stroke:var(--vp-c-brand-1),color:var(--vp-c-text-1);
+class App,Svc,Dom,Base layer;
 ```
 
 - `app`：唯一 import `wails/v3` 的包，`AppService` 是暴露给前端的单一服务，所有方法委托 `service`。
@@ -30,19 +30,19 @@ React 18 + TypeScript 5 + Vite。通过 Wails 自动生成的 TS 绑定（`front
 
 ```
 luckydraw/
-  main.go                        # Wails v3 入口（embed 前端 dist）
-  Taskfile.yml                   # 构建工作流（dev/build/package/generate）
+  main.go                # Wails v3 入口（embed 前端 dist）
+  Taskfile.yml           # 构建工作流（dev/build/package/generate）
   internal/
-    app/                         # 薄 Wails 服务层，委托 service
-      app.go  auth.go  live.go  profile.go
-    service/                     # 纯业务逻辑（auth/live/profile）
-    domain/                      # 接口 + DTO
-    event/                       # Emitter 接口（service 与 Wails 解耦）
-    config/  bili/  live/  login/   # 配置 / B站API / 弹幕协议 / 扫码登录
+    app/                 # 薄 Wails 服务层，委托 service
+      app.go auth.go live.go profile.go
+    service/             # 纯业务逻辑（auth/live/profile）
+    domain/              # 接口 + DTO
+    event/               # Emitter 接口（service 与 Wails 解耦）
+    config/ bili/ live/ login/   # 配置 / B站API / 弹幕协议 / 扫码登录
   frontend/
     src/
-      themes/                    # 主题系统：light / dark / spring-festival / beach
-      styles/                    # 基础结构 token + 组件样式
-      components/  hooks/
-    bindings/                    # wails3 generate bindings 生成（勿手改）
+      themes/            # 主题系统（light/dark/spring-festival/beach）
+      styles/            # 基础结构 token + 组件样式
+      components/ hooks/
+    bindings/            # wails3 generate bindings 生成（勿手改）
 ```
