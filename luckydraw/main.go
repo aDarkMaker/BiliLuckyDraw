@@ -2,33 +2,46 @@ package main
 
 import (
 	"embed"
+	"log"
 
-	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"luckydraw/internal/app"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
-func main() {
-	app := NewApp()
+//go:embed build/appicon.png
+var appIcon []byte
 
-	err := wails.Run(&options.App{
-		Title:  "BiliLuckyDraw",
-		Width:  1200,
-		Height: 800,
-		AssetServer: &assetserver.Options{
-			Assets: assets,
+func main() {
+	appSvc := app.New()
+
+	a := application.New(application.Options{
+		Name:        "BiliLuckyDraw",
+		Description: "B站直播抽奖助手",
+		Services: []application.Service{
+			application.NewService(appSvc),
 		},
-		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
-		OnStartup:        app.startup,
-		Bind: []interface{}{
-			app,
+		Assets: application.AssetOptions{
+			Handler: application.AssetFileServerFS(assets),
+		},
+		Icon: appIcon,
+		Mac: application.MacOptions{
+			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
 	})
 
-	if err != nil {
-		println("Error:", err.Error())
+	a.Window.NewWithOptions(application.WebviewWindowOptions{
+		Title:            "BiliLuckyDraw",
+		Width:            1200,
+		Height:           800,
+		URL:              "/",
+		BackgroundColour: application.NewRGB(255, 255, 255),
+	})
+
+	if err := a.Run(); err != nil {
+		log.Fatal(err)
 	}
 }

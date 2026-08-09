@@ -5,11 +5,16 @@
   ],
   "words": [
     "assetserver",
+    "binaryname",
+    "macfilename",
     "maxday",
     "minfollower",
     "Nunito",
     "Pubdate",
     "sneaktower",
-    "uids"
+    "Taskfile",
+    "topbar",
+    "uids",
+    "windowsfilename"
   ]
 }
