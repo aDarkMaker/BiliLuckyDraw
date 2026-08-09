@@ -1,6 +1,8 @@
 # Product
 
-BiliLuckyDraw is a desktop app for Bilibili live-stream lucky draws, built with Wails v3 (Go backend + React 18 + TypeScript frontend). It runs as a single 1200×800 webview window; on macOS, closing the last window quits the app.
+BiliLuckyDraw is a desktop app for running lucky draws in Bilibili live streams. Once connected to a room, it listens to danmaku in real time: viewers who send a danmaku containing a configured keyword are entered into the draw, and winners are picked at random from all participants. The whole process is automatic — no manual list-keeping, fair and transparent.
+
+It's built for streamers who want to run interactive giveaways during a stream — whether it's a daily thank-you, a fan-festival event or a holiday celebration, you can start a draw in seconds.
 
 - **Repository**: [aDarkMaker/BiliLuckyDraw](https://github.com/aDarkMaker/BiliLuckyDraw)
 - **Releases**: [github.com/aDarkMaker/BiliLuckyDraw/releases](https://github.com/aDarkMaker/BiliLuckyDraw/releases)
@@ -8,28 +10,27 @@ BiliLuckyDraw is a desktop app for Bilibili live-stream lucky draws, built with 
 
 ## What it does
 
-- Connects to one or more Bilibili live rooms and monitors danmaku in real time
-- Collects participants whose danmaku contains a configured keyword (deduplicated by UID)
-- Draws N winners at random (Fisher-Yates shuffle)
-- Supports Cookie login and QR-code login
-- Saves multiple draw profiles and switches between them
-- Ships four themes (light / dark / spring-festival / beach) with custom backgrounds
+- Monitors danmaku in one or more live rooms in real time
+- Enters viewers who send the keyword into the draw, deduplicated by UID (multiple messages in the same room count once)
+- One-click draw — randomly picks the configured number of winners
+- Two login methods: paste a Cookie, or scan a QR code with the mobile app
+- Multiple draw configs, switchable any time and remembered across restarts
+- Four themes (light / dark / spring-festival / beach), switchable at runtime
 
 ## Screenshots
 
-| | |
-| --- | --- |
-| ![Home](/img/home.png) | ![Login](/img/login.png) |
-| Home (idle) | Cookie login |
-| ![QR code](/img/prcode.png) | ![Settings](/img/settings.png) |
-| QR-code login | Settings |
-| ![Winners](/img/winners.png) | |
-| Winners | |
+| Home (idle) | Cookie login | QR-code login |
+| --- | --- | --- |
+| ![Home](/img/home.png) | ![Login](/img/login.png) | ![QR code](/img/prcode.png) |
+
+| Settings | Winners | |
+| --- | --- | --- |
+| ![Settings](/img/settings.png) | ![Winners](/img/winners.png) | |
 
 ## Tech stack
 
 | Layer | Tech |
 | --- | --- |
-| Backend | Wails v3 (v3.0.0-alpha.95) · Go 1.25 · Gorilla WebSocket |
+| Backend | Wails v3 (v3.0.0-alpha.95) · Go 1.25 |
 | Frontend | React 18 · TypeScript 5 · Vite · Bun |
-| Build | Task (Taskfile.yml) · wails3 CLI |
+| Transport | WebSocket · Gorilla |

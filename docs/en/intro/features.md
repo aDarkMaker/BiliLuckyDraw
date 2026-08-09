@@ -1,42 +1,34 @@
 # Features
 
-## Live-stream lucky draw
+## Real-time danmaku draw
 
-`ConnectLiveRooms(roomIDs)` opens danmaku WebSockets for the given rooms. `StartLiveLottery(keyword)` starts monitoring; each danmaku containing the keyword adds its sender to the participant pool (deduplicated by UID, first occurrence only). `DrawWinners(count)` shuffles the pool with Fisher-Yates and returns the top `count` winners.
+Once connected to a live room, the app continuously listens to danmaku. Any viewer whose message contains your configured keyword is automatically added to the draw pool — no manual list-keeping for the streamer or mods. A viewer who sends multiple qualifying messages in the same room is only counted once, keeping the draw fair. At draw time, the configured number of winners is picked at random from the pool.
 
-## Multiple login methods
+## Two login methods
 
-- **Cookie login**: paste a Bilibili Cookie string → `Login` validates via `GetMyInfo` and persists it.
-- **QR-code login**: `GetQRCode` returns a URL rendered into a QR image; the app polls `CheckQRCodeStatus` every 2000ms (status `0` success / `86038` expired / `86090` scanned, awaiting confirmation).
+- **Cookie login**: copy your Bilibili Cookie from the browser and paste it in — handy if you're comfortable with it.
+- **QR-code login**: click "QR login" to generate a QR code, then scan it with the Bilibili mobile app — secure and convenient, no manual Cookie copying.
 
-## Multi-profile
+## Multiple draw profiles
 
-A **Profile** is a draw-configuration set (not a Bilibili account). Each `ProfileConfig` holds:
+You can keep a separate profile for each scenario — each one holds its own keyword, winner count, watched rooms and background image. Create one for "daily thank-you", another for "fan festival", a third for "New Year special", and switch between them with a single click before going live. Everything is preserved when you switch or exit.
 
-| Field | Meaning |
-| --- | --- |
-| `ID` | `pf_<unixnano>` |
-| `Name` | Profile label |
-| `BackgroundImage` | Custom background path |
-| `WatchedRooms` | Monitored room IDs |
-| `Keyword` | Danmaku keyword |
-| `WinnerCount` | Number of winners (1–9999) |
+## Four themes
 
-Profiles persist to `~/.luckydraw/state.json`. Switch or create profiles in Settings.
+Four built-in looks, switchable any time while running:
 
-## Theme system
+| Theme | Description | Bundled background |
+| --- | --- | --- |
+| light | Light interface; follows system color scheme on first launch | No (customizable) |
+| dark | Dark interface, easy on the eyes | No (customizable) |
+| spring-festival | Red palette, frosted-glass and festive feel | Yes |
+| beach | Blue palette, frosted-glass and fresh feel | Yes |
 
-Four built-in themes:
+Your choice is remembered, so the app reopens in the theme you left it. Spring-festival and beach ship with their own backgrounds; under light and dark you can use your own.
 
-| Theme | Background image |
-| --- | --- |
-| light | none |
-| dark | none |
-| spring-festival | bundled |
-| beach | bundled |
+## Flexible & customizable
 
-Theme persists in `localStorage 'luckydraw-theme'`. On first launch, light/dark follows `prefers-color-scheme`. All theme backgrounds are preloaded on mount to eliminate switch lag. A theme background takes priority over a custom background.
-
-## Customizable
-
-Per profile: keyword, winner count (1–9999), watched rooms, and a custom background image. Theme background (if any) overrides the custom background.
+- Custom keyword — decides which danmaku count as entries
+- Custom watched rooms — monitor several rooms at once, with participants merged into one pool
+- Custom winner count — anywhere from 1 to 9999
+- Custom background image — applies under light / dark (spring-festival and beach use their bundled backgrounds)
