@@ -160,8 +160,11 @@
 .message-toast {
 	position: fixed;
 	bottom: 50px;
-	left: 50%;
-	transform: translate(-50%, 20px);
+	left: 0;
+	right: 0;
+	width: fit-content;
+	margin: 0 auto;
+	transform: translateY(20px);
 	opacity: 0;
 	background: var(--color-toast-bg);
 	color: var(--color-toast-text);
@@ -183,6 +186,6 @@
 
 .message-toast.is-visible {
 	opacity: 1;
-	transform: translate(-50%, 0);
+	transform: translateY(0);
 	pointer-events: auto;
 }
