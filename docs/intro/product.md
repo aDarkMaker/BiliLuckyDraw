@@ -23,9 +23,9 @@ BiliLuckyDraw 是一个为 B 站直播间设计的弹幕抽奖桌面应用。开
 | --- | --- | --- |
 | ![首页](/img/home.png) | ![登录页](/img/login.png) | ![扫码登录](/img/prcode.png) |
 
-| 设置页 | 中奖结果 | |
+| 设置页 | 中奖结果 | 抽奖历史 |
 | --- | --- | --- |
-| ![设置页](/img/settings.png) | ![中奖结果](/img/winners.png) | |
+| ![设置页](/img/settings.png) | ![中奖结果](/img/winners.png) | ![抽奖历史](/img/history.png) |
 
 ## 技术栈
 

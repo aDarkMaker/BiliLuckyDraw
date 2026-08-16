@@ -13,6 +13,16 @@ Once connected to a live room, the app continuously listens to danmaku. Any view
 
 Keep a separate profile for each scenario — each one holds its own keyword, winner count, watched rooms and background image. Switch with one click before going live; everything is preserved across switches and restarts.
 
+## Draw history & export
+
+Every draw is automatically recorded as a history entry, bound to the active profile — it stores the keyword, winner count, draw time and the full winner list. The "Lottery History" card in Settings shows every entry for the current profile:
+
+- **Export one**: click "Export" on an entry, pick where to save, and the winner list is exported as a Markdown file named `keyword-count-time.md` with a table of nickname + UID.
+- **Delete one**: remove a history entry you no longer need.
+- **Delete all**: clear every entry for the current profile in one click.
+
+Switching profiles switches the history list to that profile's entries. Deleting a profile clears its history along with it.
+
 ## Four themes
 
 Four built-in looks, switchable any time while running:
@@ -32,3 +42,7 @@ Your choice is remembered across restarts. Spring-festival and beach ship with a
 - Custom watched rooms — monitor several rooms at once, with participants merged into one pool
 - Custom winner count — anywhere from 1 to 9999
 - Custom background image — applies under light / dark (spring-festival and beach use their bundled backgrounds)
+
+## Winner-list display
+
+When there are many winners, the winner-list card caps its height and scrolls internally (the scrollbar is hidden), so the lottery page itself never scrolls vertically and stays visually clean.

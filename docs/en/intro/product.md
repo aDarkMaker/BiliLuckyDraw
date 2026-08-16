@@ -23,9 +23,9 @@ It's built for streamers who want to run interactive giveaways during a stream â
 | --- | --- | --- |
 | ![Home](/img/home.png) | ![Login](/img/login.png) | ![QR code](/img/prcode.png) |
 
-| Settings | Winners | |
+| Settings | Winners | Draw history |
 | --- | --- | --- |
-| ![Settings](/img/settings.png) | ![Winners](/img/winners.png) | |
+| ![Settings](/img/settings.png) | ![Winners](/img/winners.png) | ![Draw history](/img/history.png) |
 
 ## Tech stack
 

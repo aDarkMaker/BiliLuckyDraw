@@ -33,6 +33,7 @@ export default withMermaid(
 					{ text: '架构', link: '/architecture/overview' },
 					{ text: '开发', link: '/development/setup' },
 					{ text: '应用场景', link: '/use-cases/scenarios' },
+					{ text: '开发日志', link: '/development/changelog' },
 				],
 				sidebar: [
 					{
@@ -61,6 +62,7 @@ export default withMermaid(
 							{ text: '环境准备', link: '/development/setup' },
 							{ text: '构建与打包', link: '/development/build' },
 							{ text: '前端绑定', link: '/development/bindings' },
+							{ text: '开发日志', link: '/development/changelog' },
 						],
 					},
 					{
@@ -80,6 +82,7 @@ export default withMermaid(
 					{ text: 'Architecture', link: '/en/architecture/overview' },
 					{ text: 'Development', link: '/en/development/setup' },
 					{ text: 'Use Cases', link: '/en/use-cases/scenarios' },
+					{ text: 'Changelog', link: '/en/development/changelog' },
 				],
 				sidebar: [
 					{
@@ -108,6 +111,7 @@ export default withMermaid(
 							{ text: 'Setup', link: '/en/development/setup' },
 							{ text: 'Build & Package', link: '/en/development/build' },
 							{ text: 'Frontend Bindings', link: '/en/development/bindings' },
+							{ text: 'Changelog', link: '/en/development/changelog' },
 						],
 					},
 					{

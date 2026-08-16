@@ -17,8 +17,15 @@ Open Settings and enter the IDs of the rooms you want to monitor. You can add se
 
 ## 4. Start a draw
 
-Back on the home screen, set the keyword and winner count in the top bar, then click **Start**. As viewers send danmaku containing the keyword, the participant count rises in real time. When you're ready to draw, click **Stop** and the randomly picked winners appear right away.
+Back on the home screen, set the keyword and winner count in the top bar, then click **Start**. As viewers send danmaku containing the keyword, the participant count rises in real time. When you're ready to draw, click **Stop** and the randomly picked winners appear right away. With many winners, the list scrolls inside the card without affecting the page layout.
 
-## 5. Switch theme & language
+## 5. View & export history
+
+Every draw is automatically recorded under the active profile's history. In Settings, the "Lottery History" card lets you:
+
+- Click "Export" on an entry, pick where to save, and the winner list is exported as a Markdown file named `keyword-count-time.md`.
+- Delete a single history entry, or click "Delete All" to clear every entry for the current profile.
+
+## 6. Switch theme & language
 
 In Settings, under "Appearance", you can switch the theme (light / dark / spring-festival / beach) and the language (中文 / English). Changes apply instantly and are remembered.
