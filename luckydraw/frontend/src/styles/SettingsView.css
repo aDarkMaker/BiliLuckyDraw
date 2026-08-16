@@ -179,6 +179,32 @@
 	font-size: 13px;
 }
 
+.settings-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
+.settings-card-header .settings-title {
+	margin-bottom: 0;
+}
+
+.history-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 14px;
+	background: var(--color-input-bg);
+	border-radius: var(--radius-card);
+	border: 1px solid var(--color-border);
+}
+
+.history-label {
+	font-size: 13px;
+	color: var(--color-text-secondary);
+}
+
 .background-preview {
 	width: 100%;
 	margin-bottom: 16px;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Input } from './Input';
 import { AppService } from '../../bindings/luckydraw/internal/app';
@@ -14,6 +14,20 @@ interface Profile {
 	name: string;
 	keyword: string;
 	winner_count: number;
+}
+
+interface HistoryWinner {
+	uid: number;
+	username: string;
+	count: number;
+}
+
+interface HistoryRecord {
+	id: string;
+	keyword: string;
+	winner_count: number;
+	time: string;
+	winners: HistoryWinner[];
 }
 
 interface SettingsViewProps {
@@ -145,6 +159,63 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 		await onRenameProfile(editingProfileId, editingName.trim());
 		setEditingProfileId('');
 		setEditingName('');
+	};
+
+	const [history, setHistory] = useState<HistoryRecord[]>([]);
+	const [historyLoading, setHistoryLoading] = useState(false);
+
+	const loadHistory = async () => {
+		if (!activeProfileId) return;
+		setHistoryLoading(true);
+		try {
+			const data = await AppService.GetHistory(activeProfileId);
+			setHistory(JSON.parse(data) || []);
+		} catch (e) {
+			setHistory([]);
+		} finally {
+			setHistoryLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		loadHistory();
+	}, [activeProfileId]);
+
+	const handleDeleteHistory = async (historyID: string) => {
+		try {
+			await AppService.DeleteHistory(activeProfileId, historyID);
+			await loadHistory();
+			onMessage(t('settings.toast.historyDeleted'));
+		} catch (e: any) {
+			onMessage(t('settings.toast.historyExportFailed', { error: e.message }));
+		}
+	};
+
+	const handleDeleteAllHistory = async () => {
+		try {
+			await AppService.DeleteAllHistory(activeProfileId);
+			await loadHistory();
+			onMessage(t('settings.toast.historyAllDeleted'));
+		} catch (e: any) {
+			onMessage(t('settings.toast.historyExportFailed', { error: e.message }));
+		}
+	};
+
+	const handleExportHistory = async (historyID: string) => {
+		try {
+			const path = await AppService.ExportHistory(activeProfileId, historyID);
+			if (path) onMessage(t('settings.toast.historyExported', { path }));
+		} catch (e: any) {
+			onMessage(t('settings.toast.historyExportFailed', { error: e.message }));
+		}
+	};
+
+	const formatHistoryTime = (time: string) => {
+		try {
+			return new Date(time).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US');
+		} catch {
+			return time;
+		}
 	};
 
 	return (
@@ -310,6 +381,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 						{(!watchedRooms || watchedRooms.length === 0) && <p className="empty-hint">{t('settings.rooms.empty')}</p>}
 					</div>
 				</div>
+
+				{loggedIn && (
+					<div className="settings-card settings-bg-2">
+						<div className="settings-card-header">
+							<h2 className="settings-title">{t('settings.history.title')}</h2>
+							{history.length > 0 && (
+								<Button variant="text" size="small" onClick={handleDeleteAllHistory}>
+									{t('settings.history.deleteAll')}
+								</Button>
+							)}
+						</div>
+						<div className="rooms-list">
+							{history.map((record) => (
+								<div key={record.id} className="history-item">
+									<span className="history-label">
+										{t('settings.history.recordLabel', {
+											keyword: record.keyword || '--',
+											count: record.winner_count,
+											time: formatHistoryTime(record.time),
+										})}
+									</span>
+									<div className="profile-item-actions">
+										<Button variant="text" size="small" onClick={() => handleExportHistory(record.id)}>
+											{t('settings.history.export')}
+										</Button>
+										<Button variant="text" size="small" onClick={() => handleDeleteHistory(record.id)}>
+											{t('settings.lottery.delete')}
+										</Button>
+									</div>
+								</div>
+							))}
+							{history.length === 0 && !historyLoading && <p className="empty-hint">{t('settings.history.empty')}</p>}
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
