@@ -1,5 +1,11 @@
 package app
 
+import (
+	"encoding/json"
+
+	"luckydraw/internal/config"
+)
+
 func (a *AppService) ConnectLiveRooms(roomIDs []int) error {
 	return a.live.ConnectLiveRooms(roomIDs)
 }
@@ -13,7 +19,19 @@ func (a *AppService) StopLiveLottery() error {
 }
 
 func (a *AppService) DrawWinners(count int) (string, error) {
-	return a.live.DrawWinners(count)
+	result, err := a.live.DrawWinners(count)
+	if err != nil {
+		return "", err
+	}
+
+	var winners []config.HistoryWinner
+	if err := json.Unmarshal([]byte(result), &winners); err == nil {
+		profile := a.profile.ActiveProfile()
+		if profile != nil {
+			_ = a.profile.AddHistory(profile.ID, profile.Keyword, count, winners)
+		}
+	}
+	return result, nil
 }
 
 func (a *AppService) GetParticipantCount() int {

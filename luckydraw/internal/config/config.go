@@ -4,10 +4,25 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Config struct {
 	Cookie string `json:"cookie,omitempty"`
+}
+
+type HistoryWinner struct {
+	UID      int64  `json:"uid"`
+	Username string `json:"username"`
+	Count    int    `json:"count"`
+}
+
+type HistoryRecord struct {
+	ID          string          `json:"id"`
+	Keyword     string          `json:"keyword"`
+	WinnerCount int             `json:"winner_count"`
+	Time        time.Time       `json:"time"`
+	Winners     []HistoryWinner `json:"winners"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -51,12 +66,13 @@ func SaveConfig(path string, cfg *Config) error {
 }
 
 type ProfileConfig struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	BackgroundImage string `json:"background_image,omitempty"`
-	WatchedRooms    []int  `json:"watched_rooms,omitempty"`
-	Keyword         string `json:"keyword,omitempty"`
-	WinnerCount     int    `json:"winner_count"`
+	ID              string          `json:"id"`
+	Name            string          `json:"name"`
+	BackgroundImage string          `json:"background_image,omitempty"`
+	WatchedRooms    []int           `json:"watched_rooms,omitempty"`
+	Keyword         string          `json:"keyword,omitempty"`
+	WinnerCount     int             `json:"winner_count"`
+	History         []HistoryRecord `json:"history,omitempty"`
 }
 
 type RuntimeState struct {

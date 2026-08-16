@@ -21,6 +21,12 @@ func NewProfileService(state *config.RuntimeState, statePath string, emitter eve
 	return &ProfileService{state: state, statePath: statePath, emitter: emitter}
 }
 
+func (s *ProfileService) ActiveProfile() *config.ProfileConfig {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.state.GetActiveProfile()
+}
+
 func (s *ProfileService) GetProfiles() (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
