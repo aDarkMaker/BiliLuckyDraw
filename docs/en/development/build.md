@@ -70,7 +70,7 @@ yarn build
 | companyName | aDarkMaker |
 | productName | BiliLuckyDraw |
 | productIdentifier | com.adarkmaker.bililuckydraw |
-| version | 1.0.0 |
+| version | 1.2.0 |
 | copyright | (c) 2025, aDarkMaker |
 
 The `dev_mode` section configures hot reload: ignores `node_modules`/`frontend`/`bin`, watches `*.go`/`*.js`/`*.ts`, debounce 1000ms.

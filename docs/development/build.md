@@ -70,7 +70,7 @@ yarn build
 | companyName | aDarkMaker |
 | productName | BiliLuckyDraw |
 | productIdentifier | com.adarkmaker.bililuckydraw |
-| version | 1.0.0 |
+| version | 1.2.0 |
 | copyright | (c) 2025, aDarkMaker |
 
 `dev_mode` 段定义热重载行为：忽略 `node_modules`/`frontend`/`bin` 等目录，监听 `*.go`/`*.js`/`*.ts`，debounce 1000ms。

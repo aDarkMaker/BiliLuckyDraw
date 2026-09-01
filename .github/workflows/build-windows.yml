@@ -16,9 +16,13 @@ concurrency:
 jobs:
   build-windows:
     runs-on: windows-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: luckydraw
+    env:
+      BUN_CONFIG_HTTP_IDLE_TIMEOUT: '30'
+      BUN_CONFIG_HTTP_RETRY_COUNT: '1'
     steps:
       - uses: actions/checkout@v4
 
@@ -29,6 +33,10 @@ jobs:
           cache-dependency-path: luckydraw/go.sum
 
       - uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        working-directory: luckydraw/frontend
+        run: bun install --frozen-lockfile
 
       - name: Install task & wails3
         shell: bash

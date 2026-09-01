@@ -7,7 +7,7 @@ info:
   description: "B站直播抽奖助手"
   copyright: "(c) 2025, aDarkMaker"
   comments: "Bilibili live stream lucky draw helper"
-  version: "1.0.0"
+  version: "1.2.0"
 
 dev_mode:
   root_path: .

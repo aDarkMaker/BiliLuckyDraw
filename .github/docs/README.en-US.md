@@ -25,6 +25,7 @@ BiliLuckyDraw is a desktop app for running lucky draws on Bilibili live streams.
 - **Live-stream draw**: monitor danmaku in real time, collect participants by keyword, draw randomly
 - **Multiple login methods**: cookie login, Bilibili-app QR-code login
 - **Multi-profile**: multiple draw configs (keyword / winner count / watched rooms), one-click switch
+- **Draw history & export**: every draw is recorded automatically (keyword / winner count / time / full winner list), exportable as Markdown, viewable per profile
 - **Theme system**: light (default, follows system), dark, spring festival, beach — switchable at runtime, persisted
 - **Customizable**: custom keywords, watched rooms, background image
 
