@@ -36,7 +36,10 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: luckydraw/frontend
-        run: bun install --frozen-lockfile
+        shell: bash
+        run: |
+          unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy ALL_PROXY all_proxy
+          bun install --frozen-lockfile
 
       - name: Install task & wails3
         shell: bash
@@ -49,10 +52,16 @@ jobs:
         run: choco install nsis --no-progress -y
 
       - name: Build executable
-        run: task windows:build
+        shell: bash
+        run: |
+          unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy ALL_PROXY all_proxy
+          task windows:build
 
       - name: Package NSIS installer
-        run: task windows:package
+        shell: bash
+        run: |
+          unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy ALL_PROXY all_proxy
+          task windows:package
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
