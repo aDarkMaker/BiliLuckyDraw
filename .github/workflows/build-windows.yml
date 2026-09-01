@@ -47,7 +47,15 @@ jobs:
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Install NSIS
-        run: choco install nsis --no-progress -y
+        shell: pwsh
+        run: |
+          choco install nsis --no-progress -y
+          $nsis = "${env:ProgramFiles(x86)}\NSIS"
+          if (-not (Test-Path "$nsis\makensis.exe")) {
+            $nsis = "${env:ProgramFiles}\NSIS"
+          }
+          echo $nsis | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          & "$nsis\makensis.exe" /VERSION
 
       - name: Build executable
         run: task windows:build PACKAGE_MANAGER=npm
