@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.0
+
+- Windows EXE / NSIS installers built automatically and published with GitHub Releases
+- Draw history expands to show the winner list, sorted newest first with in-card scrolling
+- Room input accepts a live-room link and resolves the room ID automatically
+- Fixed Windows packaging: npm proxy hangs and NSIS / WebView2 path issues
+
 ## v1.1
 
 - Draw history is recorded automatically and bound to its profile — switching profiles switches history
