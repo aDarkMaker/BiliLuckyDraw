@@ -5,6 +5,7 @@ import { AppService } from '../../bindings/luckydraw/internal/app';
 import { useTheme, THEMES, useThemeBackground } from '../themes';
 import { useI18n, Lang } from '../i18n';
 import { formatAvatarUrl } from '../utils/format';
+import { parseRoomId } from '../utils/parseRoomId';
 import '../styles/SettingsView.css';
 
 import avatarSvg from '../assets/icon/avatar.svg';
@@ -103,8 +104,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	};
 
 	const handleAddRoom = async () => {
-		const id = parseInt(newRoomID);
-		if (isNaN(id)) {
+		const id = parseRoomId(newRoomID);
+		if (id === null) {
 			onMessage(t('settings.toast.invalidRoomId'));
 			return;
 		}
@@ -163,6 +164,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
 	const [history, setHistory] = useState<HistoryRecord[]>([]);
 	const [historyLoading, setHistoryLoading] = useState(false);
+	const [expandedHistoryId, setExpandedHistoryId] = useState('');
 
 	const loadHistory = async () => {
 		if (!activeProfileId) return;
@@ -184,20 +186,23 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	const handleDeleteHistory = async (historyID: string) => {
 		try {
 			await AppService.DeleteHistory(activeProfileId, historyID);
+			if (expandedHistoryId === historyID) setExpandedHistoryId('');
 			await loadHistory();
 			onMessage(t('settings.toast.historyDeleted'));
 		} catch (e: any) {
-			onMessage(t('settings.toast.historyExportFailed', { error: e.message }));
+			onMessage(t('settings.toast.historyDeleteFailed', { error: e.message }));
 		}
 	};
 
 	const handleDeleteAllHistory = async () => {
+		if (!window.confirm(t('settings.history.confirmDeleteAll'))) return;
 		try {
 			await AppService.DeleteAllHistory(activeProfileId);
+			setExpandedHistoryId('');
 			await loadHistory();
 			onMessage(t('settings.toast.historyAllDeleted'));
 		} catch (e: any) {
-			onMessage(t('settings.toast.historyExportFailed', { error: e.message }));
+			onMessage(t('settings.toast.historyDeleteFailed', { error: e.message }));
 		}
 	};
 
@@ -392,23 +397,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 								</Button>
 							)}
 						</div>
-						<div className="rooms-list">
-							{history.map((record) => (
+						<div className="rooms-list history-list">
+							{[...history].reverse().map((record) => (
 								<div key={record.id} className="history-item">
-									<span className="history-label">
-										{t('settings.history.recordLabel', {
-											keyword: record.keyword || '--',
-											count: record.winner_count,
-											time: formatHistoryTime(record.time),
-										})}
-									</span>
-									<div className="profile-item-actions">
-										<Button variant="text" size="small" onClick={() => handleExportHistory(record.id)}>
+									<button
+										type="button"
+										className="history-summary"
+										onClick={() => setExpandedHistoryId(expandedHistoryId === record.id ? '' : record.id)}
+									>
+										<span className="history-label">
+											{t(record.keyword ? 'settings.history.recordLabel' : 'settings.history.recordLabelNoKeyword', {
+												keyword: record.keyword || '',
+												count: record.winner_count,
+												time: formatHistoryTime(record.time),
+											})}
+										</span>
+										<span className={`history-expand ${expandedHistoryId === record.id ? 'is-open' : ''}`} aria-hidden="true" />
+									</button>
+									<div className={`history-winners ${expandedHistoryId === record.id ? 'is-open' : ''}`}>
+										<div className="history-winners-inner">
+											{(record.winners || []).map((w) => (
+												<div key={w.uid} className="history-winner">
+													<span className="history-winner-name">{w.username || '--'}</span>
+													<span className="history-winner-uid">{t('winner.uid', { uid: w.uid })}</span>
+												</div>
+											))}
+											{(record.winners || []).length === 0 && <p className="empty-hint">{t('settings.history.noWinners')}</p>}
+										</div>
+									</div>
+									<div className="history-item-actions">
+										<button type="button" className="history-action" onClick={() => handleExportHistory(record.id)}>
 											{t('settings.history.export')}
-										</Button>
-										<Button variant="text" size="small" onClick={() => handleDeleteHistory(record.id)}>
+										</button>
+										<button type="button" className="history-action is-danger" onClick={() => handleDeleteHistory(record.id)}>
 											{t('settings.lottery.delete')}
-										</Button>
+										</button>
 									</div>
 								</div>
 							))}
