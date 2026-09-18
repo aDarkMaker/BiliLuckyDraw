@@ -20,31 +20,12 @@
 *.dylib
 *.test
 *.out
+fe-practice/bin/
+fe-practice/server/fe-practice-server
 
 # build/cache
 *.coverprofile
 coverage.out
-
-# ========== Wails (app under luckydraw/) ==========
-# build outputs (keep build assets: appicon.png, darwin/windows templates, generated icons)
-luckydraw/bin/
-luckydraw/build/bin/
-luckydraw/build/*.log
-luckydraw/.task/
-
-# ========== Frontend (React + Vite) ==========
-luckydraw/frontend/node_modules/
-luckydraw/frontend/dist/
-luckydraw/frontend/bindings/
-luckydraw/frontend/.vite/
-luckydraw/frontend/.cache/
-luckydraw/frontend/npm-debug.log*
-luckydraw/frontend/yarn-debug.log*
-luckydraw/frontend/yarn-error.log*
-luckydraw/frontend/pnpm-debug.log*
-
-# screenshot generation scripts (local-only, regenerate img/*.png)
-luckydraw/frontend/scripts/
 
 # ========== Env ==========
 .env

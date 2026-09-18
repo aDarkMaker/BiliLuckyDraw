@@ -1,6 +1,0 @@
-build/bin
-bin/
-.task/
-node_modules
-frontend/dist
-frontend/bindings
