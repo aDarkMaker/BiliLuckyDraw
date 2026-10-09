@@ -37,6 +37,7 @@ type DanmakuClient struct {
 	users       map[int64]*DanmakuUser
 	onMessage   func(*DanmakuMessage)
 	cookie      string
+	client      *bili.Client
 	authSuccess bool
 	online      int64
 	uid         int64
@@ -66,8 +67,24 @@ type RoomInfo struct {
 }
 
 type DanmakuHost struct {
-	Host string `json:"host"`
-	Port int    `json:"port"`
+	Host    string `json:"host"`
+	Port    int    `json:"port"`
+	WsPort  int    `json:"ws_port"`
+	WssPort int    `json:"wss_port"`
+}
+
+func (h DanmakuHost) wssPort() int {
+	port := h.WssPort
+	if port == 0 {
+		port = h.WsPort
+	}
+	if port == 0 {
+		port = h.Port
+	}
+	if port == 2243 || port == 0 {
+		port = 443
+	}
+	return port
 }
 
 type DanmakuInfo struct {
@@ -83,6 +100,7 @@ func NewDanmakuClient(roomID int, cookie string) *DanmakuClient {
 		stop:   make(chan struct{}),
 		users:  make(map[int64]*DanmakuUser),
 		cookie: cookie,
+		client: bili.NewClient(cookie),
 		uid:    uid,
 		buvid:  buvid,
 	}
@@ -121,10 +139,7 @@ func (c *DanmakuClient) connectWithRetry(isReconnect bool) error {
 	}
 
 	for _, host := range hosts {
-		port := host.Port
-		if port == 0 {
-			port = 443
-		}
+		port := host.wssPort()
 		wsURL := fmt.Sprintf("wss://%s:%d/sub", host.Host, port)
 		conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
@@ -278,13 +293,25 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 	roomInfo := &roomData
 	roomInfo.RoomID = realRoomID
 
+	// 签名接口优先，旧接口仅作降级兜底
+	signedURL := ""
+	if signed, err := c.client.SignWBI(map[string]string{
+		"id":           fmt.Sprintf("%d", realRoomID),
+		"type":         "0",
+		"web_location": "444.8",
+	}); err == nil {
+		signedURL = "https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?" + signed.Encode()
+	}
+
 	danmakuURLs := []string{
-		fmt.Sprintf("https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=%d&type=0", realRoomID),
-		fmt.Sprintf("https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=%d", realRoomID),
+		signedURL,
 		fmt.Sprintf("https://api.live.bilibili.com/room/v1/Danmu/getConf?room_id=%d", realRoomID),
 	}
 
-	for i, danmakuURL := range danmakuURLs {
+	for _, danmakuURL := range danmakuURLs {
+		if danmakuURL == "" {
+			continue
+		}
 		req2, err := http.NewRequest("GET", danmakuURL, nil)
 		if err != nil {
 			continue
@@ -336,76 +363,36 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 			}
 		}
 
-		if i == 2 {
-			var danmakuResult2 struct {
-				Code int `json:"code"`
-				Data struct {
-					Token          string `json:"token"`
-					Host           string `json:"host"`
-					Port           int    `json:"port"`
-					HostServerList []struct {
-						Host    string `json:"host"`
-						Port    int    `json:"port"`
-						WssPort int    `json:"wss_port"`
-					} `json:"host_server_list"`
-					ServerList []struct {
-						Host string `json:"host"`
-						Port int    `json:"port"`
-					} `json:"server_list"`
-				} `json:"data"`
-			}
+		var danmakuResult struct {
+			Code int `json:"code"`
+			Data struct {
+				Token          string        `json:"token"`
+				Host           string        `json:"host"`
+				Port           int           `json:"port"`
+				HostList       []DanmakuHost `json:"host_list"`
+				HostServerList []DanmakuHost `json:"host_server_list"`
+			} `json:"data"`
+		}
 
-			if err := json.Unmarshal(body2, &danmakuResult2); err == nil && danmakuResult2.Code == 0 {
-				roomInfo.DanmakuToken = danmakuResult2.Data.Token
-				if len(danmakuResult2.Data.HostServerList) > 0 {
-					hostList := make([]DanmakuHost, 0, len(danmakuResult2.Data.HostServerList))
-					for _, host := range danmakuResult2.Data.HostServerList {
-						port := host.WssPort
-						if port == 0 {
-							port = host.Port
-						}
-						if port == 0 {
-							port = 443
-						}
-						hostList = append(hostList, DanmakuHost{
-							Host: host.Host,
-							Port: port,
-						})
-					}
-					roomInfo.HostList = hostList
-					return roomInfo, nil
-				} else if danmakuResult2.Data.Host != "" {
-					port := danmakuResult2.Data.Port
-					if port == 0 {
-						port = 443
-					}
-					roomInfo.HostList = []DanmakuHost{
-						{Host: danmakuResult2.Data.Host, Port: port},
-					}
-					return roomInfo, nil
-				}
-			}
-		} else {
-			var danmakuResult struct {
-				Code int `json:"code"`
-				Data struct {
-					Token    string        `json:"token"`
-					HostList []DanmakuHost `json:"host_list"`
-				} `json:"data"`
-			}
+		if err := json.Unmarshal(body2, &danmakuResult); err != nil || danmakuResult.Code != 0 {
+			continue
+		}
 
-			if err := json.Unmarshal(body2, &danmakuResult); err == nil && danmakuResult.Code == 0 {
-				roomInfo.DanmakuToken = danmakuResult.Data.Token
-				roomInfo.HostList = danmakuResult.Data.HostList
-				if len(roomInfo.HostList) > 0 {
-					for i := range roomInfo.HostList {
-						if roomInfo.HostList[i].Port == 2243 {
-							roomInfo.HostList[i].Port = 443
-						}
-					}
-					return roomInfo, nil
-				}
-			}
+		roomInfo.DanmakuToken = danmakuResult.Data.Token
+
+		hosts := danmakuResult.Data.HostList
+		if len(hosts) == 0 {
+			hosts = danmakuResult.Data.HostServerList
+		}
+		if len(hosts) == 0 && danmakuResult.Data.Host != "" {
+			hosts = []DanmakuHost{{
+				Host: danmakuResult.Data.Host,
+				Port: danmakuResult.Data.Port,
+			}}
+		}
+		if len(hosts) > 0 {
+			roomInfo.HostList = hosts
+			return roomInfo, nil
 		}
 	}
 
@@ -423,6 +410,10 @@ func (c *DanmakuClient) getRoomInfo() (*RoomInfo, error) {
 }
 
 func (c *DanmakuClient) sendAuth(roomID int, token string) error {
+	if c.buvid == "" {
+		c.buvid = c.client.EnsureBuvid()
+	}
+
 	authData := map[string]interface{}{
 		"uid":      c.uid,
 		"roomid":   roomID,
