@@ -15,6 +15,7 @@
     "Taskfile",
     "topbar",
     "uids",
+    "wailsio",
     "windowsfilename"
   ]
 }
