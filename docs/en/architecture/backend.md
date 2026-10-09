@@ -99,8 +99,10 @@ The `app` layer injects an `Emitter` into `live`/`profile` (`auth` needs no even
 
 ## bili / live / login
 
-- `bili`: Bilibili HTTP API client (`Client`, `GetMyInfo` → `UserInfo{Mid,Name,Face}`, `DefaultHTTPClient`).
+- `bili`: Bilibili HTTP API client (`Client`, `GetMyInfo` → `UserInfo{Mid,Name,Face}`, `DefaultHTTPClient`, WBI signing `SignWBI`).
 - `live`: live-stream danmaku WebSocket binary protocol (`DanmakuClient`, reconnect/backoff, 16-byte packet framing, `OperationJoin` auth, heartbeat) + draw aggregation (`LiveLottery`, `OnUserJoin` callback, `Draw` Fisher-Yates shuffle, UID-deduped participant pool). Types: `DanmakuUser{UID,Username,Count}`, `DanmakuMessage`.
+
+Danmaku connection notes: `getDanmuInfo` requires WBI signing (`w_rid` / `wts`, keys fetched from `web-interface/nav` and cached) and returns the `token` and `host_list` used for the handshake; the host port comes from `wss_port` (2245). The handshake must carry the logged-in `uid`, `key` and `buvid3` (fetched from `frontend/finger/spi` when absent from the cookie), otherwise Bilibili masks nicknames and zeroes `uid`, collapsing every viewer into one participant.
 - `login`: Bilibili QR-code login flow (`QRLogin.GetQRCode`, `CheckQRCodeStatus` polling; status `0` success / `86038` expired / `86090` scanned, awaiting confirmation).
 
 ## Frontend-visible methods

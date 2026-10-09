@@ -99,8 +99,10 @@ flowchart LR
 
 ## bili / live / login
 
-- `bili`：B 站 HTTP API 客户端（`Client`、`GetMyInfo` → `UserInfo{Mid,Name,Face}`、`DefaultHTTPClient`）。
+- `bili`：B 站 HTTP API 客户端（`Client`、`GetMyInfo` → `UserInfo{Mid,Name,Face}`、`DefaultHTTPClient`、WBI 签名 `SignWBI`）。
 - `live`：直播弹幕 WebSocket 二进制协议（`DanmakuClient`，重连/退避、16 字节包帧、`OperationJoin` 鉴权、心跳）+ 抽奖聚合（`LiveLottery`，`OnUserJoin` 回调、`Draw` Fisher-Yates 洗牌、按 UID 去重的参与者池）。类型：`DanmakuUser{UID,Username,Count}`、`DanmakuMessage`。
+
+弹幕接入要点：`getDanmuInfo` 需 WBI 签名（`w_rid` / `wts`，密钥取自 `web-interface/nav` 并缓存），返回的 `token` 与 `host_list` 用于握手；主机端口取 `wss_port`（2245）。握手包需带登录 `uid`、`key` 与 `buvid3`（Cookie 缺失时由 `frontend/finger/spi` 获取），否则 B 站会把昵称打码、`uid` 归零，导致所有观众被合并为同一参与者。
 - `login`：B 站扫码登录流程（`QRLogin.GetQRCode`、`CheckQRCodeStatus` 轮询；状态码 0 成功 / 86038 过期 / 86090 已扫码待确认）。
 
 ## 前端可见方法

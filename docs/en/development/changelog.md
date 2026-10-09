@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.4.0
+
+- `getDanmuInfo` now uses WBI signing, fixing `-352` responses that prevented danmaku connections
+- The danmaku handshake now includes `uid` and `buvid3`, preventing nickname masking and the `uid = 0` collapse of all participants into one
+- Danmaku hosts use `wss_port` (2245); the legacy `getConf` fallback keeps the token and host list
+- Fixed a stray `types` entry in the frontend `tsconfig.json` that surfaced type errors when deps or bindings were missing
+
 ## v1.3.0
 
 - Draw history expands to show the winner list, sorted newest first with in-card scrolling
