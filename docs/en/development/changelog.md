@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.5.0
+
+- Live participant count on the lottery screen, with an explicit waiting hint
+- An empty keyword collects all danmaku; the lottery screen shows the active mode, and no draw happens without participants
+- Failed room connections are reported instead of silently "accumulating"
+- Copy the winner list in one click from the result screen
+- History now records the real keyword and winner count, capped at the last 100 entries
+- Transient network errors no longer log you out; config files are written with 0600
+
 ## v1.4.0
 
 - `getDanmuInfo` now uses WBI signing, fixing `-352` responses that prevented danmaku connections

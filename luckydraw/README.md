@@ -28,7 +28,7 @@ luckydraw/
 
 ## 主题
 
-内置日间（默认，跟随系统 `prefers-color-scheme`）、夜间、春节三套主题，在设置页可运行时切换，选择持久化到 localStorage。颜色全部走 CSS 变量，按 `theme-*` class 作用域切换。
+内置日间（默认，跟随系统 `prefers-color-scheme`）、夜间、春节、海滩四套主题，在设置页可运行时切换，选择持久化到 localStorage。颜色全部走 CSS 变量，按 `theme-*` class 作用域切换。
 
 ## 开发
 
