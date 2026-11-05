@@ -144,7 +144,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 							<input
 								type="text"
 								className="field-input"
-								placeholder={t('topbar.keywordPlaceholder')}
+								placeholder={keyword ? t('topbar.keywordPlaceholder') : t('topbar.keywordPlaceholderAll')}
 								value={keyword}
 								onChange={(e) => onKeywordChange(e.target.value)}
 								disabled={lotteryRunning}

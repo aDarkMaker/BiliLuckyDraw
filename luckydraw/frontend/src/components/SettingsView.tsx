@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Input } from './Input';
+import { ConfirmDialog } from './ConfirmDialog';
 import { AppService } from '../../bindings/luckydraw/internal/app';
 import { useTheme, THEMES, useThemeBackground } from '../themes';
 import { useI18n, Lang } from '../i18n';
@@ -165,6 +166,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	const [history, setHistory] = useState<HistoryRecord[]>([]);
 	const [historyLoading, setHistoryLoading] = useState(false);
 	const [expandedHistoryId, setExpandedHistoryId] = useState('');
+	const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
 	const loadHistory = async () => {
 		if (!activeProfileId) return;
@@ -195,7 +197,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 	};
 
 	const handleDeleteAllHistory = async () => {
-		if (!window.confirm(t('settings.history.confirmDeleteAll'))) return;
 		try {
 			await AppService.DeleteAllHistory(activeProfileId);
 			setExpandedHistoryId('');
@@ -392,7 +393,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 						<div className="settings-card-header">
 							<h2 className="settings-title">{t('settings.history.title')}</h2>
 							{history.length > 0 && (
-								<Button variant="text" size="small" onClick={handleDeleteAllHistory}>
+								<Button variant="text" size="small" onClick={() => setConfirmClearOpen(true)}>
 									{t('settings.history.deleteAll')}
 								</Button>
 							)}
@@ -440,6 +441,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 					</div>
 				)}
 			</div>
+			<ConfirmDialog
+				open={confirmClearOpen}
+				title={t('settings.history.confirmDeleteAllTitle')}
+				message={t('settings.history.confirmDeleteAll')}
+				confirmText={t('settings.history.deleteAll')}
+				cancelText={t('common.cancel')}
+				danger
+				onCancel={() => setConfirmClearOpen(false)}
+				onConfirm={() => {
+					setConfirmClearOpen(false);
+					handleDeleteAllHistory();
+				}}
+			/>
 		</div>
 	);
 };

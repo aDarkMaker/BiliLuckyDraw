@@ -6,7 +6,7 @@ export const parseRoomId = (input: string): number | null => {
 		return parseInt(value, 10);
 	}
 
-	const match = value.match(/^(?:https?:\/\/)?(?:www\.)?live\.bilibili\.com(?:\/(?:h5|blanc))?\/(\d+)(?:\/.*)?$/i);
+	const match = value.match(/^(?:https?:\/\/)?(?:www\.)?live\.bilibili\.com(?:\/(?:h5|blanc))?\/(\d+)(?:[/?#].*)?$/i);
 	if (!match) return null;
 
 	return parseInt(match[1], 10);
