@@ -103,6 +103,12 @@
 	box-shadow: var(--shadow-sm);
 }
 
+.winner-actions {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+}
+
 .btn-reset:hover {
 	background: var(--color-glass-surface-hover);
 	border-color: var(--color-glass-border);

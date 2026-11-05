@@ -17,6 +17,8 @@ type AppService struct {
 	live    *service.LiveLotteryService
 	profile *service.ProfileService
 	app     *application.App
+
+	lastHistoryError string
 }
 
 func New() *AppService {

@@ -136,8 +136,10 @@ function App() {
 						participantCount={participantCount}
 						showResults={showResults}
 						winners={winners}
+						keyword={keyword}
 						onStartLottery={handleStartLotteryWithMessage}
 						onReset={resetLottery}
+						onMessage={onMessage}
 					/>
 				) : (
 					<SettingsView

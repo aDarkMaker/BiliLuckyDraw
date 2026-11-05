@@ -176,6 +176,33 @@
 	font-weight: 500;
 }
 
+.lottery-participants {
+	margin-top: 18px;
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--color-text-secondary);
+	animation: hintFadeIn 0.3s ease-out;
+}
+
+.lottery-mode {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 14px;
+	margin-top: 14px;
+	border-radius: var(--radius-pill);
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--color-text-secondary);
+	background: var(--color-primary-tint);
+	border: 1px solid var(--color-border);
+	transition: var(--transition);
+}
+
+.lottery-mode.is-active {
+	color: var(--color-primary);
+	border-color: var(--color-primary);
+}
+
 .lottery-hint-container {
 	height: 40px;
 	display: flex;

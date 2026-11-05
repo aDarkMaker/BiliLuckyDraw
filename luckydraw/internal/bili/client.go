@@ -29,6 +29,15 @@ func NewClient(cookie string) *Client {
 	}
 }
 
+type APIError struct {
+	Code    int
+	Message string
+}
+
+func (e *APIError) Error() string {
+	return fmt.Sprintf("api error: %d %s", e.Code, e.Message)
+}
+
 func (c *Client) GetCookie() string {
 	return c.cookie
 }
@@ -78,7 +87,7 @@ func (c *Client) GetMyInfo() (*UserInfo, error) {
 	}
 
 	if resp.Code != 0 {
-		return nil, fmt.Errorf("api error: %d %s", resp.Code, resp.Message)
+		return nil, &APIError{Code: resp.Code, Message: resp.Message}
 	}
 
 	var info UserInfo

@@ -29,29 +29,51 @@ func NewLiveLottery(roomIDs []int, cookie string) *LiveLottery {
 	}
 }
 
-func (l *LiveLottery) Start(keyword string) error {
+type RoomFailure struct {
+	RoomID int    `json:"room_id"`
+	Reason string `json:"reason"`
+}
+
+func (l *LiveLottery) Start(keyword string) (int, []RoomFailure, error) {
 	l.mu.Lock()
 	if l.isRunning {
 		l.mu.Unlock()
-		return fmt.Errorf("在抽了，我有自己的节奏……")
+		return 0, nil, fmt.Errorf("在抽了，我有自己的节奏……")
 	}
 	l.keyword = keyword
 	l.isRunning = true
 	l.users = make(map[int64]*DanmakuUser)
 	l.mu.Unlock()
 
+	connected := 0
+	var failures []RoomFailure
 	for _, client := range l.clients {
 		client.SetOnMessage(func(msg *DanmakuMessage) {
 			l.handleDanmaku(msg)
 		})
 
 		if err := client.Connect(); err != nil {
-			fmt.Printf("想看 %d 直播，驳回: %v\n", client.roomID, err)
+			failures = append(failures, RoomFailure{RoomID: client.roomID, Reason: err.Error()})
 			continue
 		}
+		connected++
 	}
 
-	return nil
+	if connected == 0 {
+		l.mu.Lock()
+		l.isRunning = false
+		l.mu.Unlock()
+		if len(failures) > 0 {
+			return 0, failures, fmt.Errorf("直播间都没连上: %s", failures[0].Reason)
+		}
+		return 0, failures, fmt.Errorf("没有可用的直播间")
+	}
+
+	return connected, failures, nil
+}
+
+func (l *LiveLottery) RoomCount() int {
+	return len(l.clients)
 }
 
 func (l *LiveLottery) handleDanmaku(msg *DanmakuMessage) {

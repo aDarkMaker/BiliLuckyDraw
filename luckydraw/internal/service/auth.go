@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -31,12 +32,13 @@ func (s *AuthService) autoLogin(cookie string) {
 		return
 	}
 	s.client = bili.NewClient(cookie)
-	if info, err := s.client.GetMyInfo(); err != nil {
-		s.config.Cookie = ""
-		config.SaveConfig(s.configPath, s.config)
-		s.client = nil
-	} else {
-		_ = info
+	if _, err := s.client.GetMyInfo(); err != nil {
+		var apiErr *bili.APIError
+		if errors.As(err, &apiErr) && (apiErr.Code == -101 || apiErr.Code == -400) {
+			s.config.Cookie = ""
+			_ = config.SaveConfig(s.configPath, s.config)
+			s.client = nil
+		}
 	}
 }
 

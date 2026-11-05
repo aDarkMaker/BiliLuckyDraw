@@ -54,11 +54,17 @@ export const useLottery = (watchedRooms: number[], keyword: string, winnerCount:
 		setIsConnecting(true);
 		try {
 			await AppService.ConnectLiveRooms(watchedRooms);
-			await AppService.StartLiveLottery(keyword);
+			const result = await AppService.StartLiveLottery(keyword);
+			const status = result ? JSON.parse(result) : null;
 			setLotteryRunning(true);
 			setShowResults(false);
 			setWinners([]);
-			onError(t('lottery.toast.accumulating'));
+			if (status && status.failures && status.failures.length > 0) {
+				const rooms = status.failures.map((f: { room_id: number }) => f.room_id).join(', ');
+				onError(t('lottery.toast.roomPartial', { rooms }));
+			} else {
+				onError(t('lottery.toast.accumulating'));
+			}
 		} catch (e: any) {
 			onError(t('lottery.toast.startFailed', { error: String(e?.message || e) }));
 		} finally {
@@ -69,11 +75,22 @@ export const useLottery = (watchedRooms: number[], keyword: string, winnerCount:
 	const stopLottery = async (onError: (message: string) => void) => {
 		try {
 			await AppService.StopLiveLottery();
+			if (participantCount === 0) {
+				setLotteryRunning(false);
+				setShowResults(false);
+				onError(t('lottery.toast.emptyPool'));
+				return;
+			}
 			const result = await AppService.DrawWinners(winnerCount);
 			const winnersData = JSON.parse(result);
 			setWinners(winnersData);
 			setShowResults(true);
 			setLotteryRunning(false);
+			const historyError = await AppService.GetLastHistoryError();
+			if (historyError) {
+				onError(t('settings.toast.historySaveFailed', { error: historyError }));
+				return;
+			}
 			onError(t('lottery.toast.drawSuccess', { n: winnersData.length }));
 		} catch (e: any) {
 			onError(t('lottery.toast.drawFailed', { error: String(e?.message || e) }));

@@ -15,6 +15,7 @@ type LiveLotteryService struct {
 	liveLottery *live.LiveLottery
 	emitter    event.Emitter
 	cookie     func() *bili.Client
+	lastKeyword string
 }
 
 func NewLiveLotteryService(emitter event.Emitter, cookie func() *bili.Client) *LiveLotteryService {
@@ -38,12 +39,18 @@ func (s *LiveLotteryService) ConnectLiveRooms(roomIDs []int) error {
 	return nil
 }
 
-func (s *LiveLotteryService) StartLiveLottery(keyword string) error {
+type ConnectStatus struct {
+	Connected int                `json:"connected"`
+	Total     int                `json:"total"`
+	Failures  []live.RoomFailure `json:"failures,omitempty"`
+}
+
+func (s *LiveLotteryService) StartLiveLottery(keyword string) (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if s.liveLottery == nil {
-		return fmt.Errorf("先看几个直播呢？")
+		return "", fmt.Errorf("先看几个直播呢？")
 	}
 
 	s.liveLottery.OnUserJoin = func(user *live.DanmakuUser) {
@@ -51,7 +58,17 @@ func (s *LiveLotteryService) StartLiveLottery(keyword string) error {
 			s.emitter.Emit("live:user_join", user)
 		}
 	}
-	return s.liveLottery.Start(keyword)
+	total := s.liveLottery.RoomCount()
+	connected, failures, err := s.liveLottery.Start(keyword)
+	if err != nil {
+		return "", err
+	}
+	s.lastKeyword = keyword
+	data, err := json.Marshal(ConnectStatus{Connected: connected, Total: total, Failures: failures})
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 func (s *LiveLotteryService) StopLiveLottery() error {
@@ -79,6 +96,12 @@ func (s *LiveLotteryService) DrawWinners(count int) (string, error) {
 		return "", err
 	}
 	return string(data), nil
+}
+
+func (s *LiveLotteryService) LastKeyword() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.lastKeyword
 }
 
 func (s *LiveLotteryService) GetParticipantCount() int {

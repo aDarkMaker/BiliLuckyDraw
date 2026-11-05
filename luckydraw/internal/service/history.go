@@ -10,6 +10,8 @@ import (
 	"luckydraw/internal/config"
 )
 
+const maxHistoryPerProfile = 100
+
 func (s *ProfileService) AddHistory(profileID string, keyword string, winnerCount int, winners []config.HistoryWinner) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -26,6 +28,9 @@ func (s *ProfileService) AddHistory(profileID string, keyword string, winnerCoun
 			Winners:     winners,
 		}
 		s.state.Profiles[i].History = append(s.state.Profiles[i].History, record)
+		if len(s.state.Profiles[i].History) > maxHistoryPerProfile {
+			s.state.Profiles[i].History = s.state.Profiles[i].History[len(s.state.Profiles[i].History)-maxHistoryPerProfile:]
+		}
 		return config.SaveRuntimeState(s.statePath, s.state)
 	}
 	return fmt.Errorf("没有这个配置喵")
@@ -139,8 +144,12 @@ func sanitizeFilename(s string) string {
 }
 
 func buildMarkdown(r *config.HistoryRecord) string {
+	title := r.Keyword
+	if title == "" {
+		title = "全部弹幕"
+	}
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("# %s 中奖名单\n\n", r.Keyword))
+	b.WriteString(fmt.Sprintf("# %s 中奖名单\n\n", title))
 	b.WriteString(fmt.Sprintf("- 中奖人数：%d\n", r.WinnerCount))
 	b.WriteString(fmt.Sprintf("- 抽奖时间：%s\n\n", r.Time.Format("2006-01-02 15:04:05")))
 	b.WriteString("| 排名 | 昵称 | UID |\n| --- | --- | --- |\n")

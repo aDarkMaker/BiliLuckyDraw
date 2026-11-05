@@ -17,8 +17,10 @@ interface LotteryViewProps {
 	participantCount: number;
 	showResults: boolean;
 	winners: Winner[];
+	keyword: string;
 	onStartLottery: () => void;
 	onReset: () => void;
+	onMessage?: (message: string) => void;
 }
 
 export const LotteryView: React.FC<LotteryViewProps> = ({
@@ -27,8 +29,10 @@ export const LotteryView: React.FC<LotteryViewProps> = ({
 	participantCount,
 	showResults,
 	winners,
+	keyword,
 	onStartLottery,
 	onReset,
+	onMessage,
 }) => {
 	const { t } = useI18n();
 	const startImg = useThemeImage('lottery-start');
@@ -75,10 +79,18 @@ export const LotteryView: React.FC<LotteryViewProps> = ({
 									</div>
 								)}
 							</div>
+							{lotteryRunning && (
+								<div className="lottery-participants">
+									{participantCount > 0 ? t('lottery.participants', { n: participantCount }) : t('lottery.waiting')}
+								</div>
+							)}
+							<div className={`lottery-mode ${lotteryRunning ? 'is-active' : ''}`}>
+								{keyword.trim() ? t('lottery.mode.keyword', { keyword: keyword.trim() }) : t('lottery.mode.all')}
+							</div>
 							<div className="lottery-hint-container">{lotteryRunning && <p className="lottery-hint">{t('lottery.hint')}</p>}</div>
 						</div>
 					) : (
-						<WinnerDisplay winners={winners} onReset={onReset} />
+						<WinnerDisplay winners={winners} onReset={onReset} onMessage={onMessage} />
 					)}
 				</div>
 			</div>
