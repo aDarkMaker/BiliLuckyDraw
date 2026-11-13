@@ -1,0 +1,44 @@
+/* Shared input focus treatment: no native ring, soft primary glow instead. */
+
+[data-slot='input-wrapper'].input-fx {
+	outline: none !important;
+	box-shadow: none;
+	--tw-ring-offset-width: 0px !important;
+	--tw-ring-offset-color: transparent !important;
+	--tw-ring-color: transparent !important;
+	--tw-ring-shadow: 0 0 #0000 !important;
+	--tw-ring-offset-shadow: 0 0 #0000 !important;
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease,
+		box-shadow 180ms ease !important;
+	caret-color: hsl(var(--heroui-primary));
+}
+
+[data-slot='input-wrapper'].input-fx:focus,
+[data-slot='input-wrapper'].input-fx:focus-visible,
+[data-slot='input-wrapper'].input-fx:focus-within,
+.group[data-focus='true'] > [data-slot='input-wrapper'].input-fx,
+.group[data-focus-visible='true'] > [data-slot='input-wrapper'].input-fx {
+	outline: none !important;
+	--tw-ring-offset-width: 0px !important;
+	--tw-ring-offset-color: transparent !important;
+	--tw-ring-color: transparent !important;
+	--tw-ring-shadow: 0 0 #0000 !important;
+	--tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+
+[data-slot='input-wrapper'] input,
+[data-slot='input-wrapper'] textarea {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+[data-slot='input-wrapper'] ::selection {
+	background-color: hsl(var(--heroui-primary) / 0.24);
+}
+
+.group[data-focus='true'] > [data-slot='input-wrapper'].input-fx,
+.group[data-focus-visible='true'] > [data-slot='input-wrapper'].input-fx {
+	box-shadow: 0 0 0 3px hsl(var(--heroui-primary) / 0.16) !important;
+}
