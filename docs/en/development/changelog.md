@@ -1,12 +1,27 @@
 # Changelog
 
+## v1.6.0
+
+UI rework and live viewing:
+
+- The lottery page is now a single screen: stream player, room list, danmaku feed and control bar; the sidebar collapses in narrow windows
+- New live danmaku panel following the selected room, with Bilibili emotes (including shortcut ones like `[oh]`), bottom sticking, pause on scroll-up and automatic resume after 3 idle seconds
+- New embedded HLS player with a clock watchdog: a silent stall triggers a soft resume first, then a player rebuild with a fresh URL, backing off up to 20s
+- Theming reworked into "mode + background preset": spring-festival and beach backdrops are optional, and the accent is sampled from the active image
+- UI moved to Tailwind + HeroUI; scrollbars appear only while scrolling and winner lists scroll inside their card
+- Image pipeline: throttled pre-decode queue, Bilibili CDN thumbnails and visibility-gated mounting, cutting main-thread jank during danmaku bursts
+- Frontend split by feature (session / lottery / rooms / profiles / settings / history); backend services split into room / danmaku_feed / emote / history
+- New browser dev bridge: `/api/*` and Wails IPC share one set of business code, and the standalone `cmd/devbridge` reuses the same routes
+- Login page gained card tilt and a theme toggle; the QR state machine covers expired and scanned-awaiting-confirmation states
+- An empty keyword collects every danmaku; adding a room accepts a pasted live-room link
+
 ## v1.5.0
 
 - Live participant count on the lottery screen, with an explicit waiting hint
-- An empty keyword collects all danmaku; the lottery screen shows the active mode, and no draw happens without participants
+- An empty keyword collects all danmaku; the screen labels the active mode, and no draw happens without participants
 - Failed room connections are reported instead of silently "accumulating"
 - Copy the winner list in one click from the result screen
-- History now records the real keyword and winner count, capped at the last 100 entries
+- History records the real keyword and winner count, capped at the last 100 entries
 - Transient network errors no longer log you out; config files are written with 0600
 
 ## v1.4.0

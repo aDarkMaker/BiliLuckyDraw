@@ -1,45 +1,105 @@
 # Architecture Overview
 
-BiliLuckyDraw is a Wails v3 desktop app: the Go backend embeds the React frontend build output via `//go:embed all:frontend/dist` and renders it in a single 1200×800 webview window. On macOS, closing the last window quits the app.
+BiliLuckyDraw is a Wails v3 desktop app: the Go backend embeds the React build output via `//go:embed all:frontend/dist` and renders it in a single 1200×800 webview window. On macOS, closing the last window quits the app; while a Vite dev server is attached the process stays alive so a browser tab can drive it.
+
+## Shape of the system
+
+```mermaid
+flowchart TB
+    subgraph Desktop["Window (webview)"]
+        FE["React 19 + Tailwind + HeroUI"]
+    end
+
+    subgraph Go["Go process"]
+        App["internal/app<br/>AppService"]
+        Svc["internal/service<br/>pure logic"]
+        Proto["internal/live · bili · login · config"]
+        Bridge["internal/devbridge<br/>127.0.0.1:9246"]
+    end
+
+    FE -- "Wails bindings (IPC)" --> App
+    FE -- "HTTP /api (browser dev)" --> Bridge
+    App --> Svc --> Proto
+    Bridge --> Svc
+```
+
+The frontend has two transports, chosen by `fallback(remote, http)` in `services/http.ts`:
+
+1. **Wails bindings** — the normal path inside the desktop window; `Call.ByID` reaches `AppService` directly.
+2. **HTTP bridge** — used when a browser tab has no `_wails` runtime or the binding call fails. It talks to `http://127.0.0.1:9246/api/*`, and Vite proxies `/api` and `/wails` there.
+
+Both end up in the same business code: the routes exposed by `devbridge.Transport.APIHandler()` mirror the `AppService` methods one-to-one.
 
 ## Backend layering
 
 ```mermaid
 flowchart LR
-    App["internal/app"]
-    Svc["internal/service"]
-    Dom["internal/domain + event"]
-    Base["config / bili / live / login"]
-
-    App --> Svc --> Dom --> Base
+    App["internal/app"] --> Svc["internal/service"]
+    Svc --> Live["internal/live"]
+    Svc --> Bili["internal/bili"]
+    Svc --> Cfg["internal/config"]
+    Svc --> Evt["internal/event"]
+    Svc --> Login["internal/login"]
+    App --> Bridge["internal/devbridge"]
 ```
 
-- `app`: the only package importing `wails/v3`. `AppService` is the single service exposed to the frontend; every method delegates to `service`.
-- `service`: pure Go business logic. Depends on `bili`/`live`/`login`/`config`/`event`/`domain`. Unit-testable without Wails.
-- `domain`: interfaces (`AuthService`/`LiveLotteryService`/`ProfileService`) + DTOs; serves as a contract document.
-- `event`: the `Emitter` interface keeps `service` from importing Wails directly; the implementation is injected by the `app` layer.
+- `app`: the only package importing `wails/v3`. `AppService` is the single service exposed to the frontend; every method thinly delegates to `service` while owning Wails-only capabilities (window, clipboard, save dialog).
+- `service`: pure Go business logic split by domain — `auth` / `live` / `profile` / `room` / `danmaku_feed` / `emote` / `history` — with no Wails dependency.
+- `live`: the danmaku WebSocket binary protocol and draw aggregation, split within the package into `types` / `protocol` / `room_auth` / `parse` / `client` / `lottery`.
+- `bili`: the Bilibili HTTP API client plus WBI signing.
+- `config`: local JSON config read/write and legacy migration.
+- `event`: the `Emitter` interface, so `service` never imports Wails; the `app` layer injects the implementation.
+- `devbridge`: HTTP transport and JSON API routes for browser-based debugging.
+- `cmd/devbridge`: a standalone bridge binary reusing the same routes, so no Wails runtime is needed.
 
-## Frontend
+## Frontend structure
 
-React 18 + TypeScript 5 + Vite. Calls backend methods through Wails-generated TS bindings (`frontend/bindings/`), and subscribes to backend events via `@wailsio/runtime` `Events`. The theme system and i18n are lightweight in-house implementations.
+Sliced by feature; every directory under `features/` owns its API, hooks and components:
+
+```
+src/
+  features/
+    session/     # login page, QR / cookie login, session hook
+    lottery/     # lottery page, control bar, winners, draw hook
+    rooms/       # room list, stream player, danmaku panel, HLS loader, emote rendering
+    profiles/    # profile CRUD and switching
+    settings/    # settings page and its four tabs
+    history/     # history list and record component
+  components/    # Panel / Icon / CachedImage / scroll hooks / Toaster
+  theme/         # light-dark mode, background presets, accent extraction
+  services/      # HTTP fallback, bridge probe, QR and clipboard helpers
+  types/         # domain-split type declarations
+  config/        # navigation config
+  contexts/      # AppContext (session + profiles + lottery)
+```
+
+Pages read one merged object from `AppProvider`, which composes `useSession` (login state), `useProfiles` (config and rooms) and `useLottery` (draw state), surfaced through `useApp()`. Routing is `react-router-dom`: `/` is the lottery page, `/settings` the settings page.
 
 ## Directory layout
 
 ```
 luckydraw/
-  main.go                # Wails v3 entry (embeds frontend dist)
-  Taskfile.yml           # build workflow (dev/build/package/generate)
+  main.go                  # Wails v3 entry (embeds frontend dist)
+  Taskfile.yml             # build workflow (dev/build/package/generate)
+  build/                   # per-platform config, Taskfiles and icons
+  cmd/devbridge/           # standalone browser bridge
   internal/
-    app/                 # thin Wails service layer, delegates to service
-      app.go auth.go live.go profile.go
-    service/             # pure business logic (auth/live/profile)
-    domain/              # interfaces + DTO
-    event/               # Emitter interface (decouples service from Wails)
-    config/ bili/ live/ login/   # config / Bilibili API / danmaku protocol / QR login
+    app/                   # Wails boundary: AppService + emitter
+    service/               # pure business logic
+    live/                  # danmaku protocol + draw aggregation
+    bili/                  # Bilibili HTTP API + WBI signing
+    login/                 # QR-code login
+    config/                # config persistence
+    event/                 # Emitter interface
+    devbridge/             # browser HTTP transport and routes
   frontend/
-    src/
-      themes/            # theme system (light/dark/spring-festival/beach)
-      styles/            # base structure tokens + component styles
-      components/ hooks/
-    bindings/            # generated by wails3 generate bindings (do not hand-edit)
+    src/                   # see above
+    scripts/               # icon generation and checks (local only, not committed)
+    bindings/              # generated by wails3 generate bindings (do not hand-edit)
 ```
+
+## Runtime notes
+
+- Single window with sidebar navigation; the sidebar becomes a drawer in narrow windows.
+- On boot the frontend probes the bridge (`/api/lottery/status`) and fixes the transport for the rest of the session.
+- Until the accent is sampled from the background, the theme uses a preset hue; once the image loads, canvas sampling overrides the `--heroui-primary-*` variables.

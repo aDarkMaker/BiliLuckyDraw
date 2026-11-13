@@ -2,30 +2,51 @@
 
 ## 1. Download
 
-Grab the latest build for your system from [Releases](https://github.com/aDarkMaker/BiliLuckyDraw/releases) and launch it.
+Grab the build for your platform from [Releases](https://github.com/aDarkMaker/BiliLuckyDraw/releases):
+
+| Platform | File |
+| --- | --- |
+| macOS (Apple Silicon / Intel) | `BiliLuckyDraw-darwin-universal.zip` |
+| Windows | `luckydraw-amd64-installer.exe` (installer) or `luckydraw.exe` (portable) |
+
+If macOS blocks the first launch, open System Settings → Privacy & Security and choose "Open Anyway".
 
 ## 2. Log in
 
-After launching, log in with a Bilibili account using either method:
+Pick one method:
 
-- **Cookie login**: copy your Bilibili Cookie from the browser, paste it into the box and click Log in.
-- **QR login**: click "QR login" to generate a QR code, then scan it with the Bilibili mobile app — no manual Cookie copying needed.
+- **Cookie login** — copy the Bilibili Cookie from a browser, paste it into the box and click log in.
+- **QR login** — switch to the QR tab, scan the code with the Bilibili mobile app and confirm on the phone.
 
-## 3. Add live rooms
+Credentials are stored only on this machine, in `~/.luckydraw/config.json`.
 
-Open Settings and enter the IDs of the rooms you want to monitor. You can add several at once; all participants are merged into a single draw pool.
+## 3. Add rooms
 
-## 4. Start a draw
+Open **Settings → Lottery** and enter the room IDs to monitor, or paste a live-room link such as `https://live.bilibili.com/12345`. Several rooms are fine; all participants merge into one pool.
 
-Back on the home screen, set the keyword and winner count in the top bar, then click **Start**. As viewers send danmaku containing the keyword, the participant count rises in real time. When you're ready to draw, click **Stop** and the randomly picked winners appear right away. With many winners, the list scrolls inside the card without affecting the page layout.
+Back on the lottery page, the room list on the right shows each room's cover, streamer and online count — click one to preview it.
 
-## 5. View & export history
+## 4. Start the draw
 
-Every draw is automatically recorded under the active profile's history. In Settings, the "Lottery History" card lets you:
+On the lottery page set the keyword and winner count (1–9999), then click **Start**. As viewers send danmaku containing the keyword, the participant count rises:
 
-- Click "Export" on an entry, pick where to save, and the winner list is exported as a Markdown file named `keyword-count-time.md`.
-- Delete a single history entry, or click "Delete All" to clear every entry for the current profile.
+- An empty keyword collects every danmaku.
+- The danmaku panel shows the current room's feed; scroll up to look back, and it returns to the newest line after a few seconds.
+- Click **Stop** when you're ready — the randomly picked winners appear at once and the draw is recorded in history.
 
-## 6. Switch theme & language
+With many winners, the list scrolls inside its card and the page layout stays put.
 
-In Settings, under "Appearance", you can switch the theme (light / dark / spring-festival / beach) and the language (中文 / English). Changes apply instantly and are remembered.
+## 5. Review and export history
+
+The **History** tab lists draws for the active profile:
+
+- **Export** saves that draw as Markdown (`keyword-count-winners-time.md`).
+- Delete a single entry, or **Delete all** to clear the current profile's history.
+
+## 6. Switch appearance and language
+
+The **Appearance** tab switches light/dark, the background (default gradient / spring-festival / beach / your own image) and the language (中文 / English). Changes apply immediately and are remembered.
+
+::: tip
+The sidebar collapses in narrow windows, and danmaku / winner scrollbars only appear while you scroll.
+:::

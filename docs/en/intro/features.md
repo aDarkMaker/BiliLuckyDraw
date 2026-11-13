@@ -2,47 +2,54 @@
 
 ## Real-time danmaku draw
 
-Once connected to a live room, the app continuously listens to danmaku. Any viewer whose message contains your configured keyword is automatically added to the draw pool — no manual list-keeping for the streamer or mods. A viewer who sends multiple qualifying messages in the same room is only counted once, keeping the draw fair. At draw time, the configured number of winners is picked at random from the pool.
+Once connected to a room the app listens to danmaku continuously. Any message containing your keyword is added to the draw pool — no manual list-keeping for the streamer or mods. A viewer sending several qualifying messages in the same room is counted once, keeping the draw fair.
+
+An empty keyword means "collect everything": every viewer who speaks joins the pool, and the lottery page labels the active mode. At draw time the configured number of winners is picked at random and written to the active profile's history.
+
+## Watch and draw on one screen
+
+The lottery page puts the stream, the room list and the danmaku feed together:
+
+- **Stream player** — an embedded HLS player following the selected room; the cover shows while the room is offline.
+- **Room list** — every joined room with its streamer, online count and live status; click to switch the preview.
+- **Live danmaku** — the current room's feed, including Bilibili's built-in emotes such as `[oh]`.
+
+The feed sticks to the bottom by default. Scrolling up pauses auto-follow, and about three seconds after you stop it snaps back. Incoming lines are batched so a busy room cannot re-render per message.
+
+## Stability during long streams
+
+- **Player watchdog** — some streams stall silently: no `error` or `stalled` event fires and `currentTime` stops advancing. The player checks the clock every 1.5s; after 5s without progress it attempts a soft resume, and if that fails it rebuilds the player with a fresh play URL, backing off up to 20s.
+- **Danmaku reconnect** — the danmaku WebSocket reconnects with backoff. The handshake carries the login state and `buvid3`, so nicknames are not masked and UIDs are not zeroed (which would collapse every viewer into one participant).
 
 ## Two login methods
 
-- **Cookie login**: copy your Bilibili Cookie from the browser and paste it in — handy if you're comfortable with it.
-- **QR-code login**: click "QR login" to generate a QR code, then scan it with the Bilibili mobile app — secure and convenient, no manual Cookie copying.
+- **Cookie login** — copy the Bilibili Cookie from a browser and paste it in.
+- **QR-code login** — click "QR login" to generate a code and scan it with the Bilibili mobile app. Expired and scanned states are surfaced, and the code can be refreshed at any time.
 
 ## Multiple draw profiles
 
-Keep a separate profile for each scenario — each one holds its own keyword, winner count, watched rooms and background image. Switch with one click before going live; everything is preserved across switches and restarts.
+Keep a profile per scenario. Each stores its own keyword, winner count, joined rooms and background image. Switching a profile switches all of it at once, and every profile survives restarts.
 
-## Draw history & export
+## Draw history and export
 
-Every draw is automatically recorded as a history entry, bound to the active profile — it stores the keyword, winner count, draw time and the full winner list. The "Lottery History" card in Settings shows every entry for the current profile:
+Every draw is recorded automatically under the active profile — keyword, winner count, draw time and the full winner list. The "History" tab in Settings lets you:
 
-- **Export one**: click "Export" on an entry, pick where to save, and the winner list is exported as a Markdown file named `keyword-count-time.md` with a table of nickname + UID.
-- **Delete one**: remove a history entry you no longer need.
-- **Delete all**: clear every entry for the current profile in one click.
+- **Export one** — write the winner list to a Markdown file named `keyword-count-time.md`, with a nickname + UID table.
+- **Delete one** — remove a single entry.
+- **Delete all** — clear every entry for the current profile (with a confirmation dialog).
 
-Switching profiles switches the history list to that profile's entries. Deleting a profile clears its history along with it.
+Switching profiles switches the list. Deleting a profile clears its history too, and each profile keeps the latest 100 entries.
 
-## Four themes
+## Appearance
 
-Four built-in looks, switchable any time while running:
+- **Light / dark** — switch manually; the first launch follows the system preference and the choice is remembered.
+- **Backgrounds** — the default gradient, the spring-festival or beach image, or an image you upload.
+- **Accent** — sampled from the active background, then expanded into a full primary ramp, so every page follows one palette.
+- **Language** — built-in 中文 / English switch, Chinese by default.
 
-| Theme | Description | Bundled background |
-| --- | --- | --- |
-| light | Light interface; follows system color scheme on first launch | No (customizable) |
-| dark | Dark interface, easy on the eyes | No (customizable) |
-| spring-festival | Red palette, frosted-glass and festive feel | Yes |
-| beach | Blue palette, frosted-glass and fresh feel | Yes |
+## Interaction details
 
-Your choice is remembered across restarts. Spring-festival and beach ship with a background; under light and dark you can use your own.
-
-## Flexible & customizable
-
-- Custom keyword — decides which danmaku count as entries
-- Custom watched rooms — monitor several rooms at once, with participants merged into one pool
-- Custom winner count — anywhere from 1 to 9999
-- Custom background image — applies under light / dark (spring-festival and beach use their bundled backgrounds)
-
-## Winner-list display
-
-When there are many winners, the winner-list card caps its height and scrolls internally (the scrollbar is hidden), so the lottery page itself never scrolls vertically and stays visually clean.
+- Long winner lists scroll inside their card, so the page itself never gains a scrollbar.
+- Panel and list scrollbars appear only while scrolling and fade out when idle.
+- Copying the winner list tries the browser clipboard first, then the native backend clipboard, then a system command over the dev bridge.
+- Rooms can be added by ID or by pasting a live-room link.
