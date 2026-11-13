@@ -52,8 +52,8 @@ task windows:package ARCH=amd64 # Windows → bin/luckydraw-amd64-installer.exe
 cd luckydraw
 
 # 1. 前端产物 + 后端编译（含绑定与图标）
+# windows:package 会依赖 windows:build，不必先单独 build
 task darwin:package:universal
-task windows:build ARCH=amd64
 task windows:package ARCH=amd64
 
 # 2. 收集发布产物
@@ -62,8 +62,13 @@ ditto -c -k --sequesterRsrc --keepParent bin/luckydraw.app bin/dist/BiliLuckyDra
 cp bin/luckydraw-amd64-installer.exe bin/dist/
 cp bin/luckydraw.exe bin/dist/luckydraw-amd64-portable.exe
 
-# 3. 生成校验和
-cd bin/dist && shasum -a 256 * > SHA256SUMS.txt
+# 3. 生成校验和（必须显式列文件，勿用 *，否则会把 SHA256SUMS.txt 自身算进去）
+cd bin/dist
+shasum -a 256 \
+  BiliLuckyDraw-darwin-universal.zip \
+  luckydraw-amd64-installer.exe \
+  luckydraw-amd64-portable.exe \
+  > SHA256SUMS.txt
 ```
 
 产物清单：

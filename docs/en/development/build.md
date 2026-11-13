@@ -50,8 +50,8 @@ CI billing issues mean releases are produced locally:
 cd luckydraw
 
 # 1. frontend output + backend build (bindings and icons included)
+# windows:package already depends on windows:build
 task darwin:package:universal
-task windows:build ARCH=amd64
 task windows:package ARCH=amd64
 
 # 2. collect release artifacts
@@ -60,8 +60,13 @@ ditto -c -k --sequesterRsrc --keepParent bin/luckydraw.app bin/dist/BiliLuckyDra
 cp bin/luckydraw-amd64-installer.exe bin/dist/
 cp bin/luckydraw.exe bin/dist/luckydraw-amd64-portable.exe
 
-# 3. checksums
-cd bin/dist && shasum -a 256 * > SHA256SUMS.txt
+# 3. checksums (list files explicitly; do not use *, or SHA256SUMS.txt hashes itself)
+cd bin/dist
+shasum -a 256 \
+  BiliLuckyDraw-darwin-universal.zip \
+  luckydraw-amd64-installer.exe \
+  luckydraw-amd64-portable.exe \
+  > SHA256SUMS.txt
 ```
 
 | Artifact | Description |
