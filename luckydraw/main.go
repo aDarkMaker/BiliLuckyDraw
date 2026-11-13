@@ -3,8 +3,10 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
 
 	"luckydraw/internal/app"
+	"luckydraw/internal/devbridge"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
@@ -27,9 +29,11 @@ func main() {
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
-		Icon: appIcon,
+		Icon:      appIcon,
+		Transport: devbridge.New(appSvc),
 		Mac: application.MacOptions{
-			ApplicationShouldTerminateAfterLastWindowClosed: true,
+			// Keep the process (and the browser bridge) alive while Vite is attached.
+			ApplicationShouldTerminateAfterLastWindowClosed: os.Getenv("FRONTEND_DEVSERVER_URL") == "",
 		},
 	})
 

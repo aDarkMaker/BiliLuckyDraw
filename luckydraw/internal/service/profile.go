@@ -180,7 +180,7 @@ func (s *ProfileService) AddWatchedRoom(roomID int) error {
 	}
 	for _, id := range profile.WatchedRooms {
 		if id == roomID {
-			return fmt.Errorf("严肃观看 %d 的直播！", roomID)
+			return nil
 		}
 	}
 

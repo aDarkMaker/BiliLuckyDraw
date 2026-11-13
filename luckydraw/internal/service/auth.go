@@ -142,10 +142,50 @@ func (s *AuthService) GetAccountInfo() (string, error) {
 	}
 
 	result := map[string]interface{}{
-		"name": info.Name,
-		"uid":  info.Mid,
-		"face": info.Face,
+		"name":      info.Name,
+		"uid":       info.Mid,
+		"face":      info.Face,
+		"sign":      info.Sign,
+		"level":     info.Level,
+		"follower":  info.Follower,
+		"following": info.Following,
 	}
+
+	if card, err := client.GetUserCard(info.Mid); err == nil && card != nil {
+		if card.Card.Sign != "" {
+			result["sign"] = card.Card.Sign
+		}
+		if card.Card.LevelInfo.CurrentLevel > 0 {
+			result["level"] = card.Card.LevelInfo.CurrentLevel
+		}
+		if card.Follower > 0 {
+			result["follower"] = card.Follower
+		} else if card.Card.Fans > 0 {
+			result["follower"] = card.Card.Fans
+		}
+		if card.Card.Attention > 0 {
+			result["following"] = card.Card.Attention
+		}
+		result["archive_count"] = card.ArchiveCount
+		result["like_count"] = card.LikeNum
+		if card.Space != nil {
+			if card.Space.LImg != "" {
+				result["top_photo"] = card.Space.LImg
+			} else if card.Space.SImg != "" {
+				result["top_photo"] = card.Space.SImg
+			}
+		}
+	}
+
+	if stat, err := client.GetUpStat(info.Mid); err == nil && stat != nil {
+		if stat.Archive.View > 0 {
+			result["view_count"] = stat.Archive.View
+		}
+		if stat.Likes > 0 {
+			result["like_count"] = stat.Likes
+		}
+	}
+
 	data, _ := json.Marshal(result)
 	return string(data), nil
 }

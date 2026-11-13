@@ -14,11 +14,15 @@ type Client struct {
 }
 
 var DefaultHTTPClient = &http.Client{
-	Timeout: 30 * time.Second,
+	Timeout: 20 * time.Second,
 	Transport: &http.Transport{
-		MaxIdleConns:       10,
-		IdleConnTimeout:    90 * time.Second,
-		DisableCompression: false,
+		MaxIdleConns:        32,
+		MaxIdleConnsPerHost: 8,
+		MaxConnsPerHost:     12,
+		IdleConnTimeout:     120 * time.Second,
+		TLSHandshakeTimeout: 10 * time.Second,
+		ForceAttemptHTTP2:   true,
+		DisableCompression:  false,
 	},
 }
 
@@ -98,8 +102,91 @@ func (c *Client) GetMyInfo() (*UserInfo, error) {
 	return &info, nil
 }
 
+func (c *Client) GetUserCard(mid int64) (*UserCard, error) {
+	data, err := c.Get("https://api.bilibili.com/x/web-interface/card", map[string]string{
+		"mid":   fmt.Sprintf("%d", mid),
+		"photo": "true",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var resp APIResponse
+	if err := json.Unmarshal(data, &resp); err != nil {
+		return nil, err
+	}
+	if resp.Code != 0 {
+		return nil, &APIError{Code: resp.Code, Message: resp.Message}
+	}
+
+	var card UserCard
+	if err := json.Unmarshal(resp.Data, &card); err != nil {
+		return nil, err
+	}
+	return &card, nil
+}
+
+func (c *Client) GetUpStat(mid int64) (*UpStat, error) {
+	data, err := c.Get("https://api.bilibili.com/x/space/upstat", map[string]string{
+		"mid": fmt.Sprintf("%d", mid),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var resp APIResponse
+	if err := json.Unmarshal(data, &resp); err != nil {
+		return nil, err
+	}
+	if resp.Code != 0 {
+		return nil, &APIError{Code: resp.Code, Message: resp.Message}
+	}
+
+	var stat UpStat
+	if err := json.Unmarshal(resp.Data, &stat); err != nil {
+		return nil, err
+	}
+	return &stat, nil
+}
+
 type UserInfo struct {
-	Mid  int64  `json:"mid"`
-	Name string `json:"name"`
-	Face string `json:"face"`
+	Mid       int64  `json:"mid"`
+	Name      string `json:"name"`
+	Face      string `json:"face"`
+	Sign      string `json:"sign"`
+	Level     int    `json:"level"`
+	Follower  int64  `json:"follower"`
+	Following int64  `json:"following"`
+}
+
+type UserCard struct {
+	Card struct {
+		Mid         string `json:"mid"`
+		Name        string `json:"name"`
+		Face        string `json:"face"`
+		Sign        string `json:"sign"`
+		Fans        int64  `json:"fans"`
+		Attention   int64  `json:"attention"`
+		LevelInfo   struct {
+			CurrentLevel int `json:"current_level"`
+		} `json:"level_info"`
+	} `json:"card"`
+	Space *struct {
+		SImg string `json:"s_img"`
+		LImg string `json:"l_img"`
+	} `json:"space"`
+	Follower     int64 `json:"follower"`
+	ArchiveCount int64 `json:"archive_count"`
+	LikeNum      int64 `json:"like_num"`
+	ArticleCount int64 `json:"article_count"`
+}
+
+type UpStat struct {
+	Archive struct {
+		View int64 `json:"view"`
+	} `json:"archive"`
+	Article struct {
+		View int64 `json:"view"`
+	} `json:"article"`
+	Likes int64 `json:"likes"`
 }

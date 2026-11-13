@@ -1,7 +1,6 @@
 package live
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -77,36 +76,7 @@ func (l *LiveLottery) RoomCount() int {
 }
 
 func (l *LiveLottery) handleDanmaku(msg *DanmakuMessage) {
-	if msg.CMD != "DANMU_MSG" {
-		return
-	}
-
-	var info []interface{}
-	if err := json.Unmarshal(msg.Info, &info); err != nil {
-		return
-	}
-
-	if len(info) < 3 {
-		return
-	}
-
-	userInfo, ok := info[2].([]interface{})
-	if !ok || len(userInfo) < 2 {
-		return
-	}
-
-	uidFloat, ok := userInfo[0].(float64)
-	if !ok {
-		return
-	}
-	uid := int64(uidFloat)
-
-	username, ok := userInfo[1].(string)
-	if !ok {
-		return
-	}
-
-	message, ok := info[1].(string)
+	uid, username, message, ok := ParseDanmakuText(msg)
 	if !ok {
 		return
 	}

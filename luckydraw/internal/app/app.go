@@ -15,7 +15,10 @@ import (
 type AppService struct {
 	auth    *service.AuthService
 	live    *service.LiveLotteryService
+	danmaku *service.DanmakuFeedService
+	emote   *service.EmoteService
 	profile *service.ProfileService
+	room    *service.RoomService
 	app     *application.App
 
 	lastHistoryError string
@@ -38,11 +41,17 @@ func (a *AppService) ServiceStartup(ctx context.Context, options application.Ser
 
 	a.auth = service.NewAuthService(cfg, configPath)
 	a.live = service.NewLiveLotteryService(emitter, a.auth.Client)
+	a.emote = service.NewEmoteService(a.auth.Client)
+	a.danmaku = service.NewDanmakuFeedService(a.auth.Client, a.emote)
 	a.profile = service.NewProfileService(state, statePath, emitter)
+	a.room = service.NewRoomService(a.auth.Client)
 	return nil
 }
 
 func (a *AppService) ServiceShutdown() error {
+	if a.danmaku != nil {
+		a.danmaku.Stop()
+	}
 	if a.live != nil {
 		a.live.Stop()
 	}
