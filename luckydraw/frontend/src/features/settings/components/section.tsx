@@ -11,7 +11,7 @@ interface SectionProps {
 
 export const Section: React.FC<SectionProps> = ({ icon, title, description, action, children }) => (
 	<section className="surface rounded-large">
-		<div className="px-4 pt-3.5">
+		<div className="px-4 pt-4">
 			<div className="flex items-center gap-2">
 				{icon && <span className="inline-flex shrink-0 text-primary">{icon}</span>}
 				<h2 className="shrink-0 text-[14px] font-semibold leading-none text-foreground">{title}</h2>
@@ -20,7 +20,7 @@ export const Section: React.FC<SectionProps> = ({ icon, title, description, acti
 				{action}
 			</div>
 		</div>
-		<div className="p-4 pt-3">{children}</div>
+		<div className="p-4 pt-4">{children}</div>
 	</section>
 );
 

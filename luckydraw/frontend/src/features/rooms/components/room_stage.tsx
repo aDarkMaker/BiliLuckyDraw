@@ -267,7 +267,7 @@ export const RoomStage: React.FC<RoomStageProps> = memo(({ room }) => {
 	}, [live, room?.room_id]);
 
 	return (
-		<div className="surface relative aspect-video w-full overflow-hidden rounded-large">
+		<div className="surface relative aspect-video w-full shrink-0 overflow-hidden rounded-large">
 			{cover ? (
 				<CachedImage
 					alt=""

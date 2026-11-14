@@ -43,7 +43,7 @@ export const ControlBar: React.FC<ControlBarProps> = ({
 	const primary = showResults;
 
 	return (
-		<div className="surface rounded-large p-3">
+		<div className="surface shrink-0 rounded-large p-3">
 			<div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_10rem_auto] sm:items-end">
 				<div className="flex min-w-0 flex-col gap-1">
 					<span className={labelClass}>{t('lottery.keyword.label')}</span>

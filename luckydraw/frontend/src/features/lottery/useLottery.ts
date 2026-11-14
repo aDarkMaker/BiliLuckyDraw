@@ -39,10 +39,12 @@ export const useLottery = ({ watchedRooms, keyword, winnerCount, enabled, notify
 				runningRef.current = status.running;
 				setRunning(status.running);
 			}
-			const count = status.running ? status.participants : 0;
-			if (count !== participantsRef.current) {
-				participantsRef.current = count;
-				setParticipantCount(count);
+			if (status.running) {
+				const count = status.participants;
+				if (count !== participantsRef.current) {
+					participantsRef.current = count;
+					setParticipantCount(count);
+				}
 			}
 		};
 		void tick();
@@ -96,6 +98,8 @@ export const useLottery = ({ watchedRooms, keyword, winnerCount, enabled, notify
 				return;
 			}
 			const result = await lotteryApi.draw(winnerCount);
+			participantsRef.current = count;
+			setParticipantCount(count);
 			setWinners(result);
 			setShowResults(true);
 			runningRef.current = false;

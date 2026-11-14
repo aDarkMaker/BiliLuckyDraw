@@ -66,7 +66,7 @@ export const HistorySection: React.FC = () => {
 				)
 			}
 		>
-			<div className="flex flex-col gap-1.5">
+			<div className="flex flex-col gap-4">
 				{loading && (
 					<div className="flex justify-center py-4">
 						<Spinner size="sm" />

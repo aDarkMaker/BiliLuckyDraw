@@ -23,7 +23,7 @@ export const HistoryRecordItem: React.FC<HistoryRecordItemProps> = ({ record, op
 	const { t, lang } = useI18n();
 
 	return (
-		<div className="overflow-hidden rounded-medium bg-default-500/[0.05] dark:bg-white/[0.045]">
+		<div className="overflow-hidden rounded-medium border border-default-200/50 bg-default-500/[0.05] dark:border-white/10 dark:bg-white/[0.045]">
 			<button className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left" type="button" onClick={onToggle}>
 				<span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-primary/10 px-1.5 font-mono text-[11px] tabular-nums text-primary">
 					{record.winner_count}
@@ -46,7 +46,7 @@ export const HistoryRecordItem: React.FC<HistoryRecordItemProps> = ({ record, op
 						initial={{ height: 0, opacity: 0 }}
 						transition={{ duration: 0.2, ease: 'easeOut' }}
 					>
-						<div className="flex flex-col gap-1 px-3 pb-2.5">
+						<div className="flex flex-col gap-1.5 px-3 pb-3">
 							{record.winners.map((winner) => (
 								<div key={winner.uid} className="flex items-center gap-2 text-[12px]">
 									<span className="font-a61 truncate text-foreground">{winner.username || '--'}</span>
@@ -54,11 +54,14 @@ export const HistoryRecordItem: React.FC<HistoryRecordItemProps> = ({ record, op
 								</div>
 							))}
 							{record.winners.length === 0 && <p className="text-[11.5px] text-default-400">{t('settings.history.noWinners')}</p>}
-							<div className="mt-1.5 flex gap-1.5">
+							<div className="mt-2 flex gap-1.5">
 								<button
 									className="flex h-7 items-center gap-1 rounded-full border border-default-200/70 px-2.5 text-[11px] text-default-500 transition-colors hover:text-foreground dark:border-white/10"
 									type="button"
-									onClick={onExport}
+									onClick={(e) => {
+										e.stopPropagation();
+										onExport();
+									}}
 								>
 									<Icon name="download" size={12} />
 									{t('settings.history.export')}
@@ -66,7 +69,10 @@ export const HistoryRecordItem: React.FC<HistoryRecordItemProps> = ({ record, op
 								<button
 									className="flex h-7 items-center gap-1 rounded-full px-2.5 text-[11px] text-default-500 transition-colors hover:bg-danger/10 hover:text-danger"
 									type="button"
-									onClick={onRemove}
+									onClick={(e) => {
+										e.stopPropagation();
+										onRemove();
+									}}
 								>
 									<Icon name="delete" size={12} />
 									{t('settings.lottery.delete')}

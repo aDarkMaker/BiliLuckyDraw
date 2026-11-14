@@ -17,7 +17,7 @@ export const WinnersPanel: React.FC<WinnersPanelProps> = ({ winners, onCopy }) =
 	const listRef = useQuietScroll<HTMLDivElement>();
 
 	return (
-		<Panel className="flex min-h-0 flex-1 flex-col">
+		<Panel className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
 			<PanelHeader
 				icon={<Icon name="emoji-events" size={16} />}
 				title={t('winner.title')}
@@ -25,8 +25,8 @@ export const WinnersPanel: React.FC<WinnersPanelProps> = ({ winners, onCopy }) =
 					<span className="rounded-full bg-primary/10 px-2 py-1 font-mono text-[11px] text-primary">{winners.length}</span>
 				}
 			/>
-			<PanelBody className="flex min-h-0 flex-1 flex-col gap-3">
-				<div ref={listRef} className="scroll-quiet flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1">
+			<PanelBody className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+				<div ref={listRef} className="scroll-quiet flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-contain pr-1">
 					<AnimatePresence initial={false}>
 						{winners.map((winner, index) => (
 							<motion.div
@@ -38,7 +38,9 @@ export const WinnersPanel: React.FC<WinnersPanelProps> = ({ winners, onCopy }) =
 							>
 								<span className="w-7 shrink-0 font-mono text-[13px] tabular-nums text-primary">{index + 1}</span>
 								<div className="min-w-0 flex-1">
-									<div className="font-a61 truncate text-[13.5px] font-medium leading-tight text-foreground">{winner.username}</div>
+									<div className="font-a61 truncate text-[13.5px] font-medium leading-tight text-foreground">
+										{winner.username}
+									</div>
 									<div className="mt-0.5 font-mono text-[11px] leading-none text-default-400">
 										{t('winner.uid', { uid: winner.uid })}
 									</div>
