@@ -49,7 +49,7 @@ Switching profiles switches the list. Deleting a profile clears its history too,
 
 ## Interaction details
 
-- Long winner lists scroll inside their card, so the page itself never gains a scrollbar.
+- When results show, the stage keeps its aspect ratio and the winners list fills only the remaining height inside its card, so the page itself never gains a scrollbar.
 - Panel and list scrollbars appear only while scrolling and fade out when idle.
 - Copying the winner list tries the browser clipboard first, then the native backend clipboard, then a system command over the dev bridge.
 - Rooms can be added by ID or by pasting a live-room link.

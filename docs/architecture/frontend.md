@@ -120,4 +120,4 @@ features/settings/settings_page.tsx
 
 - Tailwind + HeroUI，颜色一律走 CSS 变量（`--heroui-*`、`--surface`、`--well`、`--backdrop-tint`），不在组件里写死色值。
 - `styles/globals.css` 放字体、基础层与滚动条；`theme.css` 放主题相关变量；`inputs.css` 放输入框细节。
-- 布局以 `flex` + `min-h-0` 控制面板高度，避免子元素撑破容器导致整页滚动。
+- 布局以 `flex` + `min-h-0` 控制面板高度；选人页出结果时舞台不压缩，中选名单吃剩余高度并内部滚动。

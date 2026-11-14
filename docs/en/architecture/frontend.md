@@ -120,4 +120,4 @@ A lightweight in-house implementation, no react-i18next: `Lang = 'zh' | 'en'`, C
 
 - Tailwind + HeroUI; every color goes through CSS variables (`--heroui-*`, `--surface`, `--well`, `--backdrop-tint`), never a literal in a component.
 - `styles/globals.css` holds fonts, base layer and scrollbars; `theme.css` the theme variables; `inputs.css` input details.
-- Layouts use `flex` with `min-h-0` to keep panels from pushing the page into a scroll.
+- Layouts use `flex` with `min-h-0`; on the lottery page the stage stays fixed when results show, and the winners list takes the remaining height and scrolls inside.
