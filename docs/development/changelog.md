@@ -1,5 +1,24 @@
 # 开发日志
 
+## v1.7.0
+
+背景链路重做与主题跟随：
+
+- 背景图改为文件存储 `~/.luckydraw/backgrounds/<profile>.img`，`state.json` 不再内嵌 data URL，修复切换背景时的 `EOF` 报错与 `state.json` 膨胀
+- 自定义背景按体积自适应压缩：`≤640KB` 的 jpeg/png/webp 原样落盘，不再二次 JPEG 重编码，动画/平涂类图片不再发脏
+- 读取背景按文件魔数判定 MIME，`.mime` 过期也不会出现错色
+- 预设背景改为自动发现 `src/assets/backgrounds/*.webp`，通过清单补 label 与兜底色；新增预设无需改代码，可另配 `-thumb` 变体用于缩略图与取色
+- 切换预设不再删除已上传的自定义图：新增 `customActive` 状态与「自定义」格子，可随时切回；仅垃圾桶与切换配置才真正删除
+- 取色同时重写中性灰阶（`--heroui-content*`、`--heroui-default-*`），`.text-gradient-primary` 与弹幕流底色渐变改为跟随主色，消除割裂
+- `Backdrop` 改用交叉淡入，修复缓存命中时 `onLoad` 不触发导致图片一直透明
+- 弹幕：未开播不建连接、开播自动接入；空态文案统一居中
+- 账号卡片封面改用原图不压缩，`CachedImage` 补 `referrerPolicy="no-referrer"`，修复 B 站图防盗链导致的失效
+- 桌面窗口最小尺寸 960×720；桌面端把 `/api/*` 挂到 asset server，二进制走 HTTP 传输，绕开 IPC 体积限制
+- 背景上传增加体积与格式校验：超限返回 `413`，非法图片直接报错而不是存成坏文件
+- 设置页页签改为挂载一次后隐藏切换，减少切换卡顿；配置/频道列表样式统一，移除区块说明文案
+- 选人页修复浏览器开发模式下内容被裁切；「开始选人」按钮改为圆角方形
+- 前端依赖新增 `.npmrc`（`legacy-peer-deps`），解决 HeroUI 与 Tailwind 4 的 peer 冲突
+
 ## v1.6.0
 
 界面重构与实时观赛：

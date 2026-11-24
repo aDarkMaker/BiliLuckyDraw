@@ -46,7 +46,9 @@ luckydraw/
 
 ## 主题
 
-深浅色可手动切换（首次跟随系统 `prefers-color-scheme`），背景可选「默认渐变 / 春节 / 假日 / 自定义图片」。主色调由 `theme/accent.ts` 从背景图采样生成整套 `--heroui-primary-*`，没有背景图时用预设色。
+深浅色可手动切换（首次跟随系统 `prefers-color-scheme`），背景可选「默认渐变 / 春节 / 假日 / 自定义图片」。预设有 `src/assets/backgrounds/*.webp` 自动发现，`PRESET_MANIFEST` 补 label 与兜底色。主色调由 `theme/accent.ts` 从背景图采样生成整套 `--heroui-primary-*`，同时按同一色相重写中性灰阶与渐变，没有背景图时用预设色。
+
+切换预设只切换显示，不会删除已上传的自定义图，界面里的「自定义」格子可以随时切回。背景图以文件存放在 `~/.luckydraw/backgrounds/`，配置里只留 `file:` 引用；`≤640KB` 的图片原样保存，不做二次重编码。
 
 ## 开发
 

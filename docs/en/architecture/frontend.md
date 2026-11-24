@@ -109,8 +109,8 @@ Image decode is what janks the main thread during danmaku bursts, so it is handl
 `theme/index.tsx` handles two things: light/dark mode and background presets.
 
 - Mode is stored in `localStorage 'luckydraw.mode'`, defaults to `prefers-color-scheme`, and toggles `dark` / `light` on `documentElement.classList`.
-- Presets are stored in `'luckydraw.preset'` as `none` / `spring-festival` / `beach`; a custom image wins. `background = customImage || presetImage(preset)`.
-- `accent.ts` downsamples the background to 48×48 on a canvas, weights hue by saturation and mid-lightness, and generates the whole `--heroui-primary-50…900` ramp. Without a background it falls back to preset hues (344° default, 2° spring-festival, 218° beach).
+- Presets are stored in `'luckydraw.preset'` as `none` / `spring-festival` / `beach`. They are discovered from `src/assets/backgrounds/*.webp`; `PRESET_MANIFEST` only supplies labels and fallback accents, and a `-thumb` suffix yields the thumbnail variant. Whether the custom image is shown is controlled by `customActive`: `background = customActive && customImage ? customImage : presetImage(preset)`. Picking a preset only clears `customActive`, never deletes the upload.
+- `accent.ts` downsamples the background to 48×48 on a canvas, weights hue by saturation and mid-lightness, and generates the whole `--heroui-primary-50…900` ramp. It also rewrites `--heroui-content1…4` and `--heroui-default-50…900` at the same hue with low saturation so neutral ramps and `.text-gradient-primary` follow along. Without a background it falls back to preset hues (344° default, 2° spring-festival, 218° beach). Results are cached for the last 8 sources.
 
 ## i18n
 

@@ -6,9 +6,11 @@
   "words": [
     "assetserver",
     "binaryname",
+    "heroui",
     "macfilename",
     "maxday",
     "minfollower",
+    "mpegurl",
     "Nunito",
     "Pubdate",
     "sneaktower",
@@ -16,6 +18,7 @@
     "topbar",
     "uids",
     "wailsio",
-    "windowsfilename"
+    "windowsfilename",
+    "webp"
   ]
 }

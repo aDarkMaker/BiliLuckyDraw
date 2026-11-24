@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.7.0
+
+Background pipeline rewrite and theme-following accents:
+
+- Backgrounds now live as files at `~/.luckydraw/backgrounds/<profile>.img`; `state.json` no longer embeds data URLs, fixing the `EOF` error and state bloat when switching backgrounds
+- Adaptive compression: jpeg/png/webp up to 640KB are stored verbatim instead of being re-encoded as JPEG, so flat and anime art no longer turns muddy
+- Background reads sniff the MIME type from magic bytes, so a stale `.mime` file cannot produce wrong colors
+- Presets are discovered from `src/assets/backgrounds/*.webp` with a manifest for labels and fallback accents; adding a preset needs no code change, and an optional `-thumb` variant feeds thumbnails and accent sampling
+- Selecting a preset no longer deletes the uploaded custom image: a `customActive` flag plus a "Custom" tile lets you switch back anytime; only the trash button and profile switching delete it
+- Accent extraction now also rewrites the neutral ramps (`--heroui-content*`, `--heroui-default-*`); `.text-gradient-primary` and the danmaku feed gradient follow the accent, removing the jarring mismatch
+- `Backdrop` cross-fades between images, fixing images that stayed transparent when `onLoad` was skipped on cache hits
+- Danmaku: no connection while a room is offline, auto-connect once it goes live; empty states are centered
+- The account card cover uses the original image unscaled; `CachedImage` sets `referrerPolicy="no-referrer"` to fix Bilibili hotlink protection
+- Desktop window minimum size is 960×720; `/api/*` is mounted on the desktop asset server so binary payloads travel over HTTP instead of the size-limited IPC bridge
+- Background uploads are validated: oversized bodies return `413`, non-images error out instead of being stored corrupt
+- Settings tabs mount once and toggle visibility, cutting tab-switch lag; profile and room lists share one style and dropped section blurbs
+- Lottery page no longer clips in browser dev mode; the start button is now a rounded square
+- Added `.npmrc` (`legacy-peer-deps`) to resolve the HeroUI / Tailwind 4 peer conflict
+
 ## v1.6.0
 
 UI rework and live viewing:

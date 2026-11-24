@@ -76,6 +76,39 @@ shasum -a 256 \
 | `luckydraw-amd64-portable.exe` | Windows x64 portable build |
 | `SHA256SUMS.txt` | checksums for the files above |
 
+## Versioning and release
+
+Windows version metadata lives in three places that must be edited by hand (the Wails CLI does not expand `{{.Info.*}}` placeholders here):
+
+| File | Field |
+| --- | --- |
+| `build/config.yml` | `info.version` |
+| `build/windows/info.json` | `fixed.file_version` and every literal under `info.0000` |
+| `build/windows/installer/wails_tools.nsh` | `INFO_PRODUCTVERSION` |
+
+`build/windows/wails.exe.manifest` also hardcodes the version inside `assemblyIdentity`; update it in the same pass.
+
+```bash
+# 1. bump the version (files listed above)
+vim build/config.yml build/windows/info.json build/windows/installer/wails_tools.nsh
+
+# 2. sync the docs
+#    the version table in docs/development/build.md and docs/en/development/build.md
+#    add a section to docs/development/changelog.md and docs/en/development/changelog.md
+
+# 3. repackage; delete the stale syso first or task sees no reason to rebuild
+rm -f wails_windows_amd64.syso
+task windows:package ARCH=amd64
+
+# 4. commit and tag (pushing tags triggers the GitHub Actions Windows build)
+git add -A
+git commit -m "release: v1.7.0"
+git tag -a v1.7.0 -m "v1.7.0"
+git push origin main --tags
+```
+
+For local-only releases, skip `git tag` / `git push --tags` and upload the artifacts in `bin/dist/` directly.
+
 ## Frontend-only build
 
 From `frontend/`:
@@ -96,7 +129,7 @@ npm run build   # tsc && vite build into dist/
 | companyName | aDarkMaker |
 | productName | BiliLuckyDraw |
 | productIdentifier | com.adarkmaker.bililuckydraw |
-| version | 1.6.0 |
+| version | 1.7.0 |
 | copyright | (c) 2025, aDarkMaker |
 
 The `dev_mode` section configures hot reload: ignores `node_modules` / `frontend` / `bin`, watches `*.go` / `*.js` / `*.ts`, debounce 1000ms. When bumping the version, update `build/config.yml` and the version table here.

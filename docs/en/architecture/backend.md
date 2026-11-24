@@ -160,7 +160,8 @@ Every `AppService` method, callable via generated bindings or the matching `/api
 | `WatchDanmaku` / `StopDanmaku` / `GetDanmakuFeed` / `GetEmoteMap` | danmaku | live danmaku panel |
 | `GetRoomInfo` / `GetRoomPlayURL` | room | room metadata and HLS URL |
 | `GetProfiles` / `SwitchProfile` / `CreateProfile` / `DeleteProfile` / `RenameProfile` | profile | profile management |
-| `SaveProfileConfig` / `SetBackgroundImage` / `GetBackgroundImage` | profile | keyword, count, background |
+| `SaveProfileConfig` / `SetBackgroundImage` / `GetBackgroundImage` | profile | keyword, count, background (stored as files) |
+| `SetBackgroundImageBytes` | profile | raw background upload, shared by the desktop and browser paths |
 | `AddWatchedRoom` / `RemoveWatchedRoom` / `GetWatchedRooms` | profile | room management |
 | `GetHistory` / `DeleteHistory` / `DeleteAllHistory` / `ExportHistory` | history | read, delete, export |
 

@@ -27,7 +27,7 @@ BiliLuckyDraw is a desktop app for running lucky draws on Bilibili live streams.
 - **Multiple login methods**: cookie login, Bilibili-app QR-code login (with expired and awaiting-confirmation states)
 - **Multi-profile**: multiple keyword / winner count / rooms / background / history sets, switchable in one click
 - **History and export**: every draw is recorded automatically and exportable as Markdown, per profile
-- **Themes**: light and dark at any time, optional spring-festival and beach backdrops, with the accent sampled from the active image
+- **Themes**: light and dark at any time, optional spring-festival and beach backdrops, with the accent sampled from the active image; a custom upload survives preset switches
 - **Performance**: throttled image pre-decoding, CDN thumbnails and visibility-gated mounting keep the UI responsive during bursts
 
 ## Screenshots

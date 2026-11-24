@@ -100,6 +100,7 @@ luckydraw/
 
 ## 运行期要点
 
-- 单窗口应用，侧栏导航；窄窗口下侧栏变成抽屉。
-- 前端启动时先探测桥接（`/api/lottery/status`），一次性决定后续走 IPC 还是 HTTP。
-- 主题在主色提取完成前使用预设色，读取背景图后通过 canvas 采样覆盖 `--heroui-primary-*` 变量。
+- 单窗口应用，侧栏导航；窄窗口下侧栏变成抽屉。桌面窗口默认 1200×800，最小 960×720。
+- 前端启动时先探测桥接（`/api/lottery/status`），一次性决定后续走 IPC 还是 HTTP。桌面端也把 `/api/*` 挂在 asset server 上，背景上传这类二进制走 HTTP，绕开 IPC 的体积限制。
+- 主题在主色提取完成前使用预设色，读取背景图后通过 canvas 采样覆盖 `--heroui-primary-*`，并同步重写中性灰阶 `--heroui-content*` / `--heroui-default-*`。
+- 背景图以文件形式存放（`~/.luckydraw/backgrounds/`），配置里只保留 `file:` 引用。

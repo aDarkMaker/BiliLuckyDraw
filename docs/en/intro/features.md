@@ -43,8 +43,8 @@ Switching profiles switches the list. Deleting a profile clears its history too,
 ## Appearance
 
 - **Light / dark** — switch manually; the first launch follows the system preference and the choice is remembered.
-- **Backgrounds** — the default gradient, the spring-festival or beach image, or an image you upload.
-- **Accent** — sampled from the active background, then expanded into a full primary ramp, so every page follows one palette.
+- **Backgrounds** — the default gradient, the spring-festival or beach image, or an image you upload. Uploads are kept; picking a preset only changes what is shown and you can switch back to "Custom" at any time.
+- **Accent** — sampled from the active background into a full primary ramp, and the neutral ramps plus gradients are retinted to match, so every page follows one palette.
 - **Language** — built-in 中文 / English switch, Chinese by default.
 
 ## Interaction details

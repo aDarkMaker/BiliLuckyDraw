@@ -100,6 +100,7 @@ luckydraw/
 
 ## Runtime notes
 
-- Single window with sidebar navigation; the sidebar becomes a drawer in narrow windows.
-- On boot the frontend probes the bridge (`/api/lottery/status`) and fixes the transport for the rest of the session.
-- Until the accent is sampled from the background, the theme uses a preset hue; once the image loads, canvas sampling overrides the `--heroui-primary-*` variables.
+- Single window with sidebar navigation; the sidebar becomes a drawer in narrow windows. The desktop window defaults to 1200×800 with a 960×720 minimum.
+- On boot the frontend probes the bridge (`/api/lottery/status`) and fixes the transport for the rest of the session. The desktop build also mounts `/api/*` on the asset server so binary payloads such as background uploads travel over HTTP instead of the size-limited IPC bridge.
+- Until the accent is sampled from the background, the theme uses a preset hue; once the image loads, canvas sampling overrides `--heroui-primary-*` and retints the neutral ramps `--heroui-content*` / `--heroui-default-*`.
+- Backgrounds are stored as files under `~/.luckydraw/backgrounds/`; profiles only keep a `file:` reference.

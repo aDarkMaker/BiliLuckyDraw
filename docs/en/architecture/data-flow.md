@@ -115,8 +115,10 @@ Both payloads are the `ProfileConfig` JSON string.
 | File | Contents |
 | --- | --- |
 | `~/.luckydraw/config.json` | `{Cookie}` |
-| `~/.luckydraw/state.json` | `{Profiles, ActiveProfile}` |
+| `~/.luckydraw/state.json` | `{Profiles, ActiveProfile}`（背景只存 `file:` 引用） |
+| `~/.luckydraw/backgrounds/<profile>.img` | 背景图二进制，另有同名 `.mime` |
 
 - Keyword and winner-count changes are debounced 400ms before `SaveProfileConfig`.
 - Rooms, background, profile CRUD and draw history persist immediately.
+- Backgrounds are files, not JSON: uploads are compressed into `~/.luckydraw/backgrounds/<profile>.img` and the profile stores a `file:<profile>.img` reference. Deleting a profile removes the file. Profiles that still embed data URLs migrate to files on startup.
 - Both files are written with `0600` inside a `0700` directory; the legacy single-profile layout migrates on read.

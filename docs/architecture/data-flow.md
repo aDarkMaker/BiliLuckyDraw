@@ -115,8 +115,10 @@ payload 都是对应 `ProfileConfig` 的 JSON 字符串。
 | 文件 | 内容 |
 | --- | --- |
 | `~/.luckydraw/config.json` | `{Cookie}` |
-| `~/.luckydraw/state.json` | `{Profiles, ActiveProfile}` |
+| `~/.luckydraw/state.json` | `{Profiles, ActiveProfile}`（背景只存 `file:` 引用） |
+| `~/.luckydraw/backgrounds/<profile>.img` | 背景图二进制，另有同名 `.mime` |
 
 - 口令与中选人数变更后 400ms 防抖调用 `SaveProfileConfig`。
 - 频道、背景、配置增删改与开奖历史立即落盘。
+- 背景图不再写进 `state.json`：上传后压缩并落到 `~/.luckydraw/backgrounds/<profile>.img`，配置里只存 `file:<profile>.img` 引用；删除配置会连带删掉对应文件。旧版内嵌 data URL 的配置在启动时自动迁移成文件。
 - 两个文件均以 `0600` 写入，目录 `0700`；旧版单配置格式在读取时自动迁移。

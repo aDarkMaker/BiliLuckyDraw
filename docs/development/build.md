@@ -80,6 +80,39 @@ shasum -a 256 \
 | `luckydraw-amd64-portable.exe` | Windows x64 绿色版 |
 | `SHA256SUMS.txt` | 上述文件的校验和 |
 
+## 版本与发布
+
+Windows 版本信息来自三个需要手工同步的地方（Wails CLI 不会替换 `{{.Info.*}}` 占位符）：
+
+| 文件 | 字段 |
+| --- | --- |
+| `build/config.yml` | `info.version` |
+| `build/windows/info.json` | `fixed.file_version` 与 `info.0000.*` 全部字面值 |
+| `build/windows/installer/wails_tools.nsh` | `INFO_PRODUCTVERSION` |
+
+`build/windows/wails.exe.manifest` 的 `assemblyIdentity` 也写着版本号，改版本时一并更新。
+
+```bash
+# 1. 改版本号（上面列的文件）
+vim build/config.yml build/windows/info.json build/windows/installer/wails_tools.nsh
+
+# 2. 同步文档
+#    docs/development/build.md 与 docs/en/development/build.md 的 version 表
+#    docs/development/changelog.md 与 docs/en/development/changelog.md 增加一节
+
+# 3. 重新打包：先删掉旧的 syso，否则 task 认为无需重建
+rm -f wails_windows_amd64.syso
+task windows:package ARCH=amd64
+
+# 4. 提交与打标签（push 后触发 GitHub Actions 的 Windows 构建）
+git add -A
+git commit -m "release: v1.7.0"
+git tag -a v1.7.0 -m "v1.7.0"
+git push origin main --tags
+```
+
+如果只用本地打包、不走 Actions，跳过 `git tag` / `git push --tags`，直接上传 `bin/dist/` 下的产物即可。
+
 ## 前端单独构建
 
 在 `frontend/` 目录下：
@@ -100,7 +133,7 @@ npm run build   # tsc && vite build，输出到 dist/
 | companyName | aDarkMaker |
 | productName | BiliLuckyDraw |
 | productIdentifier | com.adarkmaker.bililuckydraw |
-| version | 1.6.0 |
+| version | 1.7.0 |
 | copyright | (c) 2025, aDarkMaker |
 
 `dev_mode` 段定义热重载行为：忽略 `node_modules` / `frontend` / `bin` 等目录，监听 `*.go` / `*.js` / `*.ts`，debounce 1000ms。版本号改动需同步 `build/config.yml` 与文档中的版本表。

@@ -109,8 +109,8 @@ features/settings/settings_page.tsx
 `theme/index.tsx` 管两件事：深浅模式与背景预设。
 
 - 模式存 `localStorage 'luckydraw.mode'`，首次按 `prefers-color-scheme` 决定，切换时改 `documentElement.classList` 的 `dark` / `light`。
-- 背景预设存 `'luckydraw.preset'`，取值 `none` / `spring-festival` / `beach`；自定义图片优先级最高。`background = customImage || presetImage(preset)`。
-- `accent.ts` 把背景图缩到 48×48 画进 canvas，按饱和度与亮度加权求主色，生成整套 `--heroui-primary-50…900`。没有背景图时用预设色（默认 344 度，春节 2 度，假日 218 度）。
+- 背景预设存 `'luckydraw.preset'`，取值 `none` / `spring-festival` / `beach`；所有预设由 `src/assets/backgrounds/*.webp` 自动发现，`PRESET_MANIFEST` 只补 label 与兜底色，`-thumb` 后缀作为缩略图变体。是否显示自定义图由 `customActive` 决定：`background = customActive && customImage ? customImage : presetImage(preset)`。切换预设只关掉 `customActive`，不会删除已上传的图。
+- `accent.ts` 把背景图缩到 48×48 画进 canvas，按饱和度与亮度加权求主色，生成整套 `--heroui-primary-50…900`，同时按同一色相低饱和重写 `--heroui-content1…4` 与 `--heroui-default-50…900`，让中性灰阶和 `.text-gradient-primary` 一起跟随。没有背景图时用预设色（默认 344 度，春节 2 度，假日 218 度）。取色结果按源地址缓存最近 8 份。
 
 ## i18n
 

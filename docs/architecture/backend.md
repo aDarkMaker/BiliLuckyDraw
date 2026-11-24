@@ -160,7 +160,8 @@ flowchart LR
 | `WatchDanmaku` / `StopDanmaku` / `GetDanmakuFeed` / `GetEmoteMap` | danmaku | 实时弹幕面板 |
 | `GetRoomInfo` / `GetRoomPlayURL` | room | 房间元信息与 HLS 地址 |
 | `GetProfiles` / `SwitchProfile` / `CreateProfile` / `DeleteProfile` / `RenameProfile` | profile | 配置管理 |
-| `SaveProfileConfig` / `SetBackgroundImage` / `GetBackgroundImage` | profile | 口令、人数、背景 |
+| `SaveProfileConfig` / `SetBackgroundImage` / `GetBackgroundImage` | profile | 口令、人数、背景（背景读写走文件） |
+| `SetBackgroundImageBytes` | profile | 背景二进制直传，桌面与浏览器共用 |
 | `AddWatchedRoom` / `RemoveWatchedRoom` / `GetWatchedRooms` | profile | 频道管理 |
 | `GetHistory` / `DeleteHistory` / `DeleteAllHistory` / `ExportHistory` | history | 历史读取、删除、导出 |
 
