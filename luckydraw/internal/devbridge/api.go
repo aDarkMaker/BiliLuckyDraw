@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 )
 
 var errMissingKey = errors.New("missing qrcode key")
+
+const maxBackgroundBytes = 12 << 20
 
 // API is the subset of the app service that browsers reach over plain HTTP
 // when the Wails IPC bridge is not available (e.g. Cursor's embedded browser).
@@ -21,6 +25,7 @@ type API interface {
 	GetAccountInfo() (string, error)
 	GetBackgroundImage() string
 	SetBackgroundImage(imagePath string) error
+	SetBackgroundImageBytes(raw []byte) error
 	GetWatchedRooms() (string, error)
 	AddWatchedRoom(roomID int) error
 	RemoveWatchedRoom(roomID int) error
@@ -192,10 +197,32 @@ func (t *Transport) handleBackground(rw http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		writeJSON(rw, http.StatusOK, map[string]string{"image": t.api.GetBackgroundImage()})
 	case http.MethodPost:
+		if strings.HasPrefix(r.Header.Get("Content-Type"), "image/") {
+			// LimitReader alone truncates oversized bodies into a corrupt image.
+			if r.ContentLength > maxBackgroundBytes {
+				writeJSON(rw, http.StatusRequestEntityTooLarge, map[string]string{"error": "image too large"})
+				return
+			}
+			raw, err := io.ReadAll(io.LimitReader(r.Body, maxBackgroundBytes+1))
+			if err != nil {
+				writeAPIError(rw, err)
+				return
+			}
+			if len(raw) > maxBackgroundBytes {
+				writeJSON(rw, http.StatusRequestEntityTooLarge, map[string]string{"error": "image too large"})
+				return
+			}
+			if err := t.api.SetBackgroundImageBytes(raw); err != nil {
+				writeAPIError(rw, err)
+				return
+			}
+			writeJSON(rw, http.StatusOK, map[string]bool{"ok": true})
+			return
+		}
 		var body struct {
 			Image string `json:"image"`
 		}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if err := json.NewDecoder(io.LimitReader(r.Body, maxBackgroundBytes*2+1)).Decode(&body); err != nil {
 			writeAPIError(rw, err)
 			return
 		}

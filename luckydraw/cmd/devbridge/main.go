@@ -77,9 +77,12 @@ func (s *standalone) IsLoggedIn() bool                  { return s.auth.IsLogged
 func (s *standalone) GetAccountInfo() (string, error)   { return s.auth.GetAccountInfo() }
 func (s *standalone) GetBackgroundImage() string        { return s.profile.GetBackgroundImage() }
 func (s *standalone) SetBackgroundImage(p string) error { return s.profile.SetBackgroundImage(p) }
-func (s *standalone) GetWatchedRooms() (string, error)  { return s.profile.GetWatchedRooms() }
-func (s *standalone) AddWatchedRoom(id int) error       { return s.profile.AddWatchedRoom(id) }
-func (s *standalone) RemoveWatchedRoom(id int) error    { return s.profile.RemoveWatchedRoom(id) }
+func (s *standalone) SetBackgroundImageBytes(raw []byte) error {
+	return s.profile.SetBackgroundImageBytes(raw)
+}
+func (s *standalone) GetWatchedRooms() (string, error) { return s.profile.GetWatchedRooms() }
+func (s *standalone) AddWatchedRoom(id int) error      { return s.profile.AddWatchedRoom(id) }
+func (s *standalone) RemoveWatchedRoom(id int) error   { return s.profile.RemoveWatchedRoom(id) }
 func (s *standalone) GetRoomInfo(id int) (string, error) {
 	return s.room.GetRoomInfo(id)
 }

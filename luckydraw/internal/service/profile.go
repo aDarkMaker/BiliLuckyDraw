@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -18,7 +19,9 @@ type ProfileService struct {
 }
 
 func NewProfileService(state *config.RuntimeState, statePath string, emitter event.Emitter) *ProfileService {
-	return &ProfileService{state: state, statePath: statePath, emitter: emitter}
+	s := &ProfileService{state: state, statePath: statePath, emitter: emitter}
+	s.migrateInlineBackgrounds()
+	return s
 }
 
 func (s *ProfileService) ActiveProfile() *config.ProfileConfig {
@@ -31,8 +34,12 @@ func (s *ProfileService) GetProfiles() (string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	profiles := make([]config.ProfileConfig, len(s.state.Profiles))
+	for i, profile := range s.state.Profiles {
+		profiles[i] = publicProfile(profile)
+	}
 	result := map[string]interface{}{
-		"profiles":       s.state.Profiles,
+		"profiles":       profiles,
 		"active_profile": s.state.ActiveProfile,
 	}
 	data, _ := json.Marshal(result)
@@ -59,7 +66,11 @@ func (s *ProfileService) SwitchProfile(id string) (string, error) {
 		return "", err
 	}
 
-	profile := s.state.GetActiveProfile()
+	active := s.state.GetActiveProfile()
+	if active == nil {
+		return "", fmt.Errorf("没有活跃的配置喵")
+	}
+	profile := publicProfile(*active)
 	profileData, _ := json.Marshal(profile)
 	if s.emitter != nil {
 		s.emitter.Emit("profile:switched", string(profileData))
@@ -111,6 +122,7 @@ func (s *ProfileService) DeleteProfile(id string) error {
 		return fmt.Errorf("没有这个配置喵")
 	}
 
+	s.removeBackgroundFile(id)
 	s.state.Profiles = append(s.state.Profiles[:idx], s.state.Profiles[idx+1:]...)
 	if s.state.ActiveProfile == id {
 		s.state.ActiveProfile = s.state.Profiles[0].ID
@@ -154,7 +166,20 @@ func (s *ProfileService) SetBackgroundImage(imagePath string) error {
 	if profile == nil {
 		return fmt.Errorf("没有活跃的配置喵")
 	}
-	profile.BackgroundImage = imagePath
+
+	if imagePath == "" {
+		s.removeBackgroundFile(profile.ID)
+		profile.BackgroundImage = ""
+	} else if strings.HasPrefix(imagePath, "data:") {
+		ref, err := s.writeBackgroundFile(profile.ID, imagePath)
+		if err != nil {
+			return err
+		}
+		profile.BackgroundImage = ref
+	} else {
+		profile.BackgroundImage = imagePath
+	}
+
 	s.state.SetActiveProfile(profile)
 	return config.SaveRuntimeState(s.statePath, s.state)
 }
@@ -167,7 +192,11 @@ func (s *ProfileService) GetBackgroundImage() string {
 	if profile == nil {
 		return ""
 	}
-	return profile.BackgroundImage
+	image := profile.BackgroundImage
+	if strings.HasPrefix(image, bgFilePrefix) {
+		return s.readBackgroundFile(image)
+	}
+	return image
 }
 
 func (s *ProfileService) AddWatchedRoom(roomID int) error {

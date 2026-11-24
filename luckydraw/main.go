@@ -3,7 +3,9 @@ package main
 import (
 	"embed"
 	"log"
+	"net/http"
 	"os"
+	"strings"
 
 	"luckydraw/internal/app"
 	"luckydraw/internal/devbridge"
@@ -19,6 +21,11 @@ var appIcon []byte
 
 func main() {
 	appSvc := app.New()
+	transport := devbridge.New(appSvc)
+	// Mount the JSON API next to the bundled assets so the desktop webview can
+	// move binary payloads over HTTP instead of the size-limited IPC bridge.
+	assetHandler := application.AssetFileServerFS(assets)
+	apiHandler := transport.APIHandler()
 
 	a := application.New(application.Options{
 		Name:        "BiliLuckyDraw",
@@ -27,10 +34,16 @@ func main() {
 			application.NewService(appSvc),
 		},
 		Assets: application.AssetOptions{
-			Handler: application.AssetFileServerFS(assets),
+			Handler: http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+				if strings.HasPrefix(r.URL.Path, "/api/") {
+					apiHandler.ServeHTTP(rw, r)
+					return
+				}
+				assetHandler.ServeHTTP(rw, r)
+			}),
 		},
 		Icon:      appIcon,
-		Transport: devbridge.New(appSvc),
+		Transport: transport,
 		Mac: application.MacOptions{
 			// Keep the process (and the browser bridge) alive while Vite is attached.
 			ApplicationShouldTerminateAfterLastWindowClosed: os.Getenv("FRONTEND_DEVSERVER_URL") == "",
@@ -41,6 +54,8 @@ func main() {
 		Title:            "BiliLuckyDraw",
 		Width:            1200,
 		Height:           800,
+		MinWidth:         960,
+		MinHeight:        720,
 		URL:              "/",
 		BackgroundColour: application.NewRGB(255, 255, 255),
 	})

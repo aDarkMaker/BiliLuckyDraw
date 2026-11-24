@@ -28,6 +28,10 @@ func (a *AppService) SetBackgroundImage(imagePath string) error {
 	return a.profile.SetBackgroundImage(imagePath)
 }
 
+func (a *AppService) SetBackgroundImageBytes(raw []byte) error {
+	return a.profile.SetBackgroundImageBytes(raw)
+}
+
 func (a *AppService) GetBackgroundImage() string {
 	return a.profile.GetBackgroundImage()
 }
