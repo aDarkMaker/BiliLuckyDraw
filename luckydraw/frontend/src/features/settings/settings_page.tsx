@@ -11,6 +11,7 @@ import { useApp } from '@/contexts/app';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/theme';
 import { errorMessage } from '@/utils/json';
+import { prepareBackground } from '@/utils/image';
 
 type TabKey = 'account' | 'appearance' | 'lottery' | 'history';
 
@@ -26,13 +27,28 @@ export const SettingsPage: React.FC = () => {
 	const { applyBackground, notify } = useApp();
 	const { customImage, setCustomImage, setPreset } = useTheme();
 	const [tab, setTab] = useState<TabKey>('account');
+	const [mounted, setMounted] = useState<TabKey[]>(['account']);
 
-	const selectImage = async (dataUrl: string) => {
+	const open = (key: TabKey) => {
+		setTab(key);
+		setMounted((prev) => (prev.includes(key) ? prev : [...prev, key]));
+	};
+
+	const selectImage = async (dataUrl: string, blob?: Blob) => {
 		try {
-			await applyBackground(dataUrl);
+			await applyBackground(dataUrl, blob);
 			setCustomImage(dataUrl);
 			setPreset('none');
 			notify(t('settings.toast.backgroundSet'));
+		} catch (error) {
+			notify(t('settings.toast.backgroundFailed', { error: errorMessage(error) }));
+		}
+	};
+
+	const selectFile = async (file: File) => {
+		try {
+			const prepared = await prepareBackground(file);
+			await selectImage(prepared.dataUrl, prepared.blob);
 		} catch (error) {
 			notify(t('settings.toast.backgroundFailed', { error: errorMessage(error) }));
 		}
@@ -48,12 +64,25 @@ export const SettingsPage: React.FC = () => {
 		}
 	};
 
+	const panels: Record<TabKey, React.ReactNode> = {
+		account: <AccountSection />,
+		appearance: <AppearanceSection customImage={customImage} onClearImage={clearImage} onPickFile={selectFile} />,
+		lottery: (
+			<div className="flex flex-col gap-3">
+				<ProfilesSection />
+				<RoomsSection />
+			</div>
+		),
+		history: <HistorySection />,
+	};
+
 	return (
 		<div className="mx-auto grid w-full max-w-[68rem] gap-3 md:grid-cols-[13rem_minmax(0,1fr)] md:items-start">
 			<nav className="surface flex h-fit flex-row gap-1 overflow-x-auto rounded-large p-1.5 md:flex-col">
 				{TABS.map((item) => (
 					<button
 						key={item.key}
+						aria-current={tab === item.key ? 'page' : undefined}
 						className={clsx(
 							'flex h-9 flex-1 items-center justify-center gap-2 rounded-medium text-[12.5px] font-medium transition-colors md:flex-none md:justify-start md:px-3',
 							tab === item.key
@@ -61,7 +90,7 @@ export const SettingsPage: React.FC = () => {
 								: 'text-default-500 hover:bg-default-500/10 hover:text-foreground'
 						)}
 						type="button"
-						onClick={() => setTab(item.key)}
+						onClick={() => open(item.key)}
 					>
 						<Icon name={item.icon} size={16} />
 						<span className="hidden sm:inline">{t(item.labelKey)}</span>
@@ -70,15 +99,11 @@ export const SettingsPage: React.FC = () => {
 			</nav>
 
 			<div className="min-w-0">
-				{tab === 'account' && <AccountSection />}
-				{tab === 'appearance' && <AppearanceSection customImage={customImage} onClearImage={clearImage} onSelectImage={selectImage} />}
-				{tab === 'lottery' && (
-					<div className="flex flex-col gap-3">
-						<ProfilesSection />
-						<RoomsSection />
+				{TABS.map((item) => (
+					<div key={item.key} className={clsx(tab !== item.key && 'hidden')}>
+						{mounted.includes(item.key) ? panels[item.key] : null}
 					</div>
-				)}
-				{tab === 'history' && <HistorySection />}
+				))}
 			</div>
 		</div>
 	);

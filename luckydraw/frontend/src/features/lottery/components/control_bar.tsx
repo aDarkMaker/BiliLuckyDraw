@@ -99,7 +99,7 @@ export const ControlBar: React.FC<ControlBarProps> = ({
 
 				<button
 					className={clsx(
-						'flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-5 text-[13.5px] font-semibold outline-none transition duration-150 sm:w-auto',
+						'flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-medium px-5 text-[13.5px] font-semibold outline-none transition duration-150 sm:w-auto',
 						'focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50',
 						primary
 							? 'border border-default-200/70 text-default-600 hover:bg-default-500/10 hover:text-foreground dark:border-white/10 dark:text-default-400'

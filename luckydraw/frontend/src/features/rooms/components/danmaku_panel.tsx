@@ -15,6 +15,7 @@ const NEAR_BOTTOM_PX = 48;
 interface DanmakuPanelProps {
 	roomID: number | null;
 	enabled: boolean;
+	live: boolean;
 }
 
 const DanmakuRow = memo<{ line: DanmakuLine; emotes: Record<string, string> }>(({ line, emotes }) => {
@@ -42,10 +43,10 @@ const DanmakuRow = memo<{ line: DanmakuLine; emotes: Record<string, string> }>((
 });
 DanmakuRow.displayName = 'DanmakuRow';
 
-export const DanmakuPanel = memo<DanmakuPanelProps>(({ roomID, enabled }) => {
+export const DanmakuPanel = memo<DanmakuPanelProps>(({ roomID, enabled, live }) => {
 	const { t } = useI18n();
 	// Owns the feed so incoming lines never re-render the surrounding page.
-	const { lines, watching, emotes } = useDanmakuFeed(roomID, enabled);
+	const { lines, watching, emotes } = useDanmakuFeed(roomID, enabled, live);
 	const scroller = useRef<HTMLDivElement>(null);
 	const stick = useRef(true);
 	const frame = useRef<number | null>(null);
@@ -100,9 +101,13 @@ export const DanmakuPanel = memo<DanmakuPanelProps>(({ roomID, enabled }) => {
 				icon={<Icon name="chat" size={16} />}
 				title={t('lottery.danmaku.title')}
 				extra={
-					<span className="font-a61 truncate text-[11px] text-default-400">
-						{!roomID ? t('lottery.danmaku.noRoom') : watching ? t('lottery.danmaku.live') : t('lottery.danmaku.connecting')}
-					</span>
+					roomID && live ? (
+						<span className="font-a61 truncate text-[11px] text-default-400">
+							{watching ? t('lottery.danmaku.live') : t('lottery.danmaku.connecting')}
+						</span>
+					) : !roomID ? (
+						<span className="font-a61 truncate text-[11px] text-default-400">{t('lottery.danmaku.noRoom')}</span>
+					) : null
 				}
 			/>
 			<PanelBody className="flex min-h-0 flex-1 flex-col !p-0">
@@ -118,9 +123,18 @@ export const DanmakuPanel = memo<DanmakuPanelProps>(({ roomID, enabled }) => {
 						else armIdle();
 					}}
 				>
-					{!roomID && <p className="py-6 text-center text-[12px] text-default-400">{t('lottery.danmaku.emptyRoom')}</p>}
-					{roomID && lines.length === 0 && (
-						<p className="py-6 text-center text-[12px] text-default-400">
+					{!roomID && (
+						<p className="font-a61 flex h-full items-center justify-center text-[12px] text-default-400">
+							{t('lottery.danmaku.emptyRoom')}
+						</p>
+					)}
+					{roomID && !live && (
+						<p className="font-a61 flex h-full items-center justify-center text-[12px] text-default-400">
+							{t('lottery.danmaku.offline')}
+						</p>
+					)}
+					{roomID && live && lines.length === 0 && (
+						<p className="font-a61 flex h-full items-center justify-center text-[12px] text-default-400">
 							{watching ? t('lottery.danmaku.waiting') : t('lottery.danmaku.connecting')}
 						</p>
 					)}

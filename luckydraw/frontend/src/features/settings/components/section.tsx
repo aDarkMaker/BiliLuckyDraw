@@ -4,19 +4,17 @@ import clsx from 'clsx';
 interface SectionProps {
 	icon?: React.ReactNode;
 	title: string;
-	description?: string;
 	action?: React.ReactNode;
 	children: React.ReactNode;
 }
 
-export const Section: React.FC<SectionProps> = ({ icon, title, description, action, children }) => (
+export const Section: React.FC<SectionProps> = ({ icon, title, action, children }) => (
 	<section className="surface rounded-large">
 		<div className="px-4 pt-4">
 			<div className="flex items-center gap-2">
 				{icon && <span className="inline-flex shrink-0 text-primary">{icon}</span>}
 				<h2 className="shrink-0 text-[14px] font-semibold leading-none text-foreground">{title}</h2>
-				{description && <p className="min-w-0 flex-1 truncate text-[11.5px] leading-none text-default-400">{description}</p>}
-				{!description && <div className="min-w-0 flex-1" />}
+				<div className="min-w-0 flex-1" />
 				{action}
 			</div>
 		</div>

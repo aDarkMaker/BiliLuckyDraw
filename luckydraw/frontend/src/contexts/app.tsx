@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 
 import { useLottery } from '@/features/lottery/useLottery';
@@ -22,9 +22,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 	const { setCustomImage } = useTheme();
 	const session = useSession();
 	const profiles = useProfiles(session.loggedIn);
+	const lastImage = useRef('');
 
 	useEffect(() => {
-		setCustomImage(profiles.backgroundImage || '');
+		const next = profiles.backgroundImage;
+		if (next) setCustomImage(next);
+		else if (lastImage.current) setCustomImage('');
+		lastImage.current = next;
 	}, [profiles.backgroundImage, setCustomImage]);
 
 	const notify = useCallback((message: string) => {

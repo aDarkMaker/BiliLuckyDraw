@@ -74,6 +74,16 @@ export const CachedImage: React.FC<CachedImageProps> = ({ src, thumb, wide, eage
 		return () => observer.disconnect();
 	}, [url, mounted]);
 
+	// Browser may finish before onLoad attaches (disk cache) — keep fade from sticking at 0.
+	useEffect(() => {
+		if (!fade || !mounted || !url || ready) return;
+		const el = holder.current;
+		if (el?.complete && el.naturalWidth > 0) {
+			markDecoded(url);
+			setReady(true);
+		}
+	}, [fade, mounted, url, ready]);
+
 	if (!url) return null;
 
 	return (
@@ -85,6 +95,7 @@ export const CachedImage: React.FC<CachedImageProps> = ({ src, thumb, wide, eage
 			draggable={false}
 			fetchPriority={eager ? 'high' : 'low'}
 			loading={eager ? 'eager' : 'lazy'}
+			referrerPolicy="no-referrer"
 			src={mounted ? url : undefined}
 			onLoad={(event) => {
 				markDecoded(url);

@@ -54,10 +54,10 @@ export const PrimaryButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElemen
 	<button
 		{...rest}
 		className={clsx(
-			'flex items-center justify-center gap-2 rounded-full bg-primary text-[13px] font-semibold text-primary-foreground',
+			'flex items-center justify-center gap-2 rounded-medium bg-primary text-[13px] font-semibold text-primary-foreground',
 			focusRing,
-			'shadow-[0_14px_30px_-18px_hsl(var(--heroui-primary)/0.95)] transition duration-150',
-			'hover:-translate-y-px active:translate-y-0 disabled:translate-y-0 disabled:opacity-50',
+			'shadow-[0_14px_30px_-18px_hsl(var(--heroui-primary)/0.95)] transition-colors duration-150',
+			'hover:bg-primary-500 disabled:opacity-50',
 			className
 		)}
 		type="button"

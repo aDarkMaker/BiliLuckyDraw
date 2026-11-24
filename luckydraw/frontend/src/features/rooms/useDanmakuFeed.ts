@@ -7,7 +7,7 @@ import type { DanmakuLine } from '@/types';
 const maxLines = 120;
 const maxPreloadPerBatch = 6;
 
-export const useDanmakuFeed = (roomID: number | null, enabled: boolean) => {
+export const useDanmakuFeed = (roomID: number | null, enabled: boolean, live: boolean) => {
 	const [lines, setLines] = useState<DanmakuLine[]>([]);
 	const [watching, setWatching] = useState(false);
 	const [emotes, setEmotes] = useState<Record<string, string>>({});
@@ -17,7 +17,7 @@ export const useDanmakuFeed = (roomID: number | null, enabled: boolean) => {
 	const flush = useRef<number | null>(null);
 
 	useEffect(() => {
-		if (!enabled) return;
+		if (!enabled || !live) return;
 		let cancelled = false;
 		void danmakuApi
 			.emotes()
@@ -28,10 +28,10 @@ export const useDanmakuFeed = (roomID: number | null, enabled: boolean) => {
 		return () => {
 			cancelled = true;
 		};
-	}, [enabled]);
+	}, [enabled, live]);
 
 	useEffect(() => {
-		if (!enabled || !roomID) {
+		if (!enabled || !roomID || !live) {
 			roomRef.current = null;
 			cursor.current = 0;
 			queue.current = [];
@@ -68,7 +68,11 @@ export const useDanmakuFeed = (roomID: number | null, enabled: boolean) => {
 		const boot = async () => {
 			try {
 				await danmakuApi.watch(roomID);
-				if (!cancelled && roomRef.current === roomID) setWatching(true);
+				if (cancelled || roomRef.current !== roomID) {
+					void danmakuApi.stop().catch(() => {});
+					return;
+				}
+				setWatching(true);
 			} catch {
 				if (!cancelled && roomRef.current === roomID) setWatching(false);
 			}
@@ -101,7 +105,7 @@ export const useDanmakuFeed = (roomID: number | null, enabled: boolean) => {
 				void danmakuApi.stop().catch(() => {});
 			}
 		};
-	}, [enabled, roomID]);
+	}, [enabled, roomID, live]);
 
 	return useMemo(() => ({ lines, watching, emotes }), [lines, watching, emotes]);
 };

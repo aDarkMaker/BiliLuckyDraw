@@ -62,10 +62,12 @@ export const LotteryPage: React.FC = () => {
 	];
 
 	return (
-		<div className="mx-auto flex w-full max-w-[72rem] flex-col gap-3 pb-1 lg:h-full">
+		<div className="mx-auto flex w-full max-w-[72rem] flex-col gap-3 pb-1 lg:min-h-full">
 			<div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_19rem]">
-				<div className="flex min-h-0 flex-col gap-3 overflow-hidden">
-					<RoomStage room={stageRoom} />
+				<div className="flex min-h-0 flex-col gap-3">
+					<div className="min-h-0 shrink overflow-hidden">
+						<RoomStage room={stageRoom} />
+					</div>
 					<ControlBar
 						connecting={app.connecting}
 						keyword={app.keyword}
@@ -84,7 +86,7 @@ export const LotteryPage: React.FC = () => {
 					)}
 				</div>
 
-				<div className="flex min-h-0 flex-col gap-3 overflow-hidden">
+				<div className="flex min-h-0 flex-col gap-3">
 					<AccountCard account={app.account} emptyLabel={t('settings.account.placeholder')} loggedIn={app.loggedIn} />
 					<RoomList
 						activeRoomID={stageRoomID}
@@ -92,7 +94,7 @@ export const LotteryPage: React.FC = () => {
 						rooms={rooms}
 						onSelect={selectRoom}
 					/>
-					<DanmakuPanel enabled={app.loggedIn} roomID={stageRoomID} />
+					<DanmakuPanel enabled={app.loggedIn} live={stageRoom?.live_status === 1} roomID={stageRoomID} />
 				</div>
 			</div>
 

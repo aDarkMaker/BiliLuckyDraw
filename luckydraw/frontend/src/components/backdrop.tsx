@@ -1,27 +1,87 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import clsx from 'clsx';
 
 import { useTheme } from '@/theme';
 
-/**
- * Ambient backdrop: preset/custom photo with a tone-matched scrim, or the default
- * layered gradient. Lives at z-0 behind the shell content (z-10).
- */
+interface Layer {
+	key: number;
+	src: string;
+	ready: boolean;
+}
+
+const FADE_MS = 320;
+
 export const Backdrop: React.FC = () => {
-	const { background, isDark } = useTheme();
+	const { background, backgroundThumb, isDark } = useTheme();
+	const [layers, setLayers] = useState<Layer[]>(() => (background ? [{ key: 0, src: background, ready: false }] : []));
+	const nextKey = useRef(1);
+
+	useEffect(() => {
+		if (!background) {
+			setLayers((prev) => (prev.length ? [] : prev));
+			return;
+		}
+		setLayers((prev) => {
+			const top = prev[prev.length - 1];
+			if (top?.src === background) return prev;
+			const visible = [...prev].reverse().find((layer) => layer.ready);
+			if (visible?.src === background) return [visible];
+			return [...(visible ? [visible] : []), { key: nextKey.current++, src: background, ready: false }];
+		});
+	}, [background]);
+
+	const markReady = useCallback((key: number) => {
+		setLayers((prev) => {
+			const target = prev.find((layer) => layer.key === key);
+			if (!target || target.ready) return prev;
+			return prev.map((layer) => (layer.key === key ? { ...layer, ready: true } : layer));
+		});
+	}, []);
+
+	useEffect(() => {
+		const top = layers[layers.length - 1];
+		if (layers.length < 2 || !top?.ready) return;
+		const timer = setTimeout(() => {
+			setLayers((prev) => (prev.length > 1 && prev[prev.length - 1].key === top.key ? [prev[prev.length - 1]] : prev));
+		}, FADE_MS);
+		return () => clearTimeout(timer);
+	}, [layers]);
+
+	const topSrc = layers.length ? layers[layers.length - 1].src : '';
+	const thumb = backgroundThumb && backgroundThumb !== topSrc ? backgroundThumb : null;
 
 	return (
 		<div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-background">
 			{background ? (
 				<>
-					<img
-						alt=""
-						className="h-full w-full scale-105 object-cover blur-[2px]"
-						decoding="async"
-						draggable={false}
-						fetchPriority="high"
-						src={background}
-					/>
-					{/* tone-matched scrim: keeps the photo's hue instead of washing it to flat grey */}
+					{thumb && (
+						<img
+							alt=""
+							className="absolute inset-0 h-full w-full scale-105 object-cover blur-md"
+							decoding="async"
+							draggable={false}
+							fetchPriority="high"
+							src={thumb}
+						/>
+					)}
+					{layers.map((layer) => (
+						<img
+							key={layer.key}
+							alt=""
+							className={clsx(
+								'absolute inset-0 h-full w-full scale-105 object-cover blur-[2px] transition-opacity duration-300',
+								layer.ready ? 'opacity-100' : 'opacity-0'
+							)}
+							decoding="async"
+							draggable={false}
+							fetchPriority="high"
+							src={layer.src}
+							ref={(el) => {
+								if (el?.complete && el.naturalWidth > 0) markReady(layer.key);
+							}}
+							onLoad={() => markReady(layer.key)}
+						/>
+					))}
 					<div className="absolute inset-0 bg-[hsl(var(--backdrop-tint)/var(--backdrop-alpha))]" />
 					<div
 						className={

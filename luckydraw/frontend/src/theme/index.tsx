@@ -1,7 +1,7 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { accentForPreset, applyAccent, extractAccent } from './accent';
-import { presetImage, type BackgroundPreset, type ThemeMode } from './presets';
+import { accentForPreset, applyAccent, cachedAccent, extractAccent, type Accent } from './accent';
+import { isBackgroundPreset, presetImage, type BackgroundPreset, type ThemeMode } from './presets';
 
 const MODE_KEY = 'luckydraw.mode';
 const PRESET_KEY = 'luckydraw.preset';
@@ -14,8 +14,7 @@ const readMode = (): ThemeMode => {
 
 const readPreset = (): BackgroundPreset => {
 	const stored = localStorage.getItem(PRESET_KEY);
-	if (stored === 'beach' || stored === 'spring-festival') return stored;
-	return 'none';
+	return stored && isBackgroundPreset(stored) ? stored : 'none';
 };
 
 interface ThemeValue {
@@ -27,7 +26,10 @@ interface ThemeValue {
 	setPreset: (preset: BackgroundPreset) => void;
 	customImage: string;
 	setCustomImage: (image: string) => void;
+	customActive: boolean;
+	setCustomActive: (active: boolean) => void;
 	background: string | null;
+	backgroundThumb: string | null;
 	hasBackground: boolean;
 }
 
@@ -37,6 +39,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 	const [mode, setModeState] = useState<ThemeMode>(readMode);
 	const [preset, setPresetState] = useState<BackgroundPreset>(readPreset);
 	const [customImage, setCustomImageState] = useState('');
+	const [customActive, setCustomActiveState] = useState(false);
+	const lastAccent = useRef<{ src: string; accent: Accent }>({ src: '', accent: accentForPreset('none') });
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', mode === 'dark');
@@ -47,21 +51,39 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 	useEffect(() => {
 		const root = document.documentElement;
-		const background = customImage || presetImage(preset);
-		let cancelled = false;
+		const activeImage = customActive && customImage ? customImage : null;
+		const background = activeImage || presetImage(preset);
+		const thumb = activeImage || presetImage(preset, 'thumb');
+		const src = background ? thumb || background : '';
 
-		if (!background) {
-			applyAccent(root, accentForPreset('none'), mode);
+		if (lastAccent.current.src === src) {
+			applyAccent(root, lastAccent.current.accent, mode);
 			return;
 		}
 
-		void extractAccent(background).then((accent) => {
-			if (!cancelled) applyAccent(root, accent, mode);
+		if (!src) {
+			lastAccent.current = { src, accent: accentForPreset('none') };
+			applyAccent(root, lastAccent.current.accent, mode);
+			return;
+		}
+
+		const cached = cachedAccent(src);
+		if (cached) {
+			lastAccent.current = { src, accent: cached };
+			applyAccent(root, cached, mode);
+			return;
+		}
+
+		let cancelled = false;
+		void extractAccent(src).then((accent) => {
+			if (cancelled) return;
+			lastAccent.current = { src, accent };
+			applyAccent(root, accent, mode);
 		});
 		return () => {
 			cancelled = true;
 		};
-	}, [mode, preset, customImage]);
+	}, [mode, preset, customImage, customActive]);
 
 	const setPreset = useCallback((next: BackgroundPreset) => {
 		setPresetState(next);
@@ -70,10 +92,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 	const setMode = useCallback((next: ThemeMode) => setModeState(next), []);
 	const toggleMode = useCallback(() => setModeState((prev) => (prev === 'dark' ? 'light' : 'dark')), []);
-	const setCustomImage = useCallback((image: string) => setCustomImageState(image), []);
+	const setCustomImage = useCallback((image: string) => {
+		setCustomImageState(image);
+		setCustomActiveState(Boolean(image));
+	}, []);
+	const setCustomActive = useCallback((active: boolean) => setCustomActiveState(active), []);
 
 	const value = useMemo<ThemeValue>(() => {
-		const background = customImage || presetImage(preset);
+		const activeImage = customActive && customImage ? customImage : null;
+		const background = activeImage || presetImage(preset);
 		return {
 			mode,
 			isDark: mode === 'dark',
@@ -83,10 +110,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 			setPreset,
 			customImage,
 			setCustomImage,
+			customActive,
+			setCustomActive,
 			background,
+			backgroundThumb: activeImage || presetImage(preset, 'thumb'),
 			hasBackground: Boolean(background),
 		};
-	}, [mode, setMode, toggleMode, preset, setPreset, customImage, setCustomImage]);
+	}, [mode, setMode, toggleMode, preset, setPreset, customImage, setCustomImage, customActive, setCustomActive]);
 
 	return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
@@ -98,4 +128,4 @@ export const useTheme = (): ThemeValue => {
 };
 
 export type { BackgroundPreset, ThemeMode } from './presets';
-export { BACKGROUND_PRESETS, presetImage } from './presets';
+export { BACKGROUND_PRESETS, PRESET_MANIFEST, isBackgroundPreset, presetImage } from './presets';

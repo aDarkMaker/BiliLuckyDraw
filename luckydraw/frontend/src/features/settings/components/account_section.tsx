@@ -28,19 +28,19 @@ export const AccountSection: React.FC = () => {
 						<CachedImage
 							aria-hidden
 							alt=""
-							className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-2xl"
-							fade={false}
+							className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-lg"
+							eager
 							src={account.top_photo}
-							wide={192}
+							wide={64}
 						/>
 					) : (
 						<div aria-hidden className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-transparent" />
 					)}
 					<div aria-hidden className="absolute inset-0 bg-gradient-to-b from-transparent via-[hsl(var(--surface)/0.35)] to-[hsl(var(--surface)/0.92)]" />
 
-					<div className="relative overflow-hidden">
+					<div className="relative overflow-hidden bg-default-500/10">
 						{loggedIn && account?.top_photo ? (
-							<CachedImage alt="" className="absolute inset-0 h-full w-full object-cover" eager fade={false} src={account.top_photo} wide={384} />
+							<CachedImage alt="" className="absolute inset-0 h-full w-full object-cover" eager src={account.top_photo} />
 						) : (
 							<div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-secondary/15 to-default-200/30" />
 						)}

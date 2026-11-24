@@ -99,7 +99,7 @@
 	}
 
 	.text-gradient-primary {
-		background-image: linear-gradient(135deg, #fb7299 0%, #fc8fb0 45%, #00aeec 130%);
+		background-image: linear-gradient(135deg, hsl(var(--heroui-primary-600)) 0%, hsl(var(--heroui-primary-400)) 45%, hsl(var(--heroui-focus)) 130%);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -120,6 +120,7 @@
 
 	.danmaku-feed {
 		background-color: hsl(var(--heroui-content2) / 0.55);
+		background-image: linear-gradient(to bottom, hsl(var(--heroui-primary) / 0.07), transparent 55%);
 		-webkit-mask-image: linear-gradient(to bottom, transparent, #000 1.35rem, #000 100%);
 		mask-image: linear-gradient(to bottom, transparent, #000 1.35rem, #000 100%);
 		scrollbar-width: none;

@@ -24,8 +24,8 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({ running, connecting, p
 			: t('lottery.idle');
 
 	return (
-		<Panel className="flex min-h-[11rem] flex-1 flex-col items-center justify-center overflow-hidden">
-			<div className="relative flex w-full flex-1 flex-col items-center justify-center gap-3 px-4 py-7">
+		<Panel className="flex min-h-[9rem] shrink-0 flex-col items-center justify-center overflow-hidden lg:min-h-0 lg:flex-1">
+			<div className="relative flex w-full flex-1 flex-col items-center justify-center gap-2 px-4 py-5">
 				<div className="pointer-events-none absolute inset-x-0 top-1/2 -z-0 h-36 -translate-y-1/2 bg-[radial-gradient(ellipse_at_center,hsl(var(--heroui-primary)/0.14),transparent_70%)]" />
 
 				<div className="z-10 flex flex-col items-center gap-2">
